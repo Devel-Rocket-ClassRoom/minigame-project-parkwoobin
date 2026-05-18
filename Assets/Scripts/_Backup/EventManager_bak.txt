@@ -1,0 +1,28 @@
+using UnityEngine;
+using UnityEngine.Events;
+
+public class EventManager : MonoBehaviour
+{
+    public static EventManager Instance { get; private set; }
+
+    public static UnityAction<string> OnEventTriggered;
+    public static UnityAction<string> OnEventResolved;
+
+    void Awake()
+    {
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+    }
+
+    public void TriggerEvent(string eventId)
+    {
+        OnEventTriggered?.Invoke(eventId);
+    }
+
+    public void ResolveEvent(string eventId, bool success)
+    {
+        OnEventResolved?.Invoke(eventId);
+        if (success)
+            ScoreManager.Instance?.AddScore(ScoreManager.SOLVE_EVENT);
+    }
+}

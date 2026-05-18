@@ -1,0 +1,29 @@
+using UnityEngine;
+
+public class HealthSystem : MonoBehaviour
+{
+    PlayerStats _stats;
+    bool _isDead;
+
+    void Awake() { _stats = GetComponent<PlayerStats>(); }
+
+    void Start()    { PlayerStats.OnDeath += HandleDeath; }
+    void OnDestroy(){ PlayerStats.OnDeath -= HandleDeath; }
+
+    public void TakeDamage(float amount)
+    {
+        if (_isDead) return;
+        _stats.ModifyHealth(-amount);
+        // TODO: _anim?.SetHurt(true)
+    }
+
+    public void Heal(float amount) { _stats.ModifyHealth(amount); }
+
+    void HandleDeath()
+    {
+        if (_isDead) return;
+        _isDead = true;
+        GameManager.Instance?.GameOver();
+        SaveManager.Instance?.SaveGame();
+    }
+}

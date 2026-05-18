@@ -1,0 +1,87 @@
+using UnityEngine;
+
+[RequireComponent(typeof(Rigidbody2D))]
+public abstract class EnemyBase : MonoBehaviour
+{
+    [Header("Detection")]
+    [SerializeField] protected float detectionRange = 4f;
+    [SerializeField] protected float loseRange      = 8f;
+
+    [Header("Movement")]
+    [SerializeField] protected float patrolSpeed = 1.5f;
+    [SerializeField] protected float chaseSpeed  = 3.5f;
+
+    [Header("Combat")]
+    [SerializeField] protected float damage        = 10f;
+    [SerializeField] protected float attackRange   = 0.6f;
+    [SerializeField] protected float attackCooldown = 1f;
+
+    protected Rigidbody2D Rb;
+    protected Transform Player;
+    protected bool IsChasing;
+    float _attackTimer;
+
+    protected enum EnemyState { Patrol, Chase, Attack, Return }
+    protected EnemyState State = EnemyState.Patrol;
+
+    protected virtual void Awake()
+    {
+        Rb = GetComponent<Rigidbody2D>();
+        var playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj) Player = playerObj.transform;
+    }
+
+    protected virtual void Update()
+    {
+        if (!GameManager.Instance.IsPlaying) return;
+        if (Player == null) return;
+
+        float dist = Vector2.Distance(transform.position, Player.position);
+
+        if (!IsChasing && dist < detectionRange)
+            OnDetectPlayer();
+        else if (IsChasing && dist > loseRange)
+            OnLosePlayer();
+
+        _attackTimer -= Time.deltaTime;
+        UpdateBehaviour(dist);
+    }
+
+    protected abstract void UpdateBehaviour(float distToPlayer);
+
+    protected virtual void OnDetectPlayer()
+    {
+        IsChasing = true;
+        State     = EnemyState.Chase;
+    }
+
+    protected virtual void OnLosePlayer()
+    {
+        IsChasing = false;
+        State     = EnemyState.Patrol;
+    }
+
+    protected void TryAttackPlayer(float dist)
+    {
+        if (dist > attackRange || _attackTimer > 0f) return;
+        _attackTimer = attackCooldown;
+        Player.GetComponent<HealthSystem>()?.TakeDamage(damage);
+    }
+
+    protected void MoveTowards(Vector2 target, float speed)
+    {
+        Vector2 dir = ((Vector2)target - (Vector2)transform.position).normalized;
+        Rb.linearVelocity = new Vector2(dir.x * speed, Rb.linearVelocity.y);
+
+        if (dir.x < 0) transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, 1);
+        else            transform.localScale = new Vector3( Mathf.Abs(transform.localScale.x), transform.localScale.y, 1);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, loseRange);
+    }
+}

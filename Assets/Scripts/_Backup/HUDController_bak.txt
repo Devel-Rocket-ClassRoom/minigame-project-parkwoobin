@@ -1,0 +1,30 @@
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class HUDController : MonoBehaviour
+{
+    [Header("Bars")]
+    [SerializeField] Slider healthBar;
+    [SerializeField] Slider hungerBar;
+    [SerializeField] Slider expBar;
+    [SerializeField] Slider feverBar;
+
+    [Header("Labels")]
+    [SerializeField] TMP_Text scoreText;
+    [SerializeField] TMP_Text moneyText;
+    [SerializeField] GameObject dangerAlert;
+
+    void Start()
+    {
+        PlayerStats.OnHealthChanged += v => healthBar?.SetValueWithoutNotify(v);
+        PlayerStats.OnHungerChanged += v => hungerBar?.SetValueWithoutNotify(v);
+        PlayerStats.OnExpChanged    += v => expBar?.SetValueWithoutNotify((float)v / 100f);
+        PlayerStats.OnFeverChanged  += v => feverBar?.SetValueWithoutNotify(v);
+        PlayerStats.OnMoneyChanged  += v => moneyText.text  = $"${v}";
+        ScoreManager.OnScoreChanged += v => scoreText.text  = $"{v}";
+        FeverManager.OnFeverChanged += on => feverBar?.gameObject.SetActive(on);
+    }
+
+    public void ShowDanger(bool show) => dangerAlert?.SetActive(show);
+}

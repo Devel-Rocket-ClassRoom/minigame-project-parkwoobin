@@ -1,0 +1,41 @@
+using UnityEngine;
+
+public class UIManager : MonoBehaviour
+{
+    public static UIManager Instance { get; private set; }
+
+    [Header("Screens")]
+    [SerializeField] GameObject hudScreen;
+    [SerializeField] GameObject pauseScreen;
+    [SerializeField] GameObject stageClearScreen;
+    [SerializeField] GameObject gameOverScreen;
+
+    void Awake()
+    {
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+    }
+
+    void Start()
+    {
+        GameManager.OnStateChanged += OnGameStateChanged;
+    }
+
+    void OnDestroy()
+    {
+        GameManager.OnStateChanged -= OnGameStateChanged;
+    }
+
+    void OnGameStateChanged(GameManager.GameState state)
+    {
+        hudScreen?.SetActive(state == GameManager.GameState.Playing);
+        pauseScreen?.SetActive(state == GameManager.GameState.Paused);
+        stageClearScreen?.SetActive(state == GameManager.GameState.StageClear);
+        gameOverScreen?.SetActive(state == GameManager.GameState.GameOver);
+    }
+
+    public void ShowHUD()        => hudScreen?.SetActive(true);
+    public void ShowPause()      => pauseScreen?.SetActive(true);
+    public void ShowStageClear() => stageClearScreen?.SetActive(true);
+    public void ShowGameOver()   => gameOverScreen?.SetActive(true);
+}
