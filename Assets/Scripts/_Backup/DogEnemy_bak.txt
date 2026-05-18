@@ -1,0 +1,36 @@
+using UnityEngine;
+
+public class DogEnemy : EnemyBase
+{
+    [SerializeField] float barkCooldown = 3f;
+    float _barkTimer;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        chaseSpeed     *= 1.3f;
+        detectionRange *= 1.2f;
+    }
+
+    protected override void UpdateBehaviour(float distToPlayer)
+    {
+        _barkTimer -= Time.deltaTime;
+
+        switch (State)
+        {
+            case EnemyState.Patrol:
+                Rb.linearVelocity = Vector2.zero;
+                break;
+
+            case EnemyState.Chase:
+                MoveTowards(Player.position, chaseSpeed);
+                TryAttackPlayer(distToPlayer);
+                if (_barkTimer <= 0f)
+                {
+                    _barkTimer = barkCooldown;
+                    // TODO: play bark sound
+                }
+                break;
+        }
+    }
+}

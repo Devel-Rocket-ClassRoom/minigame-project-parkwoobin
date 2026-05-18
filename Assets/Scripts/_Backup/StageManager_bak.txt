@@ -1,0 +1,45 @@
+using UnityEngine;
+using UnityEngine.Events;
+
+public class StageManager : MonoBehaviour
+{
+    public static StageManager Instance { get; private set; }
+
+    [Header("Stage Config")]
+    [SerializeField] StageData[] stages;
+    [SerializeField] int currentStageIndex = 0;
+
+    public StageData CurrentStage      => stages[currentStageIndex];
+    public int       CurrentStageIndex => currentStageIndex;
+
+    public static UnityAction<int> OnStageLoaded;
+    public static UnityAction      OnStageClear;
+
+    void Awake()
+    {
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public void LoadStage(int index)
+    {
+        if (index < 0 || index >= stages.Length) return;
+        currentStageIndex = index;
+        OnStageLoaded?.Invoke(currentStageIndex);
+    }
+
+    public void CompleteStage()
+    {
+        SaveManager.Instance?.SaveGame();
+        OnStageClear?.Invoke();
+        GameManager.Instance?.StageClear();
+    }
+
+    public void LoadNextStage()
+    {
+        int next = currentStageIndex + 1;
+        if (next < stages.Length) LoadStage(next);
+        else Debug.Log("All stages complete!");
+    }
+}

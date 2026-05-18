@@ -1,0 +1,54 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+
+[CreateAssetMenu(fileName = "MapData", menuName = "CatGame/Map Data")]
+public class MapData : ScriptableObject
+{
+    [Header("기본 정보")]
+    public string mapName;
+    public int    stageIndex;
+    [TextArea(3, 5)] public string description;
+
+    [Header("타일 레이아웃 (위 행 = 높은 y값)")]
+    public string[] rows;
+
+    [Header("맵 오프셋")]
+    public Vector2Int originOffset = Vector2Int.zero;
+
+    [Header("타일 에셋")]
+    public TileBase groundTile;
+    public TileBase undergroundTile;
+    public TileBase wallTile;
+    public TileBase boxTile;
+    public TileBase fenceTile;
+    public TileBase platformTile;
+
+    [Header("패럴랙스 배경 이미지")]
+    public Sprite skyBackground;
+    public Sprite midBackground;
+    public Sprite nearBackground;
+
+    [Header("스폰 포인트")]
+    public List<SpawnPoint> spawnPoints = new List<SpawnPoint>();
+
+    [Header("맵 경계")]
+    public float leftBound  = -2f;
+    public float rightBound = 80f;
+}
+
+public enum SpawnType
+{
+    Player, PersonEnemy, CatEnemy, DogEnemy,
+    FoodItem, MoneyItem, TutorialSign, StageGoal
+}
+
+[System.Serializable]
+public class SpawnPoint
+{
+    public SpawnType type;
+    public Vector2   worldPos;
+    [Tooltip("PersonEnemy: 순찰 반경, FoodItem: 아이템 종류 ID")]
+    public float     param = 0f;
+    public string    label;
+}

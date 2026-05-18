@@ -1,21 +1,27 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// 현재 게임 상태가 프롤로그인지, 플레이 중인지, 일시정지인지, 스테이지 클리어인지, 게임 오버인지 관리하는 스크립트
+/// </summary>
+
 public class GameManager : MonoBehaviour
 {
+    // 다른 스크립트에서 GameManager.Instance로 접근 가능하도록 싱글톤 패턴 구현
     public static GameManager Instance { get; private set; }
 
+    // 게임 상태 열거형 정의
     public enum GameState { Prologue, Playing, Paused, StageClear, GameOver }
 
     public GameState CurrentState { get; private set; }
 
-    public static UnityAction<GameState> OnStateChanged;
+    public static UnityAction<GameState> OnStateChanged;    // 다른 스크립트에서 게임 상태 변경 이벤트를 구독해서 상태 변화를 알 수 있음
 
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject);  // 씬이 바뀌어도 GameManager가 파괴되지 않도록 설정
     }
 
     void Start()
@@ -26,14 +32,14 @@ public class GameManager : MonoBehaviour
     public void ChangeState(GameState next)
     {
         CurrentState = next;
-        OnStateChanged?.Invoke(next);
+        OnStateChanged?.Invoke(next);   // 상태 변경 이벤트 호출
     }
 
-    public void StartGame()  => ChangeState(GameState.Playing);
-    public void PauseGame()  => ChangeState(GameState.Paused);
+    public void StartGame() => ChangeState(GameState.Playing);
+    public void PauseGame() => ChangeState(GameState.Paused);
     public void ResumeGame() => ChangeState(GameState.Playing);
     public void StageClear() => ChangeState(GameState.StageClear);
-    public void GameOver()   => ChangeState(GameState.GameOver);
+    public void GameOver() => ChangeState(GameState.GameOver);
 
-    public bool IsPlaying => CurrentState == GameState.Playing;
+    public bool IsPlaying => CurrentState == GameState.Playing; // 현재 게임이 플레이 중인지 여부
 }
