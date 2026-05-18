@@ -11,10 +11,10 @@ public class ParallaxBackground : MonoBehaviour
     [System.Serializable]
     public class Layer
     {
-        public Transform  target;          // 레이어 오브젝트
+        public Transform target;          // 레이어 오브젝트
         [Range(0f, 1f)]
-        public float      parallaxFactor;  // 0=완전 고정, 1=카메라와 같이 이동
-        public bool       repeatX = true;  // X 방향 무한 반복
+        public float parallaxFactor;  // 0=완전 고정, 1=카메라와 같이 이동
+        public bool repeatX = true;  // X 방향 무한 반복
         [HideInInspector] public float spriteWidth;
         [HideInInspector] public float startX;
     }
@@ -22,7 +22,7 @@ public class ParallaxBackground : MonoBehaviour
     [SerializeField] Layer[] layers;
 
     Camera _cam;
-    float  _prevCamX;
+    float _prevCamX;
 
     void Awake()
     {
@@ -65,7 +65,7 @@ public class ParallaxBackground : MonoBehaviour
                 {
                     float offset = relX > 0
                         ? -layer.spriteWidth
-                        :  layer.spriteWidth;
+                        : layer.spriteWidth;
                     layer.target.position += new Vector3(offset, 0f, 0f);
                 }
             }
