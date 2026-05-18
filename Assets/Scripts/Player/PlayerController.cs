@@ -196,39 +196,42 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// 개발용 테스트 키 입력.
+    /// 개발용 테스트 키 입력 — Unity Input System API 사용 (레거시 Input 미사용).
     /// 완성 후 이 메서드 제거 또는 #if UNITY_EDITOR 로 감싸면 됨.
     /// </summary>
     void HandleTestInput()
     {
+        var kb = UnityEngine.InputSystem.Keyboard.current;
+        if (kb == null) return;
+
         // S — 스틸 모션
-        if (Input.GetKeyDown(KeyCode.S))
+        if (kb.sKey.wasPressedThisFrame)
             _anim?.TriggerSteal();
 
         // H — 배고픈 모션 토글
-        if (Input.GetKeyDown(KeyCode.H))
+        if (kb.hKey.wasPressedThisFrame)
         {
             _testHungry = !_testHungry;
             _anim?.SetHungry(_testHungry);
         }
 
         // T — 던지기 모션 (animResetTime 후 자동 복귀)
-        if (Input.GetKeyDown(KeyCode.T))
+        if (kb.tKey.wasPressedThisFrame)
         {
             _anim?.SetThrow(true);
             _throwTimer = animResetTime;
         }
 
         // Q — 공격 모션
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (kb.qKey.wasPressedThisFrame)
             _anim?.TriggerFight();
 
         // Shift — Turn/Spin 모션
-        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+        if (kb.leftShiftKey.wasPressedThisFrame || kb.rightShiftKey.wasPressedThisFrame)
             _anim?.TriggerTurn();
 
         // G — 피격 모션 (animResetTime 후 자동 복귀)
-        if (Input.GetKeyDown(KeyCode.G))
+        if (kb.gKey.wasPressedThisFrame)
         {
             _anim?.SetHurt(true);
             _hurtTimer = animResetTime;
