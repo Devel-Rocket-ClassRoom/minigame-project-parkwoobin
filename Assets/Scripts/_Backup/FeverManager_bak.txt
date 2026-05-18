@@ -1,0 +1,56 @@
+using UnityEngine;
+using UnityEngine.Events;
+
+public class FeverManager : MonoBehaviour
+{
+    public static FeverManager Instance { get; private set; }
+
+    [SerializeField] float feverDuration = 8f;
+
+    public bool IsFeverActive { get; private set; }
+    float _feverTimer;
+
+    PlayerStats _stats;
+
+    public static UnityAction<bool> OnFeverChanged;
+
+    void Awake()
+    {
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+        _stats   = GetComponentInParent<PlayerStats>();
+    }
+
+    void Update()
+    {
+        if (!IsFeverActive) return;
+        _feverTimer -= Time.deltaTime;
+        if (_feverTimer <= 0f) EndFever();
+    }
+
+    public void TryActivateFever()
+    {
+        if (IsFeverActive) return;
+        if (_stats == null || _stats.FeverRatio < 1f) return;
+        _stats.ConsumeFever();
+        StartFever();
+    }
+
+    void StartFever()
+    {
+        IsFeverActive = true;
+        _feverTimer   = feverDuration;
+        ScoreManager.Instance?.AddScore(ScoreManager.FEVER_ACTIVE);
+        ScoreManager.Instance?.SetMultiplier(2f);
+        // TODO: _anim?.SetFever(true)
+        OnFeverChanged?.Invoke(true);
+    }
+
+    void EndFever()
+    {
+        IsFeverActive = false;
+        ScoreManager.Instance?.ResetMultiplier();
+        // TODO: _anim?.SetFever(false)
+        OnFeverChanged?.Invoke(false);
+    }
+}

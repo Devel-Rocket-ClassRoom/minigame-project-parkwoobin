@@ -1,0 +1,17 @@
+using System;
+
+[Serializable]
+public class SaveData
+{
+    public int bestScore;
+    public int totalMoney;
+    public int unlockedStage;
+
+    // Upgrade levels
+    public int speedLevel;
+    public int healthLevel;
+    public int hungerLevel;
+    public int clawLevel;
+    public int stealLevel;
+    public int feverLevel;
+}

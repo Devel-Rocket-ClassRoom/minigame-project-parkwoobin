@@ -1,10 +1,16 @@
 using UnityEngine;
 
+/// <summary>
+/// target 위치를 확인하여 계산한 offset 만큼 더해주고 카메라가 이동 가능한 범위까지 Clamp하여 현재 카메라 위치에서 목표 위치까지
+/// 부드럽게 이동하는 스크립트
+/// </summary>
+
+
 public class CameraFollow : MonoBehaviour
 {
     [SerializeField] Transform target;
-    [SerializeField] float smoothSpeed  = 5f;
-    [SerializeField] Vector3 offset     = new Vector3(0f, 1f, -10f);
+    [SerializeField] float smoothSpeed = 5f;
+    [SerializeField] Vector3 offset = new Vector3(0f, 1f, -10f);
     [SerializeField] float minX = float.MinValue;
     [SerializeField] float maxX = float.MaxValue;
     [SerializeField] float minY = float.MinValue;

@@ -6,37 +6,53 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] float moveSpeed    = 4f;
-    [SerializeField] float dashForce    = 12f;
-    [SerializeField] float dashDuration = 0.2f;
+    [SerializeField] float moveSpeed     = 4f;
+    [SerializeField] float dashForce     = 12f;
+    [SerializeField] float dashDuration  = 0.2f;
 
     [Header("Jump Feel")]
-    // v₀ = 2 × height / apexTime
-    [SerializeField] float maxJumpHeight   = 3.0f;  // 높은 점프 최고 높이 (Unity units)
-    [SerializeField] float maxJumpApexTime = 0.35f; // 높은 점프 정점 도달 시간
-    [SerializeField] float minJumpHeight   = 0.8f;  // 낮은 점프 최고 높이
-    [SerializeField] float minJumpApexTime = 0.18f; // 낮은 점프 정점 도달 시간
-    [SerializeField] float fallMultiplier  = 3.5f;  // 하강 중력 배율
-    [SerializeField] float preLandDistance = 1.2f;  // 지면과 이 거리 이내일 때 Land 모션 선발동
+    [SerializeField] float maxJumpHeight   = 2.5f;
+    [SerializeField] float maxJumpApexTime = 0.28f;
+    [SerializeField] float minJumpHeight   = 0.4f;
+    [SerializeField] float minJumpApexTime = 0.2f;
+    [SerializeField] float fallMultiplier  = 3.0f;
+    [SerializeField] float preLandDistance = 0.8f;
 
-    Rigidbody2D _rb;
+    [Header("Wall / Ladder Detection")]
+    [SerializeField] float wallCheckDist   = 0.55f;  // 옆으로 쏘는 Raycast 거리
+    [SerializeField] LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
+
+    [Header("🔧 테스트 입력 (개발용)")]
+    [SerializeField] float animResetTime = 0.6f;      // Throw·Hurt 자동 리셋 시간
+
+    // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
+    Rigidbody2D               _rb;
     PlayerAnimationController _anim;
-    Collider2D _col;
-    PlayerInput _playerInput;
-    InputAction _jumpAction;
+    Collider2D                _col;
+    PlayerInput               _playerInput;
+    InputAction               _jumpAction;
+
+    // ── 레이어 마스크 ────────────────────────────────────────────────────────
     int _groundMask;
 
+    // ── 상태 ─────────────────────────────────────────────────────────────────
     float _moveInput;
-    bool _isGrounded;
-    bool _isDucking;
-    bool _isDashing;
-    bool _isOnLadder;
+    bool  _isGrounded;
+    bool  _isDucking;
+    bool  _isDashing;
+    bool  _isOnLadder;
+    bool  _isOnWall;
     float _dashTimer;
     float _defaultGravityScale;
-    bool _facingRight = true;
-    bool _jumpHeld;
+    bool  _facingRight = true;
+    bool  _jumpHeld;
 
-    // Rigidbody2D.GetContacts 용 재사용 배열 (GC 방지)
+    // 테스트용 토글 상태
+    bool  _testHungry;
+    float _throwTimer;
+    float _hurtTimer;
+
+    // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
 
     // ── Input System 콜백 ────────────────────────────────────────────────────
@@ -54,14 +70,13 @@ public class PlayerController : MonoBehaviour
         else                 ReleaseJump();
     }
 
-    void OnJumpStarted(InputAction.CallbackContext context) => PressJump();
-    void OnJumpCanceled(InputAction.CallbackContext context) => ReleaseJump();
+    void OnJumpStarted(InputAction.CallbackContext ctx) => PressJump();
+    void OnJumpCanceled(InputAction.CallbackContext ctx) => ReleaseJump();
 
     public void OnDash(InputValue value)
     {
         if (_isDucking) return;
-        if (value.isPressed && !_isDashing)
-            StartDash();
+        if (value.isPressed && !_isDashing) StartDash();
     }
 
     public void OnDuck(InputValue value)
@@ -84,16 +99,17 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        _rb   = GetComponent<Rigidbody2D>();
-        _anim = GetComponent<PlayerAnimationController>();
-        _col   = GetComponent<Collider2D>();
-        _playerInput         = GetComponent<PlayerInput>();
+        _rb           = GetComponent<Rigidbody2D>();
+        _anim         = GetComponent<PlayerAnimationController>();
+        _col          = GetComponent<Collider2D>();
+        _playerInput  = GetComponent<PlayerInput>();
         _defaultGravityScale = _rb.gravityScale;
     }
 
     void OnEnable()
     {
-        _jumpAction = _playerInput != null ? _playerInput.actions.FindAction("Jump", false) : null;
+        _jumpAction = _playerInput != null
+            ? _playerInput.actions.FindAction("Jump", false) : null;
         if (_jumpAction == null) return;
         _jumpAction.started  += OnJumpStarted;
         _jumpAction.canceled += OnJumpCanceled;
@@ -119,37 +135,127 @@ public class PlayerController : MonoBehaviour
     {
         if (!GameManager.Instance.IsPlaying) return;
 
-        // 지면 감지: Rigidbody2D 실제 충돌 법선 기반
+        // ── 지면 감지 (충돌 법선 기반) ─────────────────────────────────────
         _isGrounded = false;
         int cnt = _rb.GetContacts(_contacts);
         for (int i = 0; i < cnt; i++)
             if (_contacts[i].normal.y > 0.8f) { _isGrounded = true; break; }
 
-        // 착지 예측: 발 아래 Raycast
+        // ── 착지 예측 (Raycast) ────────────────────────────────────────────
         bool aboutToLand = false;
         if (!_isGrounded && _rb.linearVelocity.y < 0f)
         {
-            float feetY = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
-            var origin  = new Vector2(transform.position.x, feetY);
-            var hit     = Physics2D.Raycast(origin, Vector2.down, 20f, _groundMask);
+            float feetY  = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
+            var   origin = new Vector2(transform.position.x, feetY);
+            var   hit    = Physics2D.Raycast(origin, Vector2.down, 20f, _groundMask);
             if (hit.collider != null && hit.distance < preLandDistance)
                 aboutToLand = true;
         }
 
+        // ── 벽 감지 (공중에서 좌우 Raycast) ────────────────────────────────
+        _isOnWall = false;
+        if (!_isGrounded)
+        {
+            bool leftWall  = Physics2D.Raycast(transform.position, Vector2.left,  wallCheckDist, _groundMask);
+            bool rightWall = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDist, _groundMask);
+            _isOnWall = leftWall || rightWall;
+        }
+
+        // ── 사다리 감지 (OverlapPoint로 Ladder 레이어 확인) ─────────────────
+        if (ladderMask != 0)
+        {
+            var overlapCol = Physics2D.OverlapPoint(transform.position, ladderMask);
+            _isOnLadder    = overlapCol != null;
+        }
+
+        // ── 대시 타이머 ─────────────────────────────────────────────────────
         if (_isDashing)
         {
             _dashTimer -= Time.deltaTime;
             if (_dashTimer <= 0f) _isDashing = false;
         }
 
+        // ── 테스트 입력 (레거시 Input 사용) ────────────────────────────────
+        HandleTestInput();
+
+        // ── Throw · Hurt 자동 리셋 ─────────────────────────────────────────
+        if (_throwTimer > 0f)
+        {
+            _throwTimer -= Time.deltaTime;
+            if (_throwTimer <= 0f) _anim?.SetThrow(false);
+        }
+        if (_hurtTimer > 0f)
+        {
+            _hurtTimer -= Time.deltaTime;
+            if (_hurtTimer <= 0f) _anim?.SetHurt(false);
+        }
+
         UpdateFacing();
-        _anim?.UpdateState(_moveInput, _isGrounded, aboutToLand, _isDucking, _isDashing, _isOnLadder);
+        _anim?.UpdateState(_moveInput, _isGrounded, aboutToLand,
+                           _isDucking, _isDashing, _isOnLadder, _isOnWall);
+    }
+
+    /// <summary>
+    /// 개발용 테스트 키 입력 — Unity Input System API 사용 (레거시 Input 미사용).
+    /// 완성 후 이 메서드 제거 또는 #if UNITY_EDITOR 로 감싸면 됨.
+    /// </summary>
+    void HandleTestInput()
+    {
+        var kb = UnityEngine.InputSystem.Keyboard.current;
+        if (kb == null) return;
+
+        // S — 스틸 모션
+        if (kb.sKey.wasPressedThisFrame)
+            _anim?.TriggerSteal();
+
+        // H — 배고픈 모션 토글
+        if (kb.hKey.wasPressedThisFrame)
+        {
+            _testHungry = !_testHungry;
+            _anim?.SetHungry(_testHungry);
+        }
+
+        // T — 던지기 모션 (animResetTime 후 자동 복귀)
+        if (kb.tKey.wasPressedThisFrame)
+        {
+            _anim?.SetThrow(true);
+            _throwTimer = animResetTime;
+        }
+
+        // Q — 공격 모션
+        if (kb.qKey.wasPressedThisFrame)
+            _anim?.TriggerFight();
+
+        // Shift — Turn/Spin 모션
+        if (kb.leftShiftKey.wasPressedThisFrame || kb.rightShiftKey.wasPressedThisFrame)
+            _anim?.TriggerTurn();
+
+        // G — 피격 모션 (animResetTime 후 자동 복귀)
+        if (kb.gKey.wasPressedThisFrame)
+        {
+            _anim?.SetHurt(true);
+            _hurtTimer = animResetTime;
+        }
     }
 
     void FixedUpdate()
     {
         if (!GameManager.Instance.IsPlaying) return;
         if (_isDashing) return;
+
+        // 사다리 위에서는 중력 제거 + 수직 이동
+        if (_isOnLadder)
+        {
+            _rb.gravityScale = 0f;
+            float vertInput  = Input.GetAxisRaw("Vertical");   // W/S 또는 ↑↓
+            _rb.linearVelocity = new Vector2(_moveInput * moveSpeed * 0.5f,
+                                             vertInput  * moveSpeed);
+            return;
+        }
+
+        // 사다리 벗어나면 중력 복원
+        if (_rb.gravityScale == 0f)
+            _rb.gravityScale = _defaultGravityScale;
 
         if (_isDucking)
         {
@@ -158,9 +264,16 @@ public class PlayerController : MonoBehaviour
         }
 
         if (_isGrounded && _rb.linearVelocity.y <= 0f)
-            _rb.gravityScale = _defaultGravityScale;               // 착지 — 중력 복원
+            _rb.gravityScale = _defaultGravityScale;
         else if (!_isGrounded && _rb.linearVelocity.y < 0f)
-            _rb.gravityScale = _defaultGravityScale * fallMultiplier; // 하강 — g_down
+            _rb.gravityScale = _defaultGravityScale * fallMultiplier;
+
+        // 벽에 붙어 있으면 낙하 속도 감소 (벽 슬라이드)
+        if (_isOnWall && _rb.linearVelocity.y < 0f)
+        {
+            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x,
+                                             Mathf.Max(_rb.linearVelocity.y, -2f));
+        }
 
         _rb.linearVelocity = new Vector2(_moveInput * moveSpeed, _rb.linearVelocity.y);
     }
@@ -200,12 +313,10 @@ public class PlayerController : MonoBehaviour
         _rb.gravityScale = CalculateJumpGravityScale(v0min, minJumpApexTime);
     }
 
-    // v0 = g × apexTime  →  gravityScale = v0 / (|g| × apexTime)
     float CalculateJumpGravityScale(float jumpVelocity, float apexTime)
     {
         apexTime = Mathf.Max(0.01f, apexTime);
-        float gravity = Mathf.Abs(Physics2D.gravity.y);
-        return jumpVelocity / (gravity * apexTime);
+        return jumpVelocity / (Mathf.Abs(Physics2D.gravity.y) * apexTime);
     }
 
     // ── 대시 ─────────────────────────────────────────────────────────────────
@@ -216,7 +327,8 @@ public class PlayerController : MonoBehaviour
         _dashTimer = dashDuration;
         float dir  = _facingRight ? 1f : -1f;
         _rb.linearVelocity = new Vector2(dir * dashForce, _rb.linearVelocity.y);
-        _anim?.TriggerTurn();
+        // isRunning=true → Run 애니메이션 (UpdateState에서 처리)
+        // TriggerTurn()은 Shift 키 전용
     }
 
     // ── 방향 전환 ────────────────────────────────────────────────────────────
@@ -239,4 +351,6 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded => _isGrounded;
     public bool IsDucking  => _isDucking;
+    public bool IsOnLadder => _isOnLadder;
+    public bool IsOnWall   => _isOnWall;
 }
