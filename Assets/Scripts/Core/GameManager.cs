@@ -21,7 +21,9 @@ public class GameManager : MonoBehaviour
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);  // 씬이 바뀌어도 GameManager가 파괴되지 않도록 설정
+        // DontDestroyOnLoad는 루트 오브젝트에만 동작 — 자식이면 자동으로 루트로 이동
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()

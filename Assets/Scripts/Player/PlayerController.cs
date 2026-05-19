@@ -19,11 +19,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float preLandDistance = 0.8f;
 
     [Header("Wall / Ladder Detection")]
-    [SerializeField] float wallCheckDist   = 0.55f;  // 옆으로 쏘는 Raycast 거리
     [SerializeField] LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
-
-    [Header("🔧 테스트 입력 (개발용)")]
-    [SerializeField] float animResetTime = 0.6f;      // Throw·Hurt 자동 리셋 시간
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     Rigidbody2D               _rb;
@@ -46,11 +42,7 @@ public class PlayerController : MonoBehaviour
     float _defaultGravityScale;
     bool  _facingRight = true;
     bool  _jumpHeld;
-
-    // 테스트용 토글 상태
-    bool  _testHungry;
-    float _throwTimer;
-    float _hurtTimer;
+    bool  _isDead;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -60,6 +52,9 @@ public class PlayerController : MonoBehaviour
     public void OnMove(InputValue value)
     {
         if (_isDucking) return;
+        if (_isDead) return;
+        // Eat·Sleep 중 이동 차단
+        if (_anim != null && _anim.IsMovementBlocked()) { _moveInput = 0f; return; }
         _moveInput = value.Get<float>();
     }
 
@@ -76,6 +71,11 @@ public class PlayerController : MonoBehaviour
     public void OnDash(InputValue value)
     {
         if (_isDucking) return;
+        if (_isDead)   return;
+        // 액션 재생 중엔 대시 불가 (캔슬 방지) — fix #7
+        if (_anim != null && _anim.IsActionPlaying()) return;
+        // 바닥 또는 점프(상승) 중에만 가능 — fix #8
+        if (!_isGrounded && (_rb == null || _rb.linearVelocity.y <= 0f)) return;
         if (value.isPressed && !_isDashing) StartDash();
     }
 
@@ -134,6 +134,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (!GameManager.Instance.IsPlaying) return;
+        if (_isDead) return;
 
         // ── 지면 감지 (충돌 법선 기반) ─────────────────────────────────────
         _isGrounded = false;
@@ -152,13 +153,12 @@ public class PlayerController : MonoBehaviour
                 aboutToLand = true;
         }
 
-        // ── 벽 감지 (공중에서 좌우 Raycast) ────────────────────────────────
+        // ── 벽 감지 (접촉 법선 기반 — 실제로 닿았을 때만 활성화) ──────────
         _isOnWall = false;
         if (!_isGrounded)
         {
-            bool leftWall  = Physics2D.Raycast(transform.position, Vector2.left,  wallCheckDist, _groundMask);
-            bool rightWall = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDist, _groundMask);
-            _isOnWall = leftWall || rightWall;
+            for (int i = 0; i < cnt; i++)
+                if (Mathf.Abs(_contacts[i].normal.x) > 0.8f) { _isOnWall = true; break; }
         }
 
         // ── 사다리 감지 (OverlapPoint로 Ladder 레이어 확인) ─────────────────
@@ -175,72 +175,19 @@ public class PlayerController : MonoBehaviour
             if (_dashTimer <= 0f) _isDashing = false;
         }
 
-        // ── 테스트 입력 (레거시 Input 사용) ────────────────────────────────
-        HandleTestInput();
-
-        // ── Throw · Hurt 자동 리셋 ─────────────────────────────────────────
-        if (_throwTimer > 0f)
-        {
-            _throwTimer -= Time.deltaTime;
-            if (_throwTimer <= 0f) _anim?.SetThrow(false);
-        }
-        if (_hurtTimer > 0f)
-        {
-            _hurtTimer -= Time.deltaTime;
-            if (_hurtTimer <= 0f) _anim?.SetHurt(false);
-        }
+        // Eat·Sleep 중에는 수평 이동 입력을 매 프레임 차단 — fix #6
+        if (_anim != null && _anim.IsMovementBlocked())
+            _moveInput = 0f;
 
         UpdateFacing();
         _anim?.UpdateState(_moveInput, _isGrounded, aboutToLand,
                            _isDucking, _isDashing, _isOnLadder, _isOnWall);
     }
 
-    /// <summary>
-    /// 개발용 테스트 키 입력 — Unity Input System API 사용 (레거시 Input 미사용).
-    /// 완성 후 이 메서드 제거 또는 #if UNITY_EDITOR 로 감싸면 됨.
-    /// </summary>
-    void HandleTestInput()
-    {
-        var kb = UnityEngine.InputSystem.Keyboard.current;
-        if (kb == null) return;
-
-        // S — 스틸 모션
-        if (kb.sKey.wasPressedThisFrame)
-            _anim?.TriggerSteal();
-
-        // H — 배고픈 모션 토글
-        if (kb.hKey.wasPressedThisFrame)
-        {
-            _testHungry = !_testHungry;
-            _anim?.SetHungry(_testHungry);
-        }
-
-        // T — 던지기 모션 (animResetTime 후 자동 복귀)
-        if (kb.tKey.wasPressedThisFrame)
-        {
-            _anim?.SetThrow(true);
-            _throwTimer = animResetTime;
-        }
-
-        // Q — 공격 모션
-        if (kb.qKey.wasPressedThisFrame)
-            _anim?.TriggerFight();
-
-        // Shift — Turn/Spin 모션
-        if (kb.leftShiftKey.wasPressedThisFrame || kb.rightShiftKey.wasPressedThisFrame)
-            _anim?.TriggerTurn();
-
-        // G — 피격 모션 (animResetTime 후 자동 복귀)
-        if (kb.gKey.wasPressedThisFrame)
-        {
-            _anim?.SetHurt(true);
-            _hurtTimer = animResetTime;
-        }
-    }
-
     void FixedUpdate()
     {
         if (!GameManager.Instance.IsPlaying) return;
+        if (_isDead) return;
         if (_isDashing) return;
 
         // 사다리 위에서는 중력 제거 + 수직 이동
@@ -291,6 +238,8 @@ public class PlayerController : MonoBehaviour
     void PressJump()
     {
         if (_isDucking) return;
+        if (_isDead)    return;                                          // fix #4
+        if (_anim != null && _anim.IsMovementBlocked()) return;         // fix #6 Eat·Sleep 중 점프 차단
         if (_jumpHeld)  return;
         _jumpHeld = true;
         if (_isGrounded) Jump();
@@ -327,8 +276,6 @@ public class PlayerController : MonoBehaviour
         _dashTimer = dashDuration;
         float dir  = _facingRight ? 1f : -1f;
         _rb.linearVelocity = new Vector2(dir * dashForce, _rb.linearVelocity.y);
-        // isRunning=true → Run 애니메이션 (UpdateState에서 처리)
-        // TriggerTurn()은 Shift 키 전용
     }
 
     // ── 방향 전환 ────────────────────────────────────────────────────────────
@@ -347,10 +294,24 @@ public class PlayerController : MonoBehaviour
         transform.localScale = s;
     }
 
+    // ── 외부 호출 ────────────────────────────────────────────────────────────
+
+    /// <summary>게임 오버 처리 — 이동·입력을 즉시 차단하고 속도를 0으로 만듦</summary>
+    public void Die()
+    {
+        if (_isDead) return;
+        _isDead = true;
+        _rb.linearVelocity = Vector2.zero;
+        _rb.gravityScale   = _defaultGravityScale;
+    }
+
     // ── 외부 참조용 프로퍼티 ─────────────────────────────────────────────────
 
-    public bool IsGrounded => _isGrounded;
-    public bool IsDucking  => _isDucking;
-    public bool IsOnLadder => _isOnLadder;
-    public bool IsOnWall   => _isOnWall;
+    public bool IsGrounded  => _isGrounded;
+    public bool IsDucking   => _isDucking;
+    public bool IsOnLadder  => _isOnLadder;
+    public bool IsOnWall    => _isOnWall;
+    public bool IsDead      => _isDead;
+    /// <summary>공중에서 상승 중(점프)이면 true — Turn·Dash 허용 판단에 사용</summary>
+    public bool IsAscending => !_isGrounded && _rb != null && _rb.linearVelocity.y > 0f;
 }
