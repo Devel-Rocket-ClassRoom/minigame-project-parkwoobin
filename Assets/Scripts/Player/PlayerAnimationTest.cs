@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,7 +11,8 @@ using UnityEngine.InputSystem;
 public class PlayerAnimationTest : MonoBehaviour
 {
     [Header("테스트 설정")]
-    [SerializeField] float animResetTime = 0.6f;   // Hurt·Throw 재입력 쿨다운
+    [SerializeField] float animResetTime = 0.6f;
+    [SerializeField] int   attackPower   = 1;
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     PlayerAnimationController _anim;
@@ -58,13 +60,6 @@ public class PlayerAnimationTest : MonoBehaviour
             _anim.SetHungry(_testHungry);
         }
 
-        // Q — 공격 모션 (쿨다운만 체크)
-        if (kb.qKey.wasPressedThisFrame && _fightCooldown <= 0f)
-        {
-            _anim.TriggerFight();
-            _fightCooldown = animResetTime;
-        }
-
         // F — 게임 오버 (PlayerController 이동 차단 + GameOver 애니메이션)
         if (kb.fKey.wasPressedThisFrame)
         {
@@ -74,6 +69,14 @@ public class PlayerAnimationTest : MonoBehaviour
 
         // ── 액션 재생 중에는 아래 입력 전부 차단 ────────────────────────────
         if (_anim.IsActionPlaying()) return;
+
+        // Q — 공격 모션
+        if (kb.qKey.wasPressedThisFrame && _fightCooldown <= 0f)
+        {
+            _anim.TriggerFight();
+            _fightCooldown = animResetTime;
+            StartCoroutine(AttackHitCheck());
+        }
 
         // S — 스틸 모션 (바닥에서만) — fix #5
         if (kb.sKey.wasPressedThisFrame && (_controller == null || _controller.IsGrounded))
@@ -107,5 +110,18 @@ public class PlayerAnimationTest : MonoBehaviour
                        || _controller.IsAscending;
         if ((kb.leftShiftKey.wasPressedThisFrame || kb.rightShiftKey.wasPressedThisFrame) && canTurn)
             _anim.TriggerTurn();
+    }
+
+    IEnumerator AttackHitCheck()
+    {
+        yield return new WaitForSeconds(0.2f);
+        float facingDir = transform.localScale.x > 0 ? 1f : -1f;
+        var hitCenter = (Vector2)transform.position + Vector2.right * facingDir * 0.6f;
+        var hits = Physics2D.OverlapCircleAll(hitCenter, 0.5f);
+        foreach (var h in hits)
+        {
+            if (h.CompareTag("Enemy"))
+                h.SendMessage("TakeDamage", attackPower, SendMessageOptions.DontRequireReceiver);
+        }
     }
 }

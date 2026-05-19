@@ -6,43 +6,43 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] float moveSpeed     = 4f;
-    [SerializeField] float dashForce     = 12f;
-    [SerializeField] float dashDuration  = 0.2f;
+    [SerializeField] float moveSpeed = 4f;
+    [SerializeField] float dashForce = 12f;
+    [SerializeField] float dashDuration = 0.2f;
 
     [Header("Jump Feel")]
-    [SerializeField] float maxJumpHeight   = 2.5f;
+    [SerializeField] float maxJumpHeight = 2.5f;
     [SerializeField] float maxJumpApexTime = 0.28f;
-    [SerializeField] float minJumpHeight   = 0.4f;
+    [SerializeField] float minJumpHeight = 0.4f;
     [SerializeField] float minJumpApexTime = 0.2f;
-    [SerializeField] float fallMultiplier  = 3.0f;
+    [SerializeField] float fallMultiplier = 3.0f;
     [SerializeField] float preLandDistance = 0.8f;
 
     [Header("Wall / Ladder Detection")]
     [SerializeField] LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
-    Rigidbody2D               _rb;
+    Rigidbody2D _rb;
     PlayerAnimationController _anim;
-    Collider2D                _col;
-    PlayerInput               _playerInput;
-    InputAction               _jumpAction;
+    Collider2D _col;
+    PlayerInput _playerInput;
+    InputAction _jumpAction;
 
     // ── 레이어 마스크 ────────────────────────────────────────────────────────
     int _groundMask;
 
     // ── 상태 ─────────────────────────────────────────────────────────────────
     float _moveInput;
-    bool  _isGrounded;
-    bool  _isDucking;
-    bool  _isDashing;
-    bool  _isOnLadder;
-    bool  _isOnWall;
+    bool _isGrounded;
+    bool _isDucking;
+    bool _isDashing;
+    bool _isOnLadder;
+    bool _isOnWall;
     float _dashTimer;
     float _defaultGravityScale;
-    bool  _facingRight = true;
-    bool  _jumpHeld;
-    bool  _isDead;
+    bool _facingRight = true;
+    bool _jumpHeld;
+    bool _isDead;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_isDucking) return;
         if (value.isPressed) PressJump();
-        else                 ReleaseJump();
+        else ReleaseJump();
     }
 
     void OnJumpStarted(InputAction.CallbackContext ctx) => PressJump();
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
     public void OnDash(InputValue value)
     {
         if (_isDucking) return;
-        if (_isDead)   return;
+        if (_isDead) return;
         // 액션 재생 중엔 대시 불가 (캔슬 방지) — fix #7
         if (_anim != null && _anim.IsActionPlaying()) return;
         // 바닥 또는 점프(상승) 중에만 가능 — fix #8
@@ -99,26 +99,25 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        _rb           = GetComponent<Rigidbody2D>();
-        _anim         = GetComponent<PlayerAnimationController>();
-        _col          = GetComponent<Collider2D>();
-        _playerInput  = GetComponent<PlayerInput>();
+        _rb = GetComponent<Rigidbody2D>();
+        _anim = GetComponent<PlayerAnimationController>();
+        _col = GetComponent<Collider2D>();
+        _playerInput = GetComponent<PlayerInput>();
         _defaultGravityScale = _rb.gravityScale;
     }
 
     void OnEnable()
     {
-        _jumpAction = _playerInput != null
-            ? _playerInput.actions.FindAction("Jump", false) : null;
+        _jumpAction = _playerInput != null ? _playerInput.actions.FindAction("Jump", false) : null; // PlayerInput이 없거나 Jump 액션이 없으면 null
         if (_jumpAction == null) return;
-        _jumpAction.started  += OnJumpStarted;
+        _jumpAction.started += OnJumpStarted;
         _jumpAction.canceled += OnJumpCanceled;
     }
 
     void OnDisable()
     {
         if (_jumpAction == null) return;
-        _jumpAction.started  -= OnJumpStarted;
+        _jumpAction.started -= OnJumpStarted;
         _jumpAction.canceled -= OnJumpCanceled;
     }
 
@@ -146,26 +145,29 @@ public class PlayerController : MonoBehaviour
         bool aboutToLand = false;
         if (!_isGrounded && _rb.linearVelocity.y < 0f)
         {
-            float feetY  = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
-            var   origin = new Vector2(transform.position.x, feetY);
-            var   hit    = Physics2D.Raycast(origin, Vector2.down, 20f, _groundMask);
+            float feetY = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
+            var origin = new Vector2(transform.position.x, feetY);
+            var hit = Physics2D.Raycast(origin, Vector2.down, 20f, _groundMask);
             if (hit.collider != null && hit.distance < preLandDistance)
                 aboutToLand = true;
         }
 
-        // ── 벽 감지 (접촉 법선 기반 — 실제로 닿았을 때만 활성화) ──────────
+        // ── 벽 감지 (Enemy 태그 제외 — 적과 닿았을 때 Wall 오작동 방지) ──────
         _isOnWall = false;
         if (!_isGrounded)
         {
             for (int i = 0; i < cnt; i++)
+            {
+                if (_contacts[i].collider.CompareTag("Enemy")) continue;
                 if (Mathf.Abs(_contacts[i].normal.x) > 0.8f) { _isOnWall = true; break; }
+            }
         }
 
         // ── 사다리 감지 (OverlapPoint로 Ladder 레이어 확인) ─────────────────
         if (ladderMask != 0)
         {
             var overlapCol = Physics2D.OverlapPoint(transform.position, ladderMask);
-            _isOnLadder    = overlapCol != null;
+            _isOnLadder = overlapCol != null;
         }
 
         // ── 대시 타이머 ─────────────────────────────────────────────────────
@@ -194,9 +196,9 @@ public class PlayerController : MonoBehaviour
         if (_isOnLadder)
         {
             _rb.gravityScale = 0f;
-            float vertInput  = Input.GetAxisRaw("Vertical");   // W/S 또는 ↑↓
+            float vertInput = Input.GetAxisRaw("Vertical");   // W/S 또는 ↑↓
             _rb.linearVelocity = new Vector2(_moveInput * moveSpeed * 0.5f,
-                                             vertInput  * moveSpeed);
+                                             vertInput * moveSpeed);
             return;
         }
 
@@ -230,7 +232,7 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         float v0 = 2f * maxJumpHeight / maxJumpApexTime;
-        _rb.gravityScale   = CalculateJumpGravityScale(v0, maxJumpApexTime);
+        _rb.gravityScale = CalculateJumpGravityScale(v0, maxJumpApexTime);
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, v0);
         _anim?.TriggerJump(true);
     }
@@ -238,9 +240,9 @@ public class PlayerController : MonoBehaviour
     void PressJump()
     {
         if (_isDucking) return;
-        if (_isDead)    return;                                          // fix #4
+        if (_isDead) return;                                          // fix #4
         if (_anim != null && _anim.IsMovementBlocked()) return;         // fix #6 Eat·Sleep 중 점프 차단
-        if (_jumpHeld)  return;
+        if (_jumpHeld) return;
         _jumpHeld = true;
         if (_isGrounded) Jump();
     }
@@ -274,7 +276,7 @@ public class PlayerController : MonoBehaviour
     {
         _isDashing = true;
         _dashTimer = dashDuration;
-        float dir  = _facingRight ? 1f : -1f;
+        float dir = _facingRight ? 1f : -1f;
         _rb.linearVelocity = new Vector2(dir * dashForce, _rb.linearVelocity.y);
     }
 
@@ -302,16 +304,16 @@ public class PlayerController : MonoBehaviour
         if (_isDead) return;
         _isDead = true;
         _rb.linearVelocity = Vector2.zero;
-        _rb.gravityScale   = _defaultGravityScale;
+        _rb.gravityScale = _defaultGravityScale;
     }
 
     // ── 외부 참조용 프로퍼티 ─────────────────────────────────────────────────
 
-    public bool IsGrounded  => _isGrounded;
-    public bool IsDucking   => _isDucking;
-    public bool IsOnLadder  => _isOnLadder;
-    public bool IsOnWall    => _isOnWall;
-    public bool IsDead      => _isDead;
+    public bool IsGrounded => _isGrounded;
+    public bool IsDucking => _isDucking;
+    public bool IsOnLadder => _isOnLadder;
+    public bool IsOnWall => _isOnWall;
+    public bool IsDead => _isDead;
     /// <summary>공중에서 상승 중(점프)이면 true — Turn·Dash 허용 판단에 사용</summary>
     public bool IsAscending => !_isGrounded && _rb != null && _rb.linearVelocity.y > 0f;
 }
