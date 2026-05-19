@@ -7,9 +7,9 @@ public abstract class EnemyBase : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] protected EnemyType enemyType;
-    [SerializeField] protected int   maxHp       = 3;
-    [SerializeField] protected float moveSpeed   = 3f;
-    [SerializeField] protected int   attackPower = 1;
+    [SerializeField] protected int   maxHp        = 3;
+    [SerializeField] protected float moveSpeed    = 3f;
+    [SerializeField] protected int   attackPower  = 1;
 
     protected Rigidbody2D              _rb;
     protected EnemyAnimationController _anim;
@@ -19,6 +19,7 @@ public abstract class EnemyBase : MonoBehaviour
     protected bool _isOnWall;
     protected bool _facingRight = true;
     protected bool _isDead;
+    float _flipCooldown;
 
     int _hp;
     int _groundMask;
@@ -41,6 +42,7 @@ public abstract class EnemyBase : MonoBehaviour
     protected virtual void Update()
     {
         if (_isDead) return;
+        if (_flipCooldown > 0f) _flipCooldown -= Time.deltaTime;
 
         _isGrounded = false;
         _isOnWall   = false;
@@ -54,12 +56,18 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
-    public virtual void TakeDamage(int amount)
+    public virtual void TakeDamage(int amount, float attackerX = 0f)
     {
         if (_isDead) return;
         _hp -= amount;
+        Debug.Log($"[{gameObject.name}] HP: {_hp}/{maxHp}");
         if (_hp <= 0) Die();
-        else _anim?.PlayHit();
+        else
+        {
+            _anim?.PlayHit();
+            float dir = transform.position.x >= attackerX ? 1f : -1f;
+            transform.position += new Vector3(dir * (3f / 32f), 0f, 0f);
+        }
     }
 
     protected virtual void Die()
@@ -82,8 +90,9 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected void FaceToward(float targetX)
     {
+        if (_flipCooldown > 0f) return;
         float dir = targetX - transform.position.x;
-        if (dir > 0.01f && !_facingRight) Flip();
-        else if (dir < -0.01f && _facingRight) Flip();
+        if (dir > 0.4f && !_facingRight)       { Flip(); _flipCooldown = 0.8f; }
+        else if (dir < -0.4f && _facingRight)  { Flip(); _flipCooldown = 0.8f; }
     }
 }
