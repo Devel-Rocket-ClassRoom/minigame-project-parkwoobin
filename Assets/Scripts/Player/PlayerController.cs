@@ -152,12 +152,15 @@ public class PlayerController : MonoBehaviour
                 aboutToLand = true;
         }
 
-        // ── 벽 감지 (접촉 법선 기반 — 실제로 닿았을 때만 활성화) ──────────
+        // ── 벽 감지 (Enemy 태그 제외 — 적과 닿았을 때 Wall 오작동 방지) ──────
         _isOnWall = false;
         if (!_isGrounded)
         {
             for (int i = 0; i < cnt; i++)
+            {
+                if (_contacts[i].collider.CompareTag("Enemy")) continue;
                 if (Mathf.Abs(_contacts[i].normal.x) > 0.8f) { _isOnWall = true; break; }
+            }
         }
 
         // ── 사다리 감지 (OverlapPoint로 Ladder 레이어 확인) ─────────────────
