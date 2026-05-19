@@ -21,6 +21,11 @@ public class PlayerController : MonoBehaviour
     [Header("Wall / Ladder Detection")]
     [SerializeField] LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
 
+    [Header("Combat")]
+    [SerializeField] int maxHp = 5;
+    [SerializeField] float hurtDuration = 0.35f;
+    [SerializeField] float invincibleDuration = 1f;
+
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     Rigidbody2D _rb;
     PlayerAnimationController _anim;
@@ -43,6 +48,10 @@ public class PlayerController : MonoBehaviour
     bool _facingRight = true;
     bool _jumpHeld;
     bool _isDead;
+    int _hp;
+    bool _isHurt;
+    float _hurtTimer;
+    float _invincibleTimer;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -126,6 +135,7 @@ public class PlayerController : MonoBehaviour
         _groundMask = LayerMask.GetMask("Ground");
         if (_groundMask == 0)
             _groundMask = ~(1 << gameObject.layer);
+        _hp = maxHp;
     }
 
     // ── 업데이트 ─────────────────────────────────────────────────────────────
@@ -134,6 +144,14 @@ public class PlayerController : MonoBehaviour
     {
         if (!GameManager.Instance.IsPlaying) return;
         if (_isDead) return;
+
+        if (_hurtTimer > 0f)
+        {
+            _hurtTimer -= Time.deltaTime;
+            if (_hurtTimer <= 0f) _isHurt = false;
+        }
+        if (_invincibleTimer > 0f)
+            _invincibleTimer -= Time.deltaTime;
 
         // ── 지면 감지 (충돌 법선 기반) ─────────────────────────────────────
         _isGrounded = false;
@@ -190,6 +208,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!GameManager.Instance.IsPlaying) return;
         if (_isDead) return;
+        if (_isHurt) return;
         if (_isDashing) return;
 
         // 사다리 위에서는 중력 제거 + 수직 이동
@@ -298,6 +317,20 @@ public class PlayerController : MonoBehaviour
 
     // ── 외부 호출 ────────────────────────────────────────────────────────────
 
+    public void TakeDamage(int amount, float attackerX = 0f)
+    {
+        if (_isDead || _invincibleTimer > 0f) return;
+        _hp = Mathf.Max(0, _hp - amount);
+        _invincibleTimer = invincibleDuration;
+        Debug.Log($"[Player] HP: {_hp}/{maxHp}");
+        _anim?.SetHurt(true);
+        if (_hp <= 0) { Die(); return; }
+        _isHurt = true;
+        _hurtTimer = hurtDuration;
+        float dir = transform.position.x >= attackerX ? 1f : -1f;
+        transform.position += new Vector3(dir * (3f / 32f), 0f, 0f);
+    }
+
     /// <summary>게임 오버 처리 — 이동·입력을 즉시 차단하고 속도를 0으로 만듦</summary>
     public void Die()
     {
@@ -305,6 +338,7 @@ public class PlayerController : MonoBehaviour
         _isDead = true;
         _rb.linearVelocity = Vector2.zero;
         _rb.gravityScale = _defaultGravityScale;
+        _anim?.SetDead(true);
     }
 
     // ── 외부 참조용 프로퍼티 ─────────────────────────────────────────────────
@@ -314,6 +348,8 @@ public class PlayerController : MonoBehaviour
     public bool IsOnLadder => _isOnLadder;
     public bool IsOnWall => _isOnWall;
     public bool IsDead => _isDead;
+    public int Hp => _hp;
+    public int MaxHp => maxHp;
     /// <summary>공중에서 상승 중(점프)이면 true — Turn·Dash 허용 판단에 사용</summary>
     public bool IsAscending => !_isGrounded && _rb != null && _rb.linearVelocity.y > 0f;
 }
