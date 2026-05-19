@@ -2954,9 +2954,10 @@ MonoBehaviour:
   moveSpeed: 3
   attackPower: 1
   detectionRange: 4
-  attackRange: 1
+  attackRange: 0.65
+  attackHeightTolerance: 0.5
   patrolRange: 3
-  attackCooldown: 2
+  attackCooldown: 3.5
   jumpForce: 5
   jumpCooldown: 2
 --- !u!114 &596310987
@@ -3506,6 +3507,9 @@ MonoBehaviour:
   ladderMask:
     serializedVersion: 2
     m_Bits: 0
+  maxHp: 5
+  hurtDuration: 0.35
+  invincibleDuration: 1
 --- !u!114 &1083857968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3691,6 +3695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationTest
   animResetTime: 0.6
+  attackPower: 1
 --- !u!1 &1771799691
 GameObject:
   m_ObjectHideFlags: 0
