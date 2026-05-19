@@ -8,32 +8,33 @@ public class PlayerAnimationController : MonoBehaviour
 
     // ── Animator 파라미터 해시 캐싱 (GC 방지) ────────────────────────────────
     // Bool
-    static readonly int H_IsWalking = Animator.StringToHash("isWalking");
-    static readonly int H_IsRunning = Animator.StringToHash("isRunning");
-    static readonly int H_IsDucking = Animator.StringToHash("isDucking");
-    static readonly int H_IsFalling = Animator.StringToHash("isFalling");
+    static readonly int H_IsWalking  = Animator.StringToHash("isWalking");
+    static readonly int H_IsRunning  = Animator.StringToHash("isRunning");
+    static readonly int H_IsDucking  = Animator.StringToHash("isDucking");
+    static readonly int H_IsFalling  = Animator.StringToHash("isFalling");
     static readonly int H_IsHighJump = Animator.StringToHash("isHighJump");
-    static readonly int H_IsHungry = Animator.StringToHash("isHungry");
-    static readonly int H_IsHurt = Animator.StringToHash("isHurt");
-    static readonly int H_IsWall = Animator.StringToHash("isWall");
-    static readonly int H_IsLadder = Animator.StringToHash("isLadder");
-    static readonly int H_IsThrow = Animator.StringToHash("isThrow");
-    static readonly int H_IsDash = Animator.StringToHash("isDash");
-    static readonly int H_IsDead = Animator.StringToHash("isDead");
+    static readonly int H_IsHungry   = Animator.StringToHash("isHungry");
+    static readonly int H_IsHurt     = Animator.StringToHash("isHurt");
+    static readonly int H_IsWall     = Animator.StringToHash("isWall");
+    static readonly int H_IsLadder   = Animator.StringToHash("isLadding");  // Animator 오타 "isLadding" 유지
+    static readonly int H_IsThrow    = Animator.StringToHash("isThrow");
+    static readonly int H_IsDash     = Animator.StringToHash("isDash");
+    static readonly int H_IsDead     = Animator.StringToHash("isDead");
 
     // State name hashes (CrossFade 직접 전환용)
-    static readonly int H_HurtState = Animator.StringToHash("Hurt");
-    static readonly int H_ThrowState = Animator.StringToHash("Throw");
+    static readonly int H_HurtState     = Animator.StringToHash("Hurt");
+    static readonly int H_ThrowState    = Animator.StringToHash("Throw");
     static readonly int H_GameOverState = Animator.StringToHash("GameOver");
-    static readonly int H_SleepState = Animator.StringToHash("Sleep");
+    static readonly int H_SleepState    = Animator.StringToHash("Sleep");
+    static readonly int H_RunState      = Animator.StringToHash("Run");
 
     // Trigger  ※ Animator에서 Turn 파라미터명이 "Trun"으로 저장돼 있으므로 그대로 맞춤
-    static readonly int H_Jump = Animator.StringToHash("Jump");
-    static readonly int H_Land = Animator.StringToHash("Land");
-    static readonly int H_Turn = Animator.StringToHash("Trun");   // Animator 오타 "Trun" 유지
+    static readonly int H_Jump  = Animator.StringToHash("Jump");
+    static readonly int H_Land  = Animator.StringToHash("Land");
+    static readonly int H_Turn  = Animator.StringToHash("Trun");   // Animator 오타 "Trun" 유지
     static readonly int H_Steal = Animator.StringToHash("Steal");
     static readonly int H_Fight = Animator.StringToHash("Fight");
-    static readonly int H_Eat = Animator.StringToHash("Eat");
+    static readonly int H_Eat   = Animator.StringToHash("Eat");
 
     // ── 내부 상태 ─────────────────────────────────────────────────────────────
     bool _wasGrounded;
@@ -43,7 +44,7 @@ public class PlayerAnimationController : MonoBehaviour
     void Awake()
     {
         _anim = GetComponent<Animator>();
-        _rb = GetComponent<Rigidbody2D>();
+        _rb   = GetComponent<Rigidbody2D>();
     }
 
     // ── 매 프레임 상태 업데이트 (PlayerController.Update 에서 호출) ────────────
@@ -56,8 +57,13 @@ public class PlayerAnimationController : MonoBehaviour
         _anim.SetBool(H_IsWalking, isMoving && !isDashing && isGrounded && !isOnLadder);
         _anim.SetBool(H_IsRunning, isDashing);
         _anim.SetBool(H_IsDucking, isDucking);
-        _anim.SetBool(H_IsLadder, isOnLadder);
-        _anim.SetBool(H_IsWall, isOnWall);
+        _anim.SetBool(H_IsLadder,  isOnLadder);
+        _anim.SetBool(H_IsWall,    isOnWall);
+
+        // 대시 중: 어느 상태에서든 Run으로 직접 전환 (공중 포함) — fix #3
+        if (isDashing && !_anim.GetCurrentAnimatorStateInfo(0).IsName("Run")
+                      && !_anim.IsInTransition(0))
+            _anim.CrossFade(H_RunState, 0f, 0, 0f);
 
         // 낙하 감지 (사다리·벽 붙기 중엔 낙하 판정 제외)
         bool isFalling = !isGrounded && !isOnLadder && !isOnWall
@@ -127,26 +133,6 @@ public class PlayerAnimationController : MonoBehaviour
     /// <summary>R 키 → 잠자기 모션 (애니메이션 끝나면 Idle로 자동 복귀)</summary>
     public void TriggerSleep() => _anim.CrossFade(H_SleepState, 0f, 0, 0f);
 
-    // ── 액션 상태 조회 ────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Sleep·Hurt·Throw·Eat·Steal·Turn·Fight 중 하나가 재생 중이면 true 반환.
-    /// Hungry·Attack(Fight)는 항상 가능하므로 호출부에서 별도 처리.
-    /// </summary>
-    public bool IsActionPlaying()
-    {
-        var cur = _anim.GetCurrentAnimatorStateInfo(0);
-        if (IsActionState(cur)) return true;
-        if (_anim.IsInTransition(0))
-            return IsActionState(_anim.GetNextAnimatorStateInfo(0));
-        return false;
-    }
-
-    static bool IsActionState(AnimatorStateInfo info)
-        => info.IsName("Sleep") || info.IsName("Hurt") || info.IsName("Throw")
-        || info.IsName("Eat") || info.IsName("Steal") || info.IsName("Turn")
-        || info.IsName("Fight");
-
     /// <summary>H 키 · HungerRatio &lt; 0.3f → 배고픈 모션</summary>
     public void SetHungry(bool value) => _anim.SetBool(H_IsHungry, value);
 
@@ -161,6 +147,39 @@ public class PlayerAnimationController : MonoBehaviour
     {
         if (value) _anim.CrossFade(H_ThrowState, 0.25f, 0, 0f);
     }
+
+    // ── 상태 조회 ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sleep·Hurt·Throw·Eat·Steal·Turn·Fight 중 하나가 재생 중이면 true.
+    /// Hungry·Fight는 항상 가능하므로 호출부에서 별도 처리.
+    /// </summary>
+    public bool IsActionPlaying()
+    {
+        var cur = _anim.GetCurrentAnimatorStateInfo(0);
+        if (IsActionState(cur)) return true;
+        if (_anim.IsInTransition(0))
+            return IsActionState(_anim.GetNextAnimatorStateInfo(0));
+        return false;
+    }
+
+    /// <summary>Sleep·Eat 재생 중에는 이동·점프 차단</summary>
+    public bool IsMovementBlocked()
+    {
+        var cur = _anim.GetCurrentAnimatorStateInfo(0);
+        if (cur.IsName("Sleep") || cur.IsName("Eat")) return true;
+        if (_anim.IsInTransition(0))
+        {
+            var nxt = _anim.GetNextAnimatorStateInfo(0);
+            return nxt.IsName("Sleep") || nxt.IsName("Eat");
+        }
+        return false;
+    }
+
+    static bool IsActionState(AnimatorStateInfo info)
+        => info.IsName("Sleep")  || info.IsName("Hurt")  || info.IsName("Throw")
+        || info.IsName("Eat")    || info.IsName("Steal") || info.IsName("Turn")
+        || info.IsName("Fight");
 
     // TODO: PlayerStats 작성 후 아래 구독 코드 추가
     // void Start()    { PlayerStats.OnHungerChanged += v => SetHungry(v < 0.3f); }
