@@ -12,14 +12,14 @@ public class PlayerAnimationTest : MonoBehaviour
 {
     [Header("테스트 설정")]
     [SerializeField] float animResetTime = 0.6f;
-    [SerializeField] int   attackPower   = 1;
+    [SerializeField] int attackPower = 1;
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     PlayerAnimationController _anim;
-    PlayerController          _controller;
+    PlayerController _controller;
 
     // ── 테스트 상태 ──────────────────────────────────────────────────────────
-    bool  _testHungry;
+    bool _testHungry;
     float _throwTimer;
     float _hurtTimer;
     float _fightCooldown;
@@ -28,7 +28,7 @@ public class PlayerAnimationTest : MonoBehaviour
 
     void Awake()
     {
-        _anim       = GetComponent<PlayerAnimationController>();
+        _anim = GetComponent<PlayerAnimationController>();
         _controller = GetComponent<PlayerController>();
     }
 
@@ -37,8 +37,8 @@ public class PlayerAnimationTest : MonoBehaviour
     void Update()
     {
         // 쿨다운 타이머
-        if (_throwTimer    > 0f) _throwTimer    -= Time.deltaTime;
-        if (_hurtTimer     > 0f) _hurtTimer     -= Time.deltaTime;
+        if (_throwTimer > 0f) _throwTimer -= Time.deltaTime;
+        if (_hurtTimer > 0f) _hurtTimer -= Time.deltaTime;
         if (_fightCooldown > 0f) _fightCooldown -= Time.deltaTime;
 
         HandleTestInput();
@@ -121,7 +121,10 @@ public class PlayerAnimationTest : MonoBehaviour
         foreach (var h in hits)
         {
             if (h.CompareTag("Enemy"))
-                h.SendMessage("TakeDamage", attackPower, SendMessageOptions.DontRequireReceiver);
+            {
+                var enemy = h.GetComponent<EnemyBase>();
+                enemy?.TakeDamage(attackPower, transform.position.x);
+            }
         }
     }
 }

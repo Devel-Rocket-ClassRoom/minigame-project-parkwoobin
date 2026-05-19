@@ -3,10 +3,11 @@ using UnityEngine;
 public class CatEnemy : EnemyBase
 {
     [Header("AI")]
-    [SerializeField] float detectionRange = 4f;   // 플레이어 감지 범위
-    [SerializeField] float attackRange = 1f;  // 공격 시작 범위 (근접 공격이므로 짧음)
+    [SerializeField] float detectionRange = 3f;
+    [SerializeField] float attackRange = 0.45f;
+    [SerializeField] float attackHeightTolerance = 0.5f;
     [SerializeField] float patrolRange = 3f;
-    [SerializeField] float attackCooldown = 2f;   // 공격 쿨다운 (공격 애니메이션 타이밍과 맞춰서 조정)
+    [SerializeField] float attackCooldown = 3.5f;
     [SerializeField] float jumpForce = 7f;
     [SerializeField] float jumpCooldown = 2f;
 
@@ -33,9 +34,9 @@ public class CatEnemy : EnemyBase
     {
         (maxHp, moveSpeed, attackPower) = enemyType switch
         {
-            EnemyType.Fast => (2, 4f, 1),
-            EnemyType.Strong => (6, 2f, 2),
-            _ => (3, 3f, 1),
+            EnemyType.Fast   => (2, 2.5f, 1),
+            EnemyType.Strong => (6, 1.2f, 2),
+            _                => (3, 1.8f, 1),
         };
         base.Awake();
         _patrolOriginX = transform.position.x;
@@ -99,6 +100,13 @@ public class CatEnemy : EnemyBase
 
     bool IsEnraged => _enragedTimer > 0f;
 
+    bool InAttackRange()
+    {
+        float dx = Mathf.Abs(_player.position.x - transform.position.x);
+        float dy = Mathf.Abs(_player.position.y - transform.position.y);
+        return dx <= attackRange && dy <= attackHeightTolerance;
+    }
+
     void UpdateAI()
     {
         if (_player == null) return;
@@ -141,23 +149,28 @@ public class CatEnemy : EnemyBase
                     _runBurstTimer   = Random.Range(_runDurationMin, _runDurationMax) * (IsEnraged ? 1.5f : 1f);
                     _nextRunCooldown = Random.Range(_runCooldownMin, _runCooldownMax) * cooldownMult;
                 }
-                float chaseSpeed = _runBurstTimer > 0f ? MoveSpeed : MoveSpeed * 0.45f;
+                float chaseSpeed = _runBurstTimer > 0f ? MoveSpeed : MoveSpeed * 0.3f;
                 MoveToward(_player.position.x, chaseSpeed);
                 TryJump();
-                if (dist <= attackRange) { _state = State.Attack; break; }
+                if (InAttackRange()) { _state = State.Attack; break; }
                 if (dist > leashDist) { _patrolOriginX = transform.position.x; _state = State.Idle; _idleTimer = Random.Range(1.5f, 3f); break; }
-                if (!IsEnraged && Random.value < 0.0025f)
-                    _chaseIdleTimer = Random.Range(0.8f, 1.8f);
+                if (!IsEnraged && Random.value < 0.006f)
+                    _chaseIdleTimer = Random.Range(1.2f, 3f);
                 break;
 
             case State.Attack:
                 _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
                 FaceToward(_player.position.x);
-                if (dist > attackRange) { _state = State.Chase; break; }
+                if (!InAttackRange()) { _state = State.Chase; break; }
                 if (_attackTimer <= 0f)
                 {
                     _attackTimer = attackCooldown;
                     _anim?.TriggerAttack();
+                    if (InAttackRange())
+                    {
+                        var playerCtrl = _player.GetComponent<PlayerController>();
+                        playerCtrl?.TakeDamage(AttackPower, transform.position.x);
+                    }
                 }
                 break;
 
@@ -206,10 +219,10 @@ public class CatEnemy : EnemyBase
         _rb.linearVelocity = new Vector2(dir * speed, _rb.linearVelocity.y);
     }
 
-    public override void TakeDamage(int amount)
+    public override void TakeDamage(int amount, float attackerX = 0f)
     {
         _state = State.Hit;
-        base.TakeDamage(amount);
+        base.TakeDamage(amount, attackerX);
         if (!_isDead)
         {
             Invoke(nameof(RecoverFromHit), 0.5f);
@@ -228,12 +241,4 @@ public class CatEnemy : EnemyBase
         if (!_isDead) _state = State.Chase;
     }
 
-    // 애니메이션 이벤트에서 호출 — 공격 히트 판정
-    void OnAttackHit()
-    {
-        if (_player == null) return;
-        float dist = Vector2.Distance(transform.position, _player.position);
-        if (dist <= attackRange + 0.2f)
-            _player.SendMessage("TakeDamage", AttackPower, SendMessageOptions.DontRequireReceiver);
-    }
 }
