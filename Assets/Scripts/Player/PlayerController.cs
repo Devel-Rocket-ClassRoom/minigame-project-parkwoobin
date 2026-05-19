@@ -19,7 +19,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float preLandDistance = 0.8f;
 
     [Header("Wall / Ladder Detection")]
-    [SerializeField] float wallCheckDist   = 0.55f;  // 옆으로 쏘는 Raycast 거리
     [SerializeField] LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
 
     [Header("🔧 테스트 입력 (개발용)")]
@@ -51,6 +50,10 @@ public class PlayerController : MonoBehaviour
     bool  _testHungry;
     float _throwTimer;
     float _hurtTimer;
+    float _fightCooldown;
+
+    // 사망 상태 (게임 오버)
+    bool _isDead;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -134,6 +137,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (!GameManager.Instance.IsPlaying) return;
+        if (_isDead) return;
 
         // ── 지면 감지 (충돌 법선 기반) ─────────────────────────────────────
         _isGrounded = false;
@@ -152,13 +156,12 @@ public class PlayerController : MonoBehaviour
                 aboutToLand = true;
         }
 
-        // ── 벽 감지 (공중에서 좌우 Raycast) ────────────────────────────────
+        // ── 벽 감지 (접촉 법선 기반 — 실제로 닿았을 때만 활성화) ──────────
         _isOnWall = false;
         if (!_isGrounded)
         {
-            bool leftWall  = Physics2D.Raycast(transform.position, Vector2.left,  wallCheckDist, _groundMask);
-            bool rightWall = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDist, _groundMask);
-            _isOnWall = leftWall || rightWall;
+            for (int i = 0; i < cnt; i++)
+                if (Mathf.Abs(_contacts[i].normal.x) > 0.8f) { _isOnWall = true; break; }
         }
 
         // ── 사다리 감지 (OverlapPoint로 Ladder 레이어 확인) ─────────────────
@@ -178,17 +181,10 @@ public class PlayerController : MonoBehaviour
         // ── 테스트 입력 (레거시 Input 사용) ────────────────────────────────
         HandleTestInput();
 
-        // ── Throw · Hurt 자동 리셋 ─────────────────────────────────────────
-        if (_throwTimer > 0f)
-        {
-            _throwTimer -= Time.deltaTime;
-            if (_throwTimer <= 0f) _anim?.SetThrow(false);
-        }
-        if (_hurtTimer > 0f)
-        {
-            _hurtTimer -= Time.deltaTime;
-            if (_hurtTimer <= 0f) _anim?.SetHurt(false);
-        }
+        // ── 쿨다운 타이머 ──────────────────────────────────────────────────
+        if (_throwTimer    > 0f) _throwTimer    -= Time.deltaTime;
+        if (_hurtTimer     > 0f) _hurtTimer     -= Time.deltaTime;
+        if (_fightCooldown > 0f) _fightCooldown -= Time.deltaTime;
 
         UpdateFacing();
         _anim?.UpdateState(_moveInput, _isGrounded, aboutToLand,
@@ -204,43 +200,69 @@ public class PlayerController : MonoBehaviour
         var kb = UnityEngine.InputSystem.Keyboard.current;
         if (kb == null) return;
 
-        // S — 스틸 모션
-        if (kb.sKey.wasPressedThisFrame)
-            _anim?.TriggerSteal();
+        // ── 항상 가능 (액션 중에도 동작) ───────────────────────────────────
 
-        // H — 배고픈 모션 토글
-        if (kb.hKey.wasPressedThisFrame)
+        // G — 배고픈 모션 토글
+        if (kb.gKey.wasPressedThisFrame)
         {
             _testHungry = !_testHungry;
             _anim?.SetHungry(_testHungry);
         }
 
-        // T — 던지기 모션 (animResetTime 후 자동 복귀)
-        if (kb.tKey.wasPressedThisFrame)
+        // Q — 공격 모션 (쿨다운만 체크)
+        if (kb.qKey.wasPressedThisFrame && _fightCooldown <= 0f)
+        {
+            _anim?.TriggerFight();
+            _fightCooldown = animResetTime;
+        }
+
+        // F — 게임 오버 (이후 모든 입력·이동 차단)
+        if (kb.fKey.wasPressedThisFrame)
+        {
+            _isDead = true;
+            _rb.linearVelocity = Vector2.zero;
+            _rb.gravityScale   = _defaultGravityScale;
+            _anim?.SetDead(true);
+        }
+
+        // ── 액션 중에는 아래 입력 전부 차단 ────────────────────────────────
+        if (_anim != null && _anim.IsActionPlaying()) return;
+
+        // S — 스틸 모션
+        if (kb.sKey.wasPressedThisFrame)
+            _anim?.TriggerSteal();
+
+        // H — 피격 모션
+        if (kb.hKey.wasPressedThisFrame && _hurtTimer <= 0f)
+        {
+            _anim?.SetHurt(true);
+            _hurtTimer = animResetTime;
+        }
+
+        // T — 던지기 모션
+        if (kb.tKey.wasPressedThisFrame && _throwTimer <= 0f)
         {
             _anim?.SetThrow(true);
             _throwTimer = animResetTime;
         }
 
-        // Q — 공격 모션
-        if (kb.qKey.wasPressedThisFrame)
-            _anim?.TriggerFight();
+        // E — 음식 먹기 모션
+        if (kb.eKey.wasPressedThisFrame)
+            _anim?.TriggerEat();
+
+        // R — 잠자기 모션
+        if (kb.rKey.wasPressedThisFrame)
+            _anim?.TriggerSleep();
 
         // Shift — Turn/Spin 모션
         if (kb.leftShiftKey.wasPressedThisFrame || kb.rightShiftKey.wasPressedThisFrame)
             _anim?.TriggerTurn();
-
-        // G — 피격 모션 (animResetTime 후 자동 복귀)
-        if (kb.gKey.wasPressedThisFrame)
-        {
-            _anim?.SetHurt(true);
-            _hurtTimer = animResetTime;
-        }
     }
 
     void FixedUpdate()
     {
         if (!GameManager.Instance.IsPlaying) return;
+        if (_isDead) return;
         if (_isDashing) return;
 
         // 사다리 위에서는 중력 제거 + 수직 이동

@@ -19,6 +19,13 @@ public class PlayerAnimationController : MonoBehaviour
     static readonly int H_IsLadder = Animator.StringToHash("isLadder");
     static readonly int H_IsThrow = Animator.StringToHash("isThrow");
     static readonly int H_IsDash = Animator.StringToHash("isDash");
+    static readonly int H_IsDead = Animator.StringToHash("isDead");
+
+    // State name hashes (CrossFade 직접 전환용)
+    static readonly int H_HurtState = Animator.StringToHash("Hurt");
+    static readonly int H_ThrowState = Animator.StringToHash("Throw");
+    static readonly int H_GameOverState = Animator.StringToHash("GameOver");
+    static readonly int H_SleepState = Animator.StringToHash("Sleep");
 
     // Trigger  ※ Animator에서 Turn 파라미터명이 "Trun"으로 저장돼 있으므로 그대로 맞춤
     static readonly int H_Jump = Animator.StringToHash("Jump");
@@ -111,14 +118,49 @@ public class PlayerAnimationController : MonoBehaviour
 
     // ── 외부 호출 — Bool ─────────────────────────────────────────────────────
 
+    /// <summary>게임 오버 — CrossFade로 직접 진입(isDead bool 미사용 → CanTransitionToSelf 루프 차단)</summary>
+    public void SetDead(bool value)
+    {
+        if (value) _anim.CrossFade(H_GameOverState, 0f, 0, 0f);
+    }
+
+    /// <summary>R 키 → 잠자기 모션 (애니메이션 끝나면 Idle로 자동 복귀)</summary>
+    public void TriggerSleep() => _anim.CrossFade(H_SleepState, 0f, 0, 0f);
+
+    // ── 액션 상태 조회 ────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sleep·Hurt·Throw·Eat·Steal·Turn·Fight 중 하나가 재생 중이면 true 반환.
+    /// Hungry·Attack(Fight)는 항상 가능하므로 호출부에서 별도 처리.
+    /// </summary>
+    public bool IsActionPlaying()
+    {
+        var cur = _anim.GetCurrentAnimatorStateInfo(0);
+        if (IsActionState(cur)) return true;
+        if (_anim.IsInTransition(0))
+            return IsActionState(_anim.GetNextAnimatorStateInfo(0));
+        return false;
+    }
+
+    static bool IsActionState(AnimatorStateInfo info)
+        => info.IsName("Sleep") || info.IsName("Hurt") || info.IsName("Throw")
+        || info.IsName("Eat") || info.IsName("Steal") || info.IsName("Turn")
+        || info.IsName("Fight");
+
     /// <summary>H 키 · HungerRatio &lt; 0.3f → 배고픈 모션</summary>
     public void SetHungry(bool value) => _anim.SetBool(H_IsHungry, value);
 
-    /// <summary>피격 시 true, 복귀 시 false</summary>
-    public void SetHurt(bool value) => _anim.SetBool(H_IsHurt, value);
+    /// <summary>피격 시 true → CrossFade로 즉각 전환. false는 no-op(ExitTime으로 자동 복귀)</summary>
+    public void SetHurt(bool value)
+    {
+        if (value) _anim.CrossFade(H_HurtState, 0f, 0, 0f);
+    }
 
-    /// <summary>T 키 · 던지기 모션 시작/종료</summary>
-    public void SetThrow(bool value) => _anim.SetBool(H_IsThrow, value);
+    /// <summary>T 키 → CrossFade로 직접 진입(isThrow bool 미사용 → CanTransitionToSelf 루프 차단)</summary>
+    public void SetThrow(bool value)
+    {
+        if (value) _anim.CrossFade(H_ThrowState, 0.25f, 0, 0f);
+    }
 
     // TODO: PlayerStats 작성 후 아래 구독 코드 추가
     // void Start()    { PlayerStats.OnHungerChanged += v => SetHungry(v < 0.3f); }
