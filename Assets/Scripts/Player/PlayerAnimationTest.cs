@@ -51,6 +51,9 @@ public class PlayerAnimationTest : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
+        // GameOver 상태에서는 모든 테스트 입력 차단
+        if (_controller != null && _controller.IsDead) return;
+
         // ── 항상 가능 (액션 중에도 동작) ───────────────────────────────────
 
         // G — 배고픈 모션 토글
@@ -60,8 +63,8 @@ public class PlayerAnimationTest : MonoBehaviour
             _anim.SetHungry(_testHungry);
         }
 
-        // F — 게임 오버 (PlayerController 이동 차단 + GameOver 애니메이션)
-        if (kb.fKey.wasPressedThisFrame)
+        // B — 게임 오버 (PlayerController 이동 차단 + GameOver 애니메이션)
+        if (kb.bKey.wasPressedThisFrame)
         {
             _controller?.Die();
             _anim.SetDead(true);

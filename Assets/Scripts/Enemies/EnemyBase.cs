@@ -24,6 +24,8 @@ public abstract class EnemyBase : MonoBehaviour
     int _hp;
     int _groundMask;
 
+    public System.Action<int, int> OnHealthChanged;
+
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
 
     public EnemyType Type        => enemyType;
@@ -60,8 +62,9 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (_isDead) return;
         _hp -= amount;
+        OnHealthChanged?.Invoke(_hp, maxHp);
         Debug.Log($"[{gameObject.name}] HP: {_hp}/{maxHp}");
-        if (_hp <= 0) Die();
+if (_hp <= 0) Die();
         else
         {
             _anim?.PlayHit();
