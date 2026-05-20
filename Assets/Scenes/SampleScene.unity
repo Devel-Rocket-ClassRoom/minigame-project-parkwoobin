@@ -311,7 +311,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 379dc5cb17c5d4a4a94bc5741330ad12, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CoinKeySystem
 --- !u!1 &54563505
 GameObject:
@@ -4832,21 +4832,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f82c67143d4e3104692952e29481aaeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 4
-  dashForce: 12
-  dashDuration: 0.2
-  maxJumpHeight: 2.5
-  maxJumpApexTime: 0.28
-  minJumpHeight: 0.4
-  minJumpApexTime: 0.2
-  fallMultiplier: 3
-  preLandDistance: 0.8
-  ladderMask:
-    serializedVersion: 2
-    m_Bits: 0
-  maxHp: 5
-  hurtDuration: 0.35
-  invincibleDuration: 1
 --- !u!114 &1083857968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5882,6 +5867,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 561636796191370951, guid: 400862249f8d28e40a8330683eaf039c, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 623882355806809193, guid: 400862249f8d28e40a8330683eaf039c, type: 3}
       propertyPath: m_IsActive
       value: 1
