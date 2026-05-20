@@ -6,25 +6,25 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] float moveSpeed = 4f;
-    [SerializeField] float dashForce = 12f;
-    [SerializeField] float dashDuration = 0.2f;
+    private float moveSpeed = 4f;
+    private float dashForce = 12f;
+    private float dashDuration = 0.2f;
 
     [Header("Jump Feel")]
-    [SerializeField] float maxJumpHeight = 2.5f;
-    [SerializeField] float maxJumpApexTime = 0.28f;
-    [SerializeField] float minJumpHeight = 0.4f;
-    [SerializeField] float minJumpApexTime = 0.2f;
-    [SerializeField] float fallMultiplier = 3.0f;
-    [SerializeField] float preLandDistance = 0.8f;
+    private float maxJumpHeight = 2.5f;
+    private float maxJumpApexTime = 0.28f;
+    private float minJumpHeight = 0.4f;
+    private float minJumpApexTime = 0.2f;
+    private float fallMultiplier = 3.0f;
+    private float preLandDistance = 0.8f;
 
     [Header("Wall / Ladder Detection")]
-    [SerializeField] LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
+    private LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
 
     [Header("Combat")]
-    [SerializeField] int maxHp = 5;
-    [SerializeField] float hurtDuration = 0.35f;
-    [SerializeField] float invincibleDuration = 1f;
+    private int maxHp = 5;
+    private float hurtDuration = 0.35f;
+    private float invincibleDuration = 1f;
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     Rigidbody2D _rb;
