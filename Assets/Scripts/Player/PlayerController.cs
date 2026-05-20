@@ -37,7 +37,8 @@ public class PlayerController : MonoBehaviour
     int _groundMask;
 
     // ── 상태 ─────────────────────────────────────────────────────────────────
-    float _moveInput;
+    float _rawMoveInput; // 실제 키 상태 (Input System 이벤트가 없어도 보존)
+    float _moveInput;    // 유효 이동 입력 (블록 중엔 0)
     bool _isGrounded;
     bool _isDucking;
     bool _isDashing;
@@ -60,15 +61,14 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputValue value)
     {
-        if (_isDucking) return;
         if (_isDead) return;
-        // Eat·Sleep 중 이동 차단
-        if (_anim != null && _anim.IsMovementBlocked()) { _moveInput = 0f; return; }
-        _moveInput = value.Get<float>();
+        // 실제 키 상태만 보존 — 적용 여부는 Update에서 결정
+        _rawMoveInput = value.Get<float>();
     }
 
     public void OnJump(InputValue value)
     {
+        if (_isDead) return;
         if (_isDucking) return;
         if (value.isPressed) PressJump();
         else ReleaseJump();
@@ -91,6 +91,7 @@ public class PlayerController : MonoBehaviour
     public void OnDuck(InputValue value)
     {
         if (!value.isPressed) return;
+        if (_isDead) return;
         if (_isDucking)
         {
             _isDucking = false;
@@ -99,7 +100,6 @@ public class PlayerController : MonoBehaviour
         {
             if (!_isGrounded) return;
             _isDucking = true;
-            _moveInput = 0f;
             _isDashing = false;
         }
     }
@@ -195,9 +195,9 @@ public class PlayerController : MonoBehaviour
             if (_dashTimer <= 0f) _isDashing = false;
         }
 
-        // Eat·Sleep 중에는 수평 이동 입력을 매 프레임 차단 — fix #6
-        if (_anim != null && _anim.IsMovementBlocked())
-            _moveInput = 0f;
+        // 매 프레임 rawMoveInput → moveInput 적용 (블록 중엔 0) — fix #9
+        bool movementBlocked = _isDucking || (_anim != null && _anim.IsMovementBlocked());
+        _moveInput = movementBlocked ? 0f : _rawMoveInput;
 
         UpdateFacing();
         _anim?.UpdateState(_moveInput, _isGrounded, aboutToLand,
@@ -316,6 +316,12 @@ public class PlayerController : MonoBehaviour
     }
 
     // ── 외부 호출 ────────────────────────────────────────────────────────────
+
+    public void Heal(int amount)
+    {
+        if (_isDead) return;
+        _hp = Mathf.Min(maxHp, _hp + amount);
+    }
 
     public void TakeDamage(int amount, float attackerX = 0f)
     {
