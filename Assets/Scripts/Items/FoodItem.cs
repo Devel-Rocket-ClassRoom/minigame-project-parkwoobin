@@ -27,9 +27,6 @@ public class FoodItem : MonoBehaviour
     [SerializeField] int coinDelta = 0;     // 코인 획득량
     [SerializeField] bool isKey = false; // 열쇠 아이템 여부
 
-    [Header("Effect")]
-    [SerializeField] GameObject collectFX;      // 수집 시 재생할 파티클 프리팹 (선택)
-
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
@@ -57,10 +54,6 @@ public class FoodItem : MonoBehaviour
         // 열쇠
         if (isKey)
             CoinKeySystem.Instance?.AddKey();
-
-        // 이펙트
-        if (collectFX != null)
-            Instantiate(collectFX, transform.position, Quaternion.identity);
 
         Destroy(gameObject);
     }
