@@ -1,0 +1,38 @@
+{
+    "asset": "ca8f8eb1b2ed369409a883a459c0158d",
+    "fileName": "019e3f5a-67eb-7474-ae4f-a8a2257f8e8e.png",
+    "prompt": "pixel art health bar frame, empty container, 16-bit style, dark grey and silver colors, matching the cute pixel art style of the reference image, high contrast, clean outlines, game UI asset",
+    "negativePrompt": "",
+    "model": "flux-2-dev",
+    "modelName": "Flux 2 (Dev)",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelatePixelGridSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": [
+            {
+                "doodleReferenceType": 7,
+                "doodle": [],
+                "label": "Image",
+                "strength": 0.25,
+                "invertStrength": false,
+                "assetReferenceGuid": "8ec070da11922a44488e374a9e07ec0b",
+                "unlabeledIndex": -1
+            }
+        ]
+    },
+    "upscaleFactor": 0,
+    "dimensions": {
+        "width": 1024,
+        "height": 1024
+    },
+    "spriteSheet": false,
+    "duration": 0.0
+}
