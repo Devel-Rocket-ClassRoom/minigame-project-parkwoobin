@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8965937657464134914}
   - component: {fileID: 936974744538219014}
   - component: {fileID: 5479335431902043269}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Coin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -80,7 +80,7 @@ CircleCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 576
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -180,7 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1987051377200174320}
   - component: {fileID: 515352887936295608}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CoinVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
