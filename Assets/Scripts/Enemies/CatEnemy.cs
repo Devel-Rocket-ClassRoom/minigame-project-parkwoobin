@@ -181,8 +181,7 @@ public class CatEnemy : EnemyBase
                     {
                         _attackTimer = attackCooldown;
                         _anim?.TriggerAttack();
-                        var playerCtrl = _player.GetComponent<PlayerController>();
-                        playerCtrl?.TakeDamage(attackPower, transform.position.x);
+                        // 데미지는 Animation Event(OnAttackHitFrame)에서 처리
                     }
                     break;
                 }
@@ -267,5 +266,14 @@ public class CatEnemy : EnemyBase
     void RecoverFromHit()
     {
         if (!_isDead) _state = State.Chase;
+    }
+
+    // Animation Event: 공격 클립의 마지막 2프레임 시작 시점에서 호출
+    public void OnAttackHitFrame()
+    {
+        if (_isDead || _player == null) return;
+        if (!PlayerInHitBox()) return;
+        var playerCtrl = _player.GetComponent<PlayerController>();
+        playerCtrl?.TakeDamage(attackPower, transform.position.x);
     }
 }
