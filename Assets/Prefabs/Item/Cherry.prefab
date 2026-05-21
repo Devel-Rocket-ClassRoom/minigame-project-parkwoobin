@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6688760654754873927}
   - component: {fileID: 4378052067951682126}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CherryVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 2311599735872843898}
   - component: {fileID: 8277154661177624973}
   - component: {fileID: 7024577162120652355}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cherry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,7 +154,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &4651751327409541737
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -171,7 +171,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 576
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
