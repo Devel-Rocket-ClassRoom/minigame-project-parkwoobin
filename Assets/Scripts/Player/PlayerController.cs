@@ -26,6 +26,13 @@ public class PlayerController : MonoBehaviour
     private float hurtDuration = 0.35f;
     private float invincibleDuration = 1f;
 
+    [Header("Attack HitBox")]
+    [SerializeField] GameObject _attackHitBox;
+    [SerializeField] float _attackActiveDuration = 0.2f;
+
+    [Header("Action Cooldowns")]
+    [SerializeField] float actionResetTime = 0.6f;
+
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     Rigidbody2D _rb;
     PlayerAnimationController _anim;
@@ -53,6 +60,13 @@ public class PlayerController : MonoBehaviour
     bool _isHurt;
     float _hurtTimer;
     float _invincibleTimer;
+    Coroutine _attackCoroutine;
+
+    // 액션 쿨다운 / 토글 상태
+    bool _isHungry;
+    float _throwTimer;
+    float _hurtAnimTimer;
+    float _fightCooldown;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -104,6 +118,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnAttack(InputValue value)
+    {
+        if (!value.isPressed) return;
+        TriggerAttack();
+    }
+
     // ── 초기화 ───────────────────────────────────────────────────────────────
 
     void Awake()
@@ -136,6 +156,27 @@ public class PlayerController : MonoBehaviour
         if (_groundMask == 0)
             _groundMask = ~(1 << gameObject.layer);
         _hp = maxHp;
+        if (_attackHitBox == null) _attackHitBox = BuildAttackHitBox();
+        _attackHitBox.SetActive(false);
+    }
+
+    // Inspector에 연결된 AttackHitBox가 없으면 플레이어 앞에 자동 생성
+    GameObject BuildAttackHitBox()
+    {
+        var go = new GameObject("Attack HitBox");
+        go.transform.SetParent(transform, false);
+        go.transform.localPosition = new Vector3(0.4f, 0f, 0f);
+        go.layer = gameObject.layer;
+        // Kinematic RB 필수: 자체 RB 없으면 OnTriggerEnter2D가 부모(Player)에만 전달됨
+        var rb = go.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.gravityScale = 0f;
+        rb.simulated = true;
+        var col = go.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(0.5f, 0.8f);
+        go.AddComponent<AttackHitBox>();
+        return go;
     }
 
     // ── 업데이트 ─────────────────────────────────────────────────────────────
@@ -152,6 +193,10 @@ public class PlayerController : MonoBehaviour
         }
         if (_invincibleTimer > 0f)
             _invincibleTimer -= Time.deltaTime;
+
+        if (_throwTimer > 0f) _throwTimer -= Time.deltaTime;
+        if (_hurtAnimTimer > 0f) _hurtAnimTimer -= Time.deltaTime;
+        if (_fightCooldown > 0f) _fightCooldown -= Time.deltaTime;
 
         // ── 지면 감지 (충돌 법선 기반) ─────────────────────────────────────
         _isGrounded = false;
@@ -344,7 +389,127 @@ public class PlayerController : MonoBehaviour
         _isDead = true;
         _rb.linearVelocity = Vector2.zero;
         _rb.gravityScale = _defaultGravityScale;
+        DisableAttackHitBox();
         _anim?.SetDead(true);
+    }
+
+    // ── 액션 트리거 (외부 입력 진입점) ───────────────────────────────────────
+
+    bool CanStartAction()
+    {
+        if (_isDead) return false;
+        if (_anim != null && _anim.IsActionPlaying()) return false;
+        return true;
+    }
+
+    public void ToggleHungry()
+    {
+        if (_isDead) return;
+        _isHungry = !_isHungry;
+        _anim?.SetHungry(_isHungry);
+    }
+
+    public void TriggerAttack()
+    {
+        if (_isDucking) return;
+        if (!CanStartAction()) return;
+        if (_fightCooldown > 0f) return;
+        _anim?.TriggerFight();
+        _fightCooldown = actionResetTime;
+        EnableAttackHitBox();
+    }
+
+    public void TriggerSteal()
+    {
+        if (!CanStartAction()) return;
+        if (!_isGrounded) return;
+        _anim?.TriggerSteal();
+    }
+
+    public void TriggerHurtAnimation()
+    {
+        if (_isDead) return;
+        if (_hurtAnimTimer > 0f) return;
+        _anim?.SetHurt(true);
+        _hurtAnimTimer = actionResetTime;
+    }
+
+    public void TriggerThrow()
+    {
+        if (_isDead) return;
+        if (_throwTimer > 0f) return;
+        _anim?.SetThrow(true);
+        _throwTimer = actionResetTime;
+    }
+
+    public void TriggerEat()
+    {
+        if (!CanStartAction()) return;
+        _anim?.TriggerEat();
+    }
+
+    public void TriggerSleep()
+    {
+        if (!CanStartAction()) return;
+        if (!_isGrounded) return;
+        _anim?.TriggerSleep();
+    }
+
+    public void TriggerTurn()
+    {
+        if (!CanStartAction()) return;
+        if (!_isGrounded && !IsAscending) return;
+        _anim?.TriggerTurn();
+    }
+
+    // Animation Event 또는 코드에서 직접 호출 가능
+    public void EnableAttackHitBox()
+    {
+        if (_attackHitBox == null) return;
+        if (_attackCoroutine != null) StopCoroutine(_attackCoroutine);
+        _attackHitBox.SetActive(true);
+        _attackCoroutine = StartCoroutine(AttackActiveRoutine());
+    }
+
+    public void DisableAttackHitBox()
+    {
+        if (_attackCoroutine != null) { StopCoroutine(_attackCoroutine); _attackCoroutine = null; }
+        _attackHitBox?.SetActive(false);
+    }
+
+    System.Collections.IEnumerator AttackActiveRoutine()
+    {
+        var col = _attackHitBox.GetComponent<BoxCollider2D>();
+        var hitConfig = _attackHitBox.GetComponent<AttackHitBox>();
+        int dmg = hitConfig != null ? hitConfig.Damage : 1;
+        var hitEnemies = new System.Collections.Generic.HashSet<EnemyBase>();
+        float elapsed = 0f;
+
+        while (elapsed < _attackActiveDuration)
+        {
+            if (col != null)
+            {
+                // HitBox 위치·크기 기준으로 겹치는 모든 콜라이더 검사
+                Vector2 center = col.bounds.center;
+                Vector2 size = col.bounds.size;
+                var hits = Physics2D.OverlapBoxAll(center, size, 0f);
+                foreach (var h in hits)
+                {
+                    if (h.gameObject == gameObject) continue; // 자기 자신 제외
+                    var enemy = h.GetComponentInParent<EnemyBase>();
+                    if (enemy != null && hitEnemies.Add(enemy))
+                    {
+                        Debug.Log($"[PlayerController] 적 적중: {enemy.name}, damage={dmg}");
+                        enemy.TakeDamage(dmg, transform.position.x);
+                    }
+                }
+            }
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _attackHitBox.SetActive(false);
+        _attackCoroutine = null;
     }
 
     // ── 외부 참조용 프로퍼티 ─────────────────────────────────────────────────

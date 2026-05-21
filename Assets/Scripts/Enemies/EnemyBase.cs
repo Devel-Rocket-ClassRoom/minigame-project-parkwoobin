@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public enum EnemyType { Normal, Fast, Strong }
 
@@ -11,6 +13,10 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected float moveSpeed    = 3f;
     [SerializeField] protected int   attackPower  = 1;
 
+    [Header("Attack HitBox")]
+    [SerializeField] GameObject _attackHitBox;
+    [SerializeField] float      _hitBoxDuration = 0.2f;
+
     protected Rigidbody2D              _rb;
     protected EnemyAnimationController _anim;
     protected Collider2D               _col;
@@ -20,6 +26,7 @@ public abstract class EnemyBase : MonoBehaviour
     protected bool _facingRight = true;
     protected bool _isDead;
     float _flipCooldown;
+    Coroutine _hitBoxCoroutine;
 
     int _hp;
     int _groundMask;
@@ -39,6 +46,11 @@ public abstract class EnemyBase : MonoBehaviour
         _col  = GetComponent<Collider2D>();
         _hp   = maxHp;
         _groundMask = LayerMask.GetMask("Ground");
+
+        // Inspector 미연결 시 "HitBox" 이름의 자식을 자동 탐색
+        if (_attackHitBox == null)
+            _attackHitBox = transform.Find("HitBox")?.gameObject;
+        _attackHitBox?.SetActive(false);
     }
 
     protected virtual void Update()
@@ -97,5 +109,40 @@ if (_hp <= 0) Die();
         float dir = targetX - transform.position.x;
         if (dir > 0.4f && !_facingRight)       { Flip(); _flipCooldown = 0.8f; }
         else if (dir < -0.4f && _facingRight)  { Flip(); _flipCooldown = 0.8f; }
+    }
+
+    protected void EnableAttackHitBox()
+    {
+        if (_attackHitBox == null) return;
+        if (_hitBoxCoroutine != null) StopCoroutine(_hitBoxCoroutine);
+        _attackHitBox.SetActive(true);
+        _hitBoxCoroutine = StartCoroutine(AttackHitBoxRoutine());
+    }
+
+    IEnumerator AttackHitBoxRoutine()
+    {
+        var col = _attackHitBox.GetComponent<BoxCollider2D>();
+        var hitPlayers = new HashSet<PlayerController>();
+        float elapsed = 0f;
+
+        while (elapsed < _hitBoxDuration)
+        {
+            if (col != null)
+            {
+                var hits = Physics2D.OverlapBoxAll(col.bounds.center, col.bounds.size, 0f);
+                foreach (var h in hits)
+                {
+                    if (h.gameObject == gameObject) continue;
+                    var player = h.GetComponentInParent<PlayerController>();
+                    if (player != null && hitPlayers.Add(player))
+                        player.TakeDamage(attackPower, transform.position.x);
+                }
+            }
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _attackHitBox.SetActive(false);
+        _hitBoxCoroutine = null;
     }
 }
