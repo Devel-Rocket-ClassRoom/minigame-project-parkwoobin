@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2873466808979723524}
   - component: {fileID: 2839062384015461042}
   - component: {fileID: 2161535972968776589}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Fish
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,7 +63,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &3782879190879420982
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -80,7 +80,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 576
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -200,7 +200,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4736693510599879223}
   - component: {fileID: 5271192472447704790}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FishVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
