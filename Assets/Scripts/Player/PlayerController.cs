@@ -26,6 +26,13 @@ public class PlayerController : MonoBehaviour
     private float hurtDuration = 0.35f;
     private float invincibleDuration = 1f;
 
+    [Header("Attack HitBox")]
+    [SerializeField] GameObject _attackHitBox;
+    [SerializeField] float _attackActiveDuration = 0.2f;
+
+    [Header("Action Cooldowns")]
+    [SerializeField] float actionResetTime = 0.6f;
+
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     Rigidbody2D _rb;
     PlayerAnimationController _anim;
@@ -40,6 +47,7 @@ public class PlayerController : MonoBehaviour
     float _rawMoveInput; // 실제 키 상태 (Input System 이벤트가 없어도 보존)
     float _moveInput;    // 유효 이동 입력 (블록 중엔 0)
     bool _isGrounded;
+    bool _aboutToLand;     // FixedUpdate에서 갱신 → Update의 애니메이션이 사용
     bool _isDucking;
     bool _isDashing;
     bool _isOnLadder;
@@ -53,6 +61,13 @@ public class PlayerController : MonoBehaviour
     bool _isHurt;
     float _hurtTimer;
     float _invincibleTimer;
+    Coroutine _attackCoroutine;
+
+    // 액션 쿨다운 / 토글 상태
+    bool _isHungry;
+    float _throwTimer;
+    float _hurtAnimTimer;
+    float _fightCooldown;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -104,6 +119,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnAttack(InputValue value)
+    {
+        if (!value.isPressed) return;
+        TriggerAttack();
+    }
+
     // ── 초기화 ───────────────────────────────────────────────────────────────
 
     void Awake()
@@ -136,23 +157,118 @@ public class PlayerController : MonoBehaviour
         if (_groundMask == 0)
             _groundMask = ~(1 << gameObject.layer);
         _hp = maxHp;
+        if (_attackHitBox == null) _attackHitBox = BuildAttackHitBox();
+        _attackHitBox.SetActive(false);
+    }
+
+    // Inspector에 연결된 AttackHitBox가 없으면 플레이어 앞에 자동 생성
+    GameObject BuildAttackHitBox()
+    {
+        var go = new GameObject("Attack HitBox");
+        go.transform.SetParent(transform, false);
+        go.transform.localPosition = new Vector3(0.4f, 0f, 0f);
+        go.layer = gameObject.layer;
+        // Kinematic RB 필수: 자체 RB 없으면 OnTriggerEnter2D가 부모(Player)에만 전달됨
+        var rb = go.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.gravityScale = 0f;
+        rb.simulated = true;
+        var col = go.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(0.5f, 0.8f);
+        go.AddComponent<AttackHitBox>();
+        return go;
     }
 
     // ── 업데이트 ─────────────────────────────────────────────────────────────
+    // 규칙:
+    //   Update      → 비물리: 타이머, 입력 가공, transform(localScale) 회전, 애니메이션 파라미터
+    //   FixedUpdate → 물리: Rigidbody2D 조작, 중력 스케일, 물리 쿼리(GetContacts/Raycast/OverlapPoint)
 
     void Update()
     {
         if (!GameManager.Instance.IsPlaying) return;
         if (_isDead) return;
 
+        // ── 타이머 감소 (비물리) ──────────────────────────────────────────
         if (_hurtTimer > 0f)
         {
             _hurtTimer -= Time.deltaTime;
             if (_hurtTimer <= 0f) _isHurt = false;
         }
-        if (_invincibleTimer > 0f)
-            _invincibleTimer -= Time.deltaTime;
+        if (_invincibleTimer > 0f) _invincibleTimer -= Time.deltaTime;
+        if (_throwTimer      > 0f) _throwTimer     -= Time.deltaTime;
+        if (_hurtAnimTimer   > 0f) _hurtAnimTimer  -= Time.deltaTime;
+        if (_fightCooldown   > 0f) _fightCooldown  -= Time.deltaTime;
 
+        if (_isDashing)
+        {
+            _dashTimer -= Time.deltaTime;
+            if (_dashTimer <= 0f) _isDashing = false;
+        }
+
+        // ── 이동 입력 가공: rawMoveInput → moveInput (블록 중엔 0) ────────
+        bool movementBlocked = _isDucking || (_anim != null && _anim.IsMovementBlocked());
+        _moveInput = movementBlocked ? 0f : _rawMoveInput;
+
+        // ── 방향(스프라이트 플립) + 애니메이션 파라미터 ───────────────────
+        UpdateFacing();
+        _anim?.UpdateState(_moveInput, _isGrounded, _aboutToLand,
+                           _isDucking, _isDashing, _isOnLadder, _isOnWall);
+    }
+
+    void FixedUpdate()
+    {
+        if (!GameManager.Instance.IsPlaying) return;
+        if (_isDead) return;
+
+        // ── 1) 물리 상태 갱신: 지면 / 벽 / 착지 예측 / 사다리 ─────────────
+        UpdatePhysicsState();
+
+        if (_isHurt) return;
+        if (_isDashing) return;  // 대시 중에는 속도를 덮어쓰지 않음
+
+        // ── 2) 사다리: 중력 제거 + 수직 이동 ─────────────────────────────
+        if (_isOnLadder)
+        {
+            _rb.gravityScale = 0f;
+            float vertInput = ReadVerticalInput();           // W/S 또는 ↑↓ (새 Input System)
+            _rb.linearVelocity = new Vector2(_moveInput * moveSpeed * 0.5f,
+                                             vertInput * moveSpeed);
+            return;
+        }
+
+        // 사다리에서 벗어났을 때 중력 복원
+        if (_rb.gravityScale == 0f)
+            _rb.gravityScale = _defaultGravityScale;
+
+        // ── 3) 숙이기: 수평 이동 정지 ─────────────────────────────────────
+        if (_isDucking)
+        {
+            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+            return;
+        }
+
+        // ── 4) 점프/낙하 중력 스케일 조정 ─────────────────────────────────
+        if (_isGrounded && _rb.linearVelocity.y <= 0f)
+            _rb.gravityScale = _defaultGravityScale;
+        else if (!_isGrounded && _rb.linearVelocity.y < 0f)
+            _rb.gravityScale = _defaultGravityScale * fallMultiplier;
+
+        // ── 5) 벽 슬라이드: 낙하 속도 제한 ───────────────────────────────
+        if (_isOnWall && _rb.linearVelocity.y < 0f)
+        {
+            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x,
+                                             Mathf.Max(_rb.linearVelocity.y, -2f));
+        }
+
+        // ── 6) 수평 이동 적용 ────────────────────────────────────────────
+        _rb.linearVelocity = new Vector2(_moveInput * moveSpeed, _rb.linearVelocity.y);
+    }
+
+    // 물리 쿼리(GetContacts / Raycast / OverlapPoint)는 모두 FixedUpdate에서 호출
+    void UpdatePhysicsState()
+    {
         // ── 지면 감지 (충돌 법선 기반) ─────────────────────────────────────
         _isGrounded = false;
         int cnt = _rb.GetContacts(_contacts);
@@ -160,14 +276,14 @@ public class PlayerController : MonoBehaviour
             if (_contacts[i].normal.y > 0.8f) { _isGrounded = true; break; }
 
         // ── 착지 예측 (Raycast) ────────────────────────────────────────────
-        bool aboutToLand = false;
+        _aboutToLand = false;
         if (!_isGrounded && _rb.linearVelocity.y < 0f)
         {
             float feetY = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
             var origin = new Vector2(transform.position.x, feetY);
             var hit = Physics2D.Raycast(origin, Vector2.down, 20f, _groundMask);
             if (hit.collider != null && hit.distance < preLandDistance)
-                aboutToLand = true;
+                _aboutToLand = true;
         }
 
         // ── 벽 감지 (Enemy 태그 제외 — 적과 닿았을 때 Wall 오작동 방지) ──────
@@ -187,63 +303,6 @@ public class PlayerController : MonoBehaviour
             var overlapCol = Physics2D.OverlapPoint(transform.position, ladderMask);
             _isOnLadder = overlapCol != null;
         }
-
-        // ── 대시 타이머 ─────────────────────────────────────────────────────
-        if (_isDashing)
-        {
-            _dashTimer -= Time.deltaTime;
-            if (_dashTimer <= 0f) _isDashing = false;
-        }
-
-        // 매 프레임 rawMoveInput → moveInput 적용 (블록 중엔 0) — fix #9
-        bool movementBlocked = _isDucking || (_anim != null && _anim.IsMovementBlocked());
-        _moveInput = movementBlocked ? 0f : _rawMoveInput;
-
-        UpdateFacing();
-        _anim?.UpdateState(_moveInput, _isGrounded, aboutToLand,
-                           _isDucking, _isDashing, _isOnLadder, _isOnWall);
-    }
-
-    void FixedUpdate()
-    {
-        if (!GameManager.Instance.IsPlaying) return;
-        if (_isDead) return;
-        if (_isHurt) return;
-        if (_isDashing) return;
-
-        // 사다리 위에서는 중력 제거 + 수직 이동
-        if (_isOnLadder)
-        {
-            _rb.gravityScale = 0f;
-            float vertInput = Input.GetAxisRaw("Vertical");   // W/S 또는 ↑↓
-            _rb.linearVelocity = new Vector2(_moveInput * moveSpeed * 0.5f,
-                                             vertInput * moveSpeed);
-            return;
-        }
-
-        // 사다리 벗어나면 중력 복원
-        if (_rb.gravityScale == 0f)
-            _rb.gravityScale = _defaultGravityScale;
-
-        if (_isDucking)
-        {
-            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
-            return;
-        }
-
-        if (_isGrounded && _rb.linearVelocity.y <= 0f)
-            _rb.gravityScale = _defaultGravityScale;
-        else if (!_isGrounded && _rb.linearVelocity.y < 0f)
-            _rb.gravityScale = _defaultGravityScale * fallMultiplier;
-
-        // 벽에 붙어 있으면 낙하 속도 감소 (벽 슬라이드)
-        if (_isOnWall && _rb.linearVelocity.y < 0f)
-        {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x,
-                                             Mathf.Max(_rb.linearVelocity.y, -2f));
-        }
-
-        _rb.linearVelocity = new Vector2(_moveInput * moveSpeed, _rb.linearVelocity.y);
     }
 
     // ── 점프 ─────────────────────────────────────────────────────────────────
@@ -344,7 +403,146 @@ public class PlayerController : MonoBehaviour
         _isDead = true;
         _rb.linearVelocity = Vector2.zero;
         _rb.gravityScale = _defaultGravityScale;
+        DisableAttackHitBox();
         _anim?.SetDead(true);
+    }
+
+    // ── 액션 트리거 (외부 입력 진입점) ───────────────────────────────────────
+
+    bool CanStartAction()
+    {
+        if (_isDead) return false;
+        if (_anim != null && _anim.IsActionPlaying()) return false;
+        return true;
+    }
+
+    public void ToggleHungry()
+    {
+        if (_isDead) return;
+        _isHungry = !_isHungry;
+        _anim?.SetHungry(_isHungry);
+    }
+
+    public void TriggerAttack()
+    {
+        if (_isDucking) return;
+        if (!CanStartAction()) return;
+        if (_fightCooldown > 0f) return;
+        _anim?.TriggerFight();
+        _fightCooldown = actionResetTime;
+        // HitBox는 Animation Event(OnAttackHitFrame)에서 활성화
+    }
+
+    // Animation Event: 공격 클립의 마지막 2프레임 시작 시점에서 호출
+    public void OnAttackHitFrame()
+    {
+        if (_isDead) return;
+        EnableAttackHitBox();
+    }
+
+    // 새 Input System으로 수직 입력 읽기 (사다리 등에서 사용)
+    // Move 액션이 Axis(float) 타입이라 수직축이 없어서 키보드를 직접 폴링
+    float ReadVerticalInput()
+    {
+        var kb = UnityEngine.InputSystem.Keyboard.current;
+        if (kb == null) return 0f;
+        float v = 0f;
+        if (kb.wKey.isPressed || kb.upArrowKey.isPressed)   v += 1f;
+        if (kb.sKey.isPressed || kb.downArrowKey.isPressed) v -= 1f;
+        return v;
+    }
+
+    public void TriggerSteal()
+    {
+        if (!CanStartAction()) return;
+        if (!_isGrounded) return;
+        _anim?.TriggerSteal();
+    }
+
+    public void TriggerHurtAnimation()
+    {
+        if (_isDead) return;
+        if (_hurtAnimTimer > 0f) return;
+        _anim?.SetHurt(true);
+        _hurtAnimTimer = actionResetTime;
+    }
+
+    public void TriggerThrow()
+    {
+        if (_isDead) return;
+        if (_throwTimer > 0f) return;
+        _anim?.SetThrow(true);
+        _throwTimer = actionResetTime;
+    }
+
+    public void TriggerEat()
+    {
+        if (!CanStartAction()) return;
+        _anim?.TriggerEat();
+    }
+
+    public void TriggerSleep()
+    {
+        if (!CanStartAction()) return;
+        if (!_isGrounded) return;
+        _anim?.TriggerSleep();
+    }
+
+    public void TriggerTurn()
+    {
+        if (!CanStartAction()) return;
+        if (!_isGrounded && !IsAscending) return;
+        _anim?.TriggerTurn();
+    }
+
+    // Animation Event 또는 코드에서 직접 호출 가능
+    public void EnableAttackHitBox()
+    {
+        if (_attackHitBox == null) return;
+        if (_attackCoroutine != null) StopCoroutine(_attackCoroutine);
+        _attackHitBox.SetActive(true);
+        _attackCoroutine = StartCoroutine(AttackActiveRoutine());
+    }
+
+    public void DisableAttackHitBox()
+    {
+        if (_attackCoroutine != null) { StopCoroutine(_attackCoroutine); _attackCoroutine = null; }
+        _attackHitBox?.SetActive(false);
+    }
+
+    System.Collections.IEnumerator AttackActiveRoutine()
+    {
+        var col = _attackHitBox.GetComponent<BoxCollider2D>();
+        var hitConfig = _attackHitBox.GetComponent<AttackHitBox>();
+        int dmg = hitConfig != null ? hitConfig.Damage : 1;
+        var hitEnemies = new System.Collections.Generic.HashSet<EnemyBase>();
+        float elapsed = 0f;
+
+        while (elapsed < _attackActiveDuration)
+        {
+            if (col != null)
+            {
+                // HitBox 위치·크기 기준으로 겹치는 모든 콜라이더 검사
+                Vector2 center = col.bounds.center;
+                Vector2 size = col.bounds.size;
+                var hits = Physics2D.OverlapBoxAll(center, size, 0f);
+                foreach (var h in hits)
+                {
+                    if (h.gameObject == gameObject) continue; // 자기 자신 제외
+                    var enemy = h.GetComponentInParent<EnemyBase>();
+                    if (enemy != null && hitEnemies.Add(enemy))
+                    {
+                        Debug.Log($"[PlayerController] 적 적중: {enemy.name}, damage={dmg}");
+                        enemy.TakeDamage(dmg, transform.position.x);
+                    }
+                }
+            }
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _attackHitBox.SetActive(false);
+        _attackCoroutine = null;
     }
 
     // ── 외부 참조용 프로퍼티 ─────────────────────────────────────────────────
