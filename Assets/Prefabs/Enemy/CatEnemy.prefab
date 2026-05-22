@@ -426,7 +426,7 @@ GameObject:
   - component: {fileID: 6738120684622560139}
   - component: {fileID: 1621679042500754827}
   m_Layer: 8
-  m_Name: CatEnemy_Normal
+  m_Name: CatEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
