@@ -1,5 +1,83 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7000100010001001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7000100010001002}
+  - component: {fileID: 7000100010001003}
+  m_Layer: 0
+  m_Name: HitBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7000100010001002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7000100010001001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.7, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2349290864869764229}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &7000100010001003
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7000100010001001}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.2, y: 1.8}
+  m_EdgeRadius: 0
 --- !u!1 &8296251091834648099
 GameObject:
   m_ObjectHideFlags: 0
@@ -145,7 +223,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &3034202306046153685
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -192,84 +270,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.3716805, y: 2.4333334}
   m_EdgeRadius: 0
---- !u!1 &7000100010001001
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7000100010001002}
-  - component: {fileID: 7000100010001003}
-  m_Layer: 0
-  m_Name: HitBox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &7000100010001002
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7000100010001001}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.7, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2349290864869764229}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &7000100010001003
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7000100010001001}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1.2, y: 1.8}
-  m_EdgeRadius: 0
 --- !u!114 &1001100110011001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,7 +280,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1e2e3e4e5e6e7e8b1b2b3b4b5b6b7b8, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HumanAnimationController
 --- !u!114 &1001100110011002
 MonoBehaviour:
@@ -292,28 +292,65 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f2f3f4f5f6f7f8a1a2a3a4a5a6a7a8, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HumanEnemy
   maxHp: 4
   moveSpeed: 2
   attackPower: 1
   _attackHitBox: {fileID: 7000100010001001}
   _hitBoxDuration: 0.2
+  knockbackDistance: 0.1
+  dropItemPrefabs:
+  - {fileID: 4246600087596067611, guid: 180f5ff90f2c5294e9107ef787f1c514, type: 3}
+  - {fileID: 3259011915748823840, guid: cd15c332ab72dc247aa0dc8639942b4f, type: 3}
+  - {fileID: 9155326854176842781, guid: 9329610e5310a4c44b432466928d4b00, type: 3}
+  - {fileID: 2979145552656130944, guid: 1268996318a00404ab7cae58e09e9769, type: 3}
+  - {fileID: 4274541676122465799, guid: 627a790b1340dd54f8bfa040bb804901, type: 3}
+  - {fileID: 7088832372887314797, guid: 450400c5bb03a6847993029d50f40440, type: 3}
+  - {fileID: 4985350628620266999, guid: c56ee5f3e32789d41a16f5e306a41a45, type: 3}
+  - {fileID: 7866700242967715327, guid: 97d91fd67d59d9f478110dd5aa759f21, type: 3}
+  - {fileID: 6431490987416665839, guid: 331727ae2ee5efa47a0c661d47aebada, type: 3}
+  - {fileID: 361824707507886353, guid: 6d06cb6009bd64349a19fdb0b652caa3, type: 3}
+  - {fileID: 2081187249348762670, guid: e4b3e7d43efa1d14ca637ee872c6d55e, type: 3}
+  - {fileID: 1640401801917746490, guid: 87be5491434058e489cbf2271fc1a02d, type: 3}
+  - {fileID: 3478340281094339650, guid: 7660e464f6600454f8774c940c8c8b4c, type: 3}
+  - {fileID: 2205287538880556747, guid: 688774a5eb4c5a442b85d145ee65bdb1, type: 3}
+  - {fileID: 2045323816012264647, guid: 49a507fa815bd6943b56947ccb38e3c2, type: 3}
+  - {fileID: 3383404546217115115, guid: 7c985b39bed84f447aa6a006cd589634, type: 3}
+  - {fileID: 2081187249348762670, guid: 3b01055e5be8263458a2c22087d0e462, type: 3}
+  dropCountWeights:
+  - 55
+  - 28
+  - 12
+  - 5
+  dropLaunchUp: {x: 3, y: 5}
+  dropLaunchSide: {x: -1.5, y: 1.5}
+  dropSpawnSpread: 0.08
   variant: 0
   patrolRange: 3
-  patrolMoveSpeed: 1.2
+  patrolWalkSpeed: 1.2
   idleMin: 0.8
   idleMax: 2.5
   detectionRange: 6
   meleeRange: 1.1
   gunRange: 8
+  leashRange: 5
+  walkSpeedRatio: 0.55
+  runBurstMin: 1.2
+  runBurstMax: 2.5
+  walkPhaseMin: 0.8
+  walkPhaseMax: 1.6
   meleeCooldown: 1.3
   gunCooldown: 2.5
-  aimDuration: 0.7
+  aimLineDelay: 0.08333334
+  aimDuration: 0.3
+  aimHoldDuration: 0.38
   meleeStateDuration: 0.6
   hitStateDuration: 0.4
   bulletPrefab: {fileID: 8000000000000006, guid: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb, type: 3}
-  bulletSpawnXOffset: 0.7
+  bulletSpawnXOffset: 0.65
   bulletSpawnYOffset: 0.1
   jumpForce: 6
   jumpCooldown: 2.5
+  randomJumpChance: 0.012
+  idleJumpChance: 0.004

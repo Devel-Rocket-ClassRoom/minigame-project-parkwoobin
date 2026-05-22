@@ -14,7 +14,8 @@ public class Bullet : MonoBehaviour
     GameObject  _shooter;
     int         _groundMask;
 
-    static Sprite _runtimeSprite;  // 모든 Bullet 인스턴스가 공유 (1회만 생성)
+    static Sprite   _runtimeSprite;     // 모든 Bullet 인스턴스가 공유 (1회만 생성)
+    static Material _runtimeMaterial;   // URP/2D 매젠타 fallback 방지용 기본 머티리얼
 
     void Awake()
     {
@@ -29,13 +30,31 @@ public class Bullet : MonoBehaviour
         EnsureVisual();
     }
 
-    /// <summary>SpriteRenderer가 비어있으면 코드로 노란 사각형 스프라이트를 자동 생성</summary>
+    /// <summary>SpriteRenderer가 비어있으면 코드로 머티리얼·스프라이트를 자동 생성 (URP 2D 매젠타 방지)</summary>
     void EnsureVisual()
     {
         var sr = GetComponent<SpriteRenderer>();
         if (sr == null) return;
-        if (sr.sprite != null) return;
 
+        // 1) 머티리얼 누락 → URP 2D에서 매젠타로 보임. 적절한 sprite 셰이더를 자동 할당
+        if (sr.sharedMaterial == null)
+        {
+            if (_runtimeMaterial == null)
+            {
+                // URP 2D → Universal Render Pipeline/2D/Sprite-Unlit-Default
+                // Built-in → Sprites/Default
+                Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+                if (shader == null) shader = Shader.Find("Sprites/Default");
+                if (shader != null)
+                {
+                    _runtimeMaterial = new Material(shader) { name = "BulletRuntimeMat" };
+                }
+            }
+            if (_runtimeMaterial != null) sr.material = _runtimeMaterial;
+        }
+
+        // 2) Sprite도 없으면 코드로 노란 사각형 생성
+        if (sr.sprite != null) return;
         if (_runtimeSprite == null)
         {
             var tex = new Texture2D(8, 8, TextureFormat.RGBA32, false);
