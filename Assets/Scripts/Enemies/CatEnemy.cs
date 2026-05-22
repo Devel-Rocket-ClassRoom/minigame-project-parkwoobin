@@ -41,7 +41,7 @@ public class CatEnemy : EnemyBase
     bool _wasGrounded;
     bool _isFalling;
     bool _landTriggered;       // preLand 예측 트리거 중복 방지
-    int  _groundLayerMask;
+    int _groundLayerMask;
 
     protected override void Awake()
     {
@@ -57,7 +57,6 @@ public class CatEnemy : EnemyBase
         var hitBoxObj = transform.Find("HitBox");
         if (hitBoxObj != null)
             _hitBoxCol = hitBoxObj.GetComponent<BoxCollider2D>();
-        Debug.Log($"[CatEnemy] HitBox 캐싱: {(_hitBoxCol != null ? "성공 size=" + _hitBoxCol.size : "실패 — HitBox 자식 또는 BoxCollider2D 없음")}");
 
         _patrolOriginX = transform.position.x;
         _idleTimer = Random.Range(1f, 2.5f);
@@ -273,7 +272,6 @@ public class CatEnemy : EnemyBase
 
     void Jump()
     {
-        Debug.Log($"[CatEnemy:{name}] Jump! grounded={_isGrounded}, vy={_rb.linearVelocity.y:F2} → {jumpForce}");
         _jumpTimer = jumpCooldown;
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
         _anim?.TriggerJump();

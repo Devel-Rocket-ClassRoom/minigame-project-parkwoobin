@@ -82,7 +82,7 @@ public class HumanEnemy : EnemyBase
     {
         if (_player == null) return false;
         float dx = _player.position.x - transform.position.x;
-        if (dx >  0.1f) return _facingRight;
+        if (dx > 0.1f) return _facingRight;
         if (dx < -0.1f) return !_facingRight;
         return true;
     }
@@ -151,8 +151,8 @@ public class HumanEnemy : EnemyBase
         if (_isDead) return;
 
         _attackTimer -= Time.deltaTime;
-        _jumpTimer   -= Time.deltaTime;
-        _stunTimer   -= Time.deltaTime;
+        _jumpTimer -= Time.deltaTime;
+        _stunTimer -= Time.deltaTime;
 
         UpdateAI();
 
@@ -468,7 +468,6 @@ public class HumanEnemy : EnemyBase
 
     void DoJump()
     {
-        Debug.Log($"[HumanEnemy:{name}] Jump! grounded={_isGrounded}, vy={_rb.linearVelocity.y:F2} → {jumpForce}");
         _jumpTimer = jumpCooldown;
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
         _humanAnim?.TriggerJump();
