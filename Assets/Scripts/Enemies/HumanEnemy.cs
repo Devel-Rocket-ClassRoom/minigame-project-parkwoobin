@@ -30,7 +30,11 @@ public class HumanEnemy : EnemyBase
     [Header("Attack Timing")]
     [SerializeField] float meleeCooldown = 1.3f;
     [SerializeField] float gunCooldown = 2.5f;
-    [SerializeField] float aimDuration = 0.7f;        // 빨간 선이 늘어나는 시간
+    [Tooltip("공격(근접/총) 종료 후 다음 행동까지 멈춰 있는 경직 시간(초)")]
+    [SerializeField] float postActionStun = 0.5f;
+    [Tooltip("Shot 모션에서 총이 화면에 나오기까지의 시간. 그동안 LineRenderer는 숨김")]
+    [SerializeField] float aimLineDelay = 0.167f;
+    [SerializeField] float aimDuration = 0.1f;        // 빨간 선이 늘어나는 시간
     [SerializeField] float aimHoldDuration = 0.1f;    // 다 늘어난 뒤 잠깐 고정
     [SerializeField] float meleeStateDuration = 0.6f;
     [SerializeField] float hitStateDuration = 0.4f;
@@ -61,6 +65,7 @@ public class HumanEnemy : EnemyBase
     float _patrolOriginX;
     int _patrolDir = 1;
     float _jumpTimer;
+    float _stunTimer;        // 공격/발사 직후 경직 시간
 
     // walk/run 전환
     float _runBurstTimer;   // > 0 이면 달리는 중
@@ -72,14 +77,36 @@ public class HumanEnemy : EnemyBase
 
     bool HasGun => variant == HumanVariant.Type1 || variant == HumanVariant.Type3;
 
+    /// <summary>현재 _facingRight가 플레이어 방향과 일치하는지 — 총 발사 가드용</summary>
+    bool IsFacingPlayer()
+    {
+        if (_player == null) return false;
+        float dx = _player.position.x - transform.position.x;
+        if (dx >  0.1f) return _facingRight;
+        if (dx < -0.1f) return !_facingRight;
+        return true;
+    }
+
     protected override void Awake()
     {
         // Variant 기본 스탯 (Inspector 값보다 우선)
+        // aimLineDelay: Shot 클립이 6fps라 1프레임 ≈ 0.167s
+        //   Human1 → 1프레임 후 총 등장 → 0.167s
+        //   Human3 → 5프레임 후 총 등장 → 0.833s
         switch (variant)
         {
-            case HumanVariant.Type1: maxHp = 4; moveSpeed = 2.2f; attackPower = 1; break;
-            case HumanVariant.Type2: maxHp = 6; moveSpeed = 2.0f; attackPower = 2; break;
-            case HumanVariant.Type3: maxHp = 3; moveSpeed = 2.7f; attackPower = 1; break;
+            case HumanVariant.Type1:
+                maxHp = 4; moveSpeed = 2.2f; attackPower = 1;
+                aimLineDelay = 1f / 12f; // Shot 모션이 12fps라 1프레임 ≈ 0.083s
+                break;
+            case HumanVariant.Type2:
+                maxHp = 6; moveSpeed = 2.0f; attackPower = 2;
+                aimLineDelay = 0f;          // 총 미사용
+                break;
+            case HumanVariant.Type3:
+                maxHp = 3; moveSpeed = 2.7f; attackPower = 1;
+                aimLineDelay = 3f / 6f;
+                break;
         }
         base.Awake();
 
@@ -113,7 +140,7 @@ public class HumanEnemy : EnemyBase
         var shader = Shader.Find("Sprites/Default");
         if (shader != null) _aimLine.material = new Material(shader);
         _aimLine.startColor = new Color(1f, 0.1f, 0.1f, 0.9f);
-        _aimLine.endColor   = new Color(1f, 0.1f, 0.1f, 0.0f);  // 끝으로 갈수록 페이드
+        _aimLine.endColor = new Color(1f, 0.1f, 0.1f, 0.0f);  // 끝으로 갈수록 페이드
         _aimLine.sortingOrder = 10;
         _aimLine.enabled = false;
     }
@@ -125,10 +152,11 @@ public class HumanEnemy : EnemyBase
 
         _attackTimer -= Time.deltaTime;
         _jumpTimer   -= Time.deltaTime;
+        _stunTimer   -= Time.deltaTime;
 
         UpdateAI();
 
-        bool moving  = Mathf.Abs(_rb.linearVelocity.x) > 0.1f;
+        bool moving = Mathf.Abs(_rb.linearVelocity.x) > 0.1f;
         bool running = _isRunningNow && moving && (_state == State.Chase);
         bool falling = !_isGrounded && _rb.linearVelocity.y < -0.5f;
         _humanAnim?.UpdateState(isMoving: moving, isRunning: running, isFalling: falling);
@@ -176,6 +204,14 @@ public class HumanEnemy : EnemyBase
                     break;
                 }
 
+                // ── 공격 직후 경직: 멈춰만 있고 다음 행동 안 함 ─────────────
+                if (_stunTimer > 0f)
+                {
+                    _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+                    _isRunningNow = false;
+                    break;
+                }
+
                 // 근접 공격 가능 (총보다 우선)
                 if (dist <= meleeRange && Mathf.Abs(dy) < 1.2f)
                 {
@@ -184,8 +220,8 @@ public class HumanEnemy : EnemyBase
                     if (_attackTimer <= 0f) StartMelee();
                     break;
                 }
-                // 총 사거리
-                if (HasGun && dist <= gunRange && Mathf.Abs(dy) < 2.0f)
+                // 총 사거리 — 단, 플레이어를 바라보고 있을 때만 발사
+                if (HasGun && dist <= gunRange && Mathf.Abs(dy) < 2.0f && IsFacingPlayer())
                 {
                     _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
                     _isRunningNow = false;
@@ -226,6 +262,13 @@ public class HumanEnemy : EnemyBase
                 }
                 // 조준 중 플레이어가 사거리 밖으로 도망간 경우도 캔슬
                 if (HasGun && dist > gunRange * 1.2f)
+                {
+                    CancelAim();
+                    _state = State.Chase;
+                    break;
+                }
+                // 조준 중 플레이어가 적의 뒤로 돌아가면 캔슬
+                if (!IsFacingPlayer())
                 {
                     CancelAim();
                     _state = State.Chase;
@@ -297,7 +340,11 @@ public class HumanEnemy : EnemyBase
 
     void EndMeleeState()
     {
-        if (_state == State.MeleeAttack) _state = State.Chase;
+        if (_state == State.MeleeAttack)
+        {
+            _state = State.Chase;
+            _stunTimer = postActionStun;   // 근접 후 경직
+        }
     }
 
     /// <summary>Animation Event: 근접 공격 클립의 마지막 2프레임 시점에서 호출</summary>
@@ -325,6 +372,16 @@ public class HumanEnemy : EnemyBase
 
     System.Collections.IEnumerator AimRoutine()
     {
+        // 0) Shot 클립에서 총이 화면에 등장하는 프레임까지 라인 없이 대기
+        //    (Human1=1프레임, Human3=5프레임 → Awake에서 자동 세팅됨)
+        if (_aimLine != null) _aimLine.enabled = false;
+        float wait = 0f;
+        while (wait < aimLineDelay)
+        {
+            if (_isDead || _state != State.Aim) { CleanupAimLine(); yield break; }
+            wait += Time.deltaTime;
+            yield return null;
+        }
         if (_aimLine != null) _aimLine.enabled = true;
 
         // 1) 선이 총구→타겟까지 점진적으로 늘어남
@@ -384,6 +441,7 @@ public class HumanEnemy : EnemyBase
             Debug.LogWarning($"[HumanEnemy] {name}: bulletPrefab 미설정");
         }
         _state = State.Chase;
+        _stunTimer = postActionStun;   // 총 발사 후 경직
     }
 
     Vector3 BulletOrigin()
