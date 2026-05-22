@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1 &361824707507886353
 GameObject:
@@ -152,7 +152,6 @@ MonoBehaviour:
   hpDelta: 0
   coinDelta: 0
   isKey: 0
-  collectFX: {fileID: 0}
 --- !u!114 &2501638355073581199
 MonoBehaviour:
   m_ObjectHideFlags: 0
