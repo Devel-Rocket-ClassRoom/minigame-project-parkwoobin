@@ -69,7 +69,7 @@ public class HUDController : MonoBehaviour
 
     void OnKeyChanged(int keys)
     {
-        if (keyText != null) keyText.text = $"{keys.ToString()}개";
+        if (keyText != null) keyText.text = keys > 0 ? $"{keys.ToString()}개" : "키 없음";
     }
 
     void OnStateChanged(GameManager.GameState state) { }
@@ -77,6 +77,6 @@ public class HUDController : MonoBehaviour
     public void SetStage(int stage)
     {
         if (stageText != null)
-            stageText.text = $"Stage {stage}";
+            stageText.text = $"[Stage {stage}]";
     }
 }
