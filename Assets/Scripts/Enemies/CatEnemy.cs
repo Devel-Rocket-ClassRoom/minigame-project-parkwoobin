@@ -2,12 +2,24 @@ using UnityEngine;
 
 public class CatEnemy : EnemyBase
 {
+    [Header("Variant")]
+    [SerializeField] EnemyType enemyType = EnemyType.Normal;
+    public EnemyType Type => enemyType;
+
     [Header("AI")]
     [SerializeField] float detectionRange = 3f;
     [SerializeField] float patrolRange = 3f;
     [SerializeField] float attackCooldown = 1.5f;
+
+    [Header("Jump / Land")]
     [SerializeField] float jumpForce = 7f;
     [SerializeField] float jumpCooldown = 2f;
+    [Tooltip("Chase/Patrol 중 매 프레임 무작위 점프 확률")]
+    [SerializeField] float randomJumpChance = 0.014f;
+    [Tooltip("Idle 중에도 가끔 통통 튀는 점프 확률 (0이면 사용 안 함)")]
+    [SerializeField] float idleJumpChance = 0.005f;
+    [Tooltip("이 거리 이내로 지면에 가까워지면 Land 모션을 미리 재생")]
+    [SerializeField] float preLandDistance = 0.8f;
 
     enum State { Idle, Patrol, Chase, Hit }
 
@@ -28,6 +40,8 @@ public class CatEnemy : EnemyBase
     int _patrolDir = 1;
     bool _wasGrounded;
     bool _isFalling;
+    bool _landTriggered;       // preLand 예측 트리거 중복 방지
+    int  _groundLayerMask;
 
     protected override void Awake()
     {
@@ -47,6 +61,9 @@ public class CatEnemy : EnemyBase
 
         _patrolOriginX = transform.position.x;
         _idleTimer = Random.Range(1f, 2.5f);
+        _groundLayerMask = LayerMask.GetMask("Ground");
+        if (_groundLayerMask == 0)
+            _groundLayerMask = ~(1 << gameObject.layer);
 
         if (enemyType == EnemyType.Fast)
         {
@@ -90,7 +107,15 @@ public class CatEnemy : EnemyBase
         _wasGrounded = _isGrounded;
         _isFalling = !_isGrounded && _rb.linearVelocity.y < -0.5f;
 
-        if (!prevGrounded && _isGrounded) _anim?.TriggerLand();
+        // 착지 예측: 0.8 unit 이내로 지면 접근 시 Land 모션을 미리 재생
+        CheckPreLand();
+
+        // 실제 착지 순간: 예측이 빠졌을 때 보강
+        if (!prevGrounded && _isGrounded)
+        {
+            if (!_landTriggered) _anim?.TriggerLand();
+            _landTriggered = false;   // 다음 점프 대비 리셋
+        }
 
         UpdateAI();
 
@@ -103,6 +128,29 @@ public class CatEnemy : EnemyBase
     }
 
     bool IsEnraged => _enragedTimer > 0f;
+
+    // 지면에 가까워지면 Land 모션 미리 재생 (한 번만)
+    void CheckPreLand()
+    {
+        if (_isGrounded || _landTriggered) return;
+        if (_rb.linearVelocity.y >= 0f) return;   // 상승 중엔 검사 안 함
+
+        float feetY = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
+        var origin = new Vector2(transform.position.x, feetY);
+        var hit = Physics2D.Raycast(origin, Vector2.down, 20f, _groundLayerMask);
+        if (hit.collider != null && hit.distance < preLandDistance)
+        {
+            _anim?.TriggerLand();
+            _landTriggered = true;
+        }
+    }
+
+    void TryRandomJump(float chance)
+    {
+        if (chance <= 0f) return;
+        if (!_isGrounded || _jumpTimer > 0f) return;
+        if (Random.value < chance) Jump();
+    }
 
     // HitBox 콜라이더 범위 안에 플레이어가 있는지 확인
     bool PlayerInHitBox()
@@ -143,12 +191,14 @@ public class CatEnemy : EnemyBase
             case State.Idle:
                 _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
                 _idleTimer -= Time.deltaTime;
+                TryRandomJump(idleJumpChance);
                 if (_idleTimer <= 0f) _state = State.Patrol;
                 if (dist < detectThreshold) _state = State.Chase;
                 break;
 
             case State.Patrol:
                 MovePatrol();
+                TryRandomJump(randomJumpChance);
                 if (dist < detectThreshold) _state = State.Chase;
                 break;
 
@@ -190,6 +240,7 @@ public class CatEnemy : EnemyBase
                 float chaseSpeed = _runBurstTimer > 0f ? MoveSpeed : MoveSpeed * 0.6f;
                 MoveToward(_player.position.x, chaseSpeed);
                 TryJump();
+                TryRandomJump(randomJumpChance);
 
                 if (dist > leashDist)
                 {
@@ -216,12 +267,13 @@ public class CatEnemy : EnemyBase
         if (heightDiff > 1.5f) { Jump(); return; }
 
         float dir = _player.position.x > transform.position.x ? 1f : -1f;
-        bool wallAhead = Physics2D.Raycast(transform.position, Vector2.right * dir, 0.7f, LayerMask.GetMask("Ground"));
+        bool wallAhead = Physics2D.Raycast(transform.position, Vector2.right * dir, 0.7f, _groundLayerMask);
         if (wallAhead) Jump();
     }
 
     void Jump()
     {
+        Debug.Log($"[CatEnemy:{name}] Jump! grounded={_isGrounded}, vy={_rb.linearVelocity.y:F2} → {jumpForce}");
         _jumpTimer = jumpCooldown;
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
         _anim?.TriggerJump();
