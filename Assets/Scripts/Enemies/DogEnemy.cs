@@ -61,6 +61,7 @@ public class DogEnemy : EnemyBase
     State _state = State.Idle;
     float _idleTimer;
     float _attackTimer;
+    float _postAttackTimer;   // 공격 직후 정지 시간
     float _patrolOriginX;
     int _patrolDir = 1;
 
@@ -82,7 +83,11 @@ public class DogEnemy : EnemyBase
         // HitBox 자식에서 BoxCollider2D 캐싱
         var hitBoxObj = transform.Find("HitBox");
         if (hitBoxObj != null)
+        {
             _hitBoxCol = hitBoxObj.GetComponent<BoxCollider2D>();
+            if (_hitBoxCol != null)
+                _hitBoxCol.gameObject.SetActive(false);  // 기본값: 비활성
+        }
 
         _patrolOriginX = transform.position.x;
         _idleTimer = Random.Range(idleMin, idleMax);
@@ -115,6 +120,14 @@ public class DogEnemy : EnemyBase
     void UpdateAI()
     {
         if (_player == null) return;
+
+        // 공격 직후 정지 대기
+        if (_postAttackTimer > 0f)
+        {
+            _postAttackTimer -= Time.deltaTime;
+            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+            return;
+        }
 
         float dx = _player.position.x - transform.position.x;
         float dist = Mathf.Abs(dx);
@@ -202,15 +215,18 @@ public class DogEnemy : EnemyBase
     // ── 공격 시작 ────────────────────────────────────────────────────────────
     void StartAttack()
     {
+        _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
         _attackTimer = attackCooldown;
         _state = State.Attack;
+        if (_hitBoxCol != null) _hitBoxCol.gameObject.SetActive(true);   // HitBox ON
         _dogAnim?.TriggerAttack();
-        // Attack 클립 재생 완료 후 Chase로 복귀
         Invoke(nameof(EndAttackState), attackClipLength);
     }
 
     void EndAttackState()
     {
+        if (_hitBoxCol != null) _hitBoxCol.gameObject.SetActive(false);  // HitBox OFF
+        _postAttackTimer = 0.4f;   // 공격 후 0.4초 정지
         if (_state == State.Attack) _state = State.Chase;
     }
 
@@ -231,17 +247,9 @@ public class DogEnemy : EnemyBase
     bool PlayerInHitBox()
     {
         if (_hitBoxCol == null || _player == null) return false;
-
-        // 비활성 콜라이더는 bounds가 (0,0,0) → offset/size로 직접 월드 좌표 계산
-        float signX = Mathf.Sign(transform.lossyScale.x);
-        Vector2 offset = new Vector2(_hitBoxCol.offset.x * signX, _hitBoxCol.offset.y);
-        Vector2 center = (Vector2)_hitBoxCol.transform.position + offset;
-        Vector2 size = new Vector2(
-            _hitBoxCol.size.x * Mathf.Abs(_hitBoxCol.transform.lossyScale.x),
-            _hitBoxCol.size.y * Mathf.Abs(_hitBoxCol.transform.lossyScale.y)
-        );
-
-        var hits = Physics2D.OverlapBoxAll(center, size, 0f);
+        // HitBox가 활성화된 상태이므로 bounds를 직접 사용
+        var hits = Physics2D.OverlapBoxAll(_hitBoxCol.bounds.center,
+                                           _hitBoxCol.bounds.size, 0f);
         foreach (var h in hits)
         {
             if (h.gameObject == gameObject) continue;
@@ -261,8 +269,9 @@ public class DogEnemy : EnemyBase
     {
         if (_isDead) return;
 
-        // 공격 Invoke가 걸려 있으면 취소 (피격 중 EndAttackState 방지)
+        // 공격 Invoke가 걸려 있으면 취소 + HitBox 즉시 OFF
         CancelInvoke(nameof(EndAttackState));
+        if (_hitBoxCol != null) _hitBoxCol.gameObject.SetActive(false);
 
         _state = State.Hit;
         _dogAnim?.PlayHurt();

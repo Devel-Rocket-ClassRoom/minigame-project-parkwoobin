@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8135535296814385872}
   - component: {fileID: 3172256606430169620}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: BearVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 4956480786269403270}
   - component: {fileID: 8558422507557194864}
   - component: {fileID: 2000726929225592764}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Bear
   m_TagString: Untagged
   m_Icon: {fileID: 0}

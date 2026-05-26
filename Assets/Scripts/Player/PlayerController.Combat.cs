@@ -65,7 +65,7 @@ public partial class PlayerController
 
     public void TriggerAttack()
     {
-        if (_isDucking) return;
+        if (_isHiding || _isDead) return;
         if (!CanStartAction()) return;
         if (_fightCooldown > 0f) return;
         _anim?.TriggerFight();
@@ -186,5 +186,21 @@ public partial class PlayerController
         if (!CanStartAction()) return;
         if (!_isGrounded && !IsAscending) return;
         _anim?.TriggerTurn();
+        if (_turnCoroutine != null) StopCoroutine(_turnCoroutine);
+        _turnCoroutine = StartCoroutine(TurnPassthroughRoutine());
+    }
+
+    IEnumerator TurnPassthroughRoutine()
+    {
+        int playerLayer = gameObject.layer;
+        int enemyLayer  = LayerMask.NameToLayer("Enemy");
+        if (enemyLayer >= 0)
+            Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
+
+        yield return new WaitForSeconds(turnDuration);
+
+        if (enemyLayer >= 0)
+            Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
+        _turnCoroutine = null;
     }
 }

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8265727493444712334}
   - component: {fileID: 8040923718214311738}
   - component: {fileID: 4530285877101613202}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Star
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 2603651426398493691}
   - component: {fileID: 1206018905913740569}
   - component: {fileID: 3119792462039877670}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: StarVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
