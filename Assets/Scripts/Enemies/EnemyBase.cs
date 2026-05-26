@@ -8,13 +8,13 @@ public enum EnemyType { Normal, Fast, Strong }
 public abstract class EnemyBase : MonoBehaviour
 {
     [Header("Stats")]
-    [SerializeField] protected int   maxHp        = 3;
-    [SerializeField] protected float moveSpeed    = 3f;
-    [SerializeField] protected int   attackPower  = 1;
+    [SerializeField] protected int maxHp = 3;
+    [SerializeField] protected float moveSpeed = 3f;
+    [SerializeField] protected int attackPower = 1;
 
     [Header("Attack HitBox")]
     [SerializeField] GameObject _attackHitBox;
-    [SerializeField] float      _hitBoxDuration = 0.2f;
+    [SerializeField] float _hitBoxDuration = 0.2f;
 
     [Header("Hurt Knockback")]
     [Tooltip("피격 시 뒤로 밀려나는 거리(unit)")]
@@ -32,9 +32,9 @@ public abstract class EnemyBase : MonoBehaviour
     [Tooltip("드롭 스폰 위치 미세 분산(±)")]
     [SerializeField] float dropSpawnSpread = 0.08f;
 
-    protected Rigidbody2D              _rb;
+    protected Rigidbody2D _rb;
     protected EnemyAnimationController _anim;
-    protected Collider2D               _col;
+    protected Collider2D _col;
 
     protected bool _isGrounded;
     protected bool _isOnWall;
@@ -50,15 +50,15 @@ public abstract class EnemyBase : MonoBehaviour
 
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
 
-    public float     MoveSpeed   => moveSpeed;
-    public int       AttackPower => attackPower;
+    public float MoveSpeed => moveSpeed;
+    public int AttackPower => attackPower;
 
     protected virtual void Awake()
     {
-        _rb   = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
         _anim = GetComponent<EnemyAnimationController>();
-        _col  = GetComponent<Collider2D>();
-        _hp   = maxHp;
+        _col = GetComponent<Collider2D>();
+        _hp = maxHp;
 
         // Ground 레이어가 정의되지 않은 프로젝트 대비: 자기 레이어 제외 전체로 fallback
         _groundMask = LayerMask.GetMask("Ground");
@@ -77,13 +77,13 @@ public abstract class EnemyBase : MonoBehaviour
         if (_flipCooldown > 0f) _flipCooldown -= Time.deltaTime;
 
         _isGrounded = false;
-        _isOnWall   = false;
+        _isOnWall = false;
         int cnt = _rb.GetContacts(_contacts);
         for (int i = 0; i < cnt; i++)
         {
             int layer = _contacts[i].collider.gameObject.layer;
             if (((1 << layer) & _groundMask) == 0) continue;
-            if (_contacts[i].normal.y >  0.8f) _isGrounded = true;
+            if (_contacts[i].normal.y > 0.8f) _isGrounded = true;
             if (Mathf.Abs(_contacts[i].normal.x) > 0.8f) _isOnWall = true;
         }
     }
@@ -93,7 +93,6 @@ public abstract class EnemyBase : MonoBehaviour
         if (_isDead) return;
         _hp -= amount;
         OnHealthChanged?.Invoke(_hp, maxHp);
-        Debug.Log($"[{gameObject.name}] HP: {_hp}/{maxHp}");
         if (_hp <= 0) Die();
         else
         {
@@ -175,8 +174,8 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (_flipCooldown > 0f) return;
         float dir = targetX - transform.position.x;
-        if (dir > 0.4f && !_facingRight)       { Flip(); _flipCooldown = 0.8f; }
-        else if (dir < -0.4f && _facingRight)  { Flip(); _flipCooldown = 0.8f; }
+        if (dir > 0.4f && !_facingRight) { Flip(); _flipCooldown = 0.8f; }
+        else if (dir < -0.4f && _facingRight) { Flip(); _flipCooldown = 0.8f; }
     }
 
     protected void EnableAttackHitBox()
