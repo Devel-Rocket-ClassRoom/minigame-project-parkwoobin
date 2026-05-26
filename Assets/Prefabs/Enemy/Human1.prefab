@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7000100010001002}
   - component: {fileID: 7000100010001003}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 7883579978084462403}
   - component: {fileID: 7574499729336250754}
   - component: {fileID: 8896114137824039350}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,7 +162,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4485113826904172249}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: VisualRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -201,7 +201,7 @@ GameObject:
   - component: {fileID: 3268627586305288938}
   - component: {fileID: 3184370197579753432}
   - component: {fileID: 8250005856054267778}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HealthBarCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -299,7 +299,7 @@ GameObject:
   - component: {fileID: 6929936209523349134}
   - component: {fileID: 8749277341201876672}
   - component: {fileID: 6609287292700164057}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -373,7 +373,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8272319597282195574}
   - component: {fileID: 5158746827705710456}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HealthSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -461,7 +461,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2464127401680039672}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -596,7 +596,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4723107735738678597, guid: 922107a97c454a749ad2066e7a3df0d0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -673,7 +673,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.5333333, y: 2.3666666}
+    oldSize: {x: 1.5333333, y: 2.4}
     newSize: {x: 1.3666667, y: 2.3666666}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

@@ -10,7 +10,7 @@ public partial class PlayerController
 
     void PressJump()
     {
-        if (_isDucking) return;
+        if (_isHiding) return;
         if (_isDead) return;
         if (_anim != null && _anim.IsMovementBlocked()) return;  // Eat·Sleep 중 점프 차단
         if (_jumpHeld) return;

@@ -28,6 +28,9 @@ public class BoxController : MonoBehaviour
     [Tooltip("스폰 위치 미세 분산(±)")]
     [SerializeField] float spawnSpread = 0.05f;
 
+    // 현재 플레이어 범위 안에 있는 박스 (AttackButton에서 참조)
+    public static BoxController Current { get; private set; }
+
     bool _isPlayerInRange;
     bool _isOpened;
 
@@ -39,7 +42,7 @@ public class BoxController : MonoBehaviour
         if (kb.fKey.wasPressedThisFrame) TryOpenBox();
     }
 
-    void TryOpenBox()
+    public void TryOpenBox()
     {
         var coinKey = CoinKeySystem.Instance;
         if (coinKey == null) return;
@@ -53,6 +56,7 @@ public class BoxController : MonoBehaviour
 
         // 키 있음 → 언락
         _isOpened = true;
+        Current = null;   // 열렸으니 버튼 아이콘 원복
         lockerAnimator?.CrossFade("UnLock", 0f, 0, 0f);
         boxAnimator?.CrossFade("Box_Open", 0f, 0, 0f);
 
@@ -117,11 +121,13 @@ public class BoxController : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
         _isPlayerInRange = true;
+        if (!_isOpened) Current = this;
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
         _isPlayerInRange = false;
+        if (Current == this) Current = null;
     }
 }
