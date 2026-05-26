@@ -15,7 +15,7 @@ public class PlayerAnimationController : MonoBehaviour
     // Bool
     static readonly int H_IsWalking = Animator.StringToHash("isWalking");
     static readonly int H_IsDashing = Animator.StringToHash("isDashing");
-    static readonly int H_IsHiding  = Animator.StringToHash("isHiding");
+    static readonly int H_IsHiding = Animator.StringToHash("isHiding");
     static readonly int H_IsFalling = Animator.StringToHash("isFalling");
     static readonly int H_IsHighJump = Animator.StringToHash("isHighJump");
     static readonly int H_IsHungry = Animator.StringToHash("isHungry");
@@ -24,7 +24,6 @@ public class PlayerAnimationController : MonoBehaviour
 
     // State name hashes (CrossFade 직접 전환용)
     static readonly int H_HurtState = Animator.StringToHash("Hurt");
-    static readonly int H_ThrowState = Animator.StringToHash("Throw");
     static readonly int H_GameOverState = Animator.StringToHash("GameOver");
     static readonly int H_SleepState = Animator.StringToHash("Sleep");
     static readonly int H_DashState = Animator.StringToHash("Dashing");
@@ -46,6 +45,7 @@ public class PlayerAnimationController : MonoBehaviour
     bool _landTriggeredThisFall;
     bool _eatPending;   // CrossFade 후 Eat 상태 진입 전까지 이동 bool 차단
     bool _idleFrozen;   // idle 3회 반복 후 정지 상태
+    static readonly int[] _actionTriggers = { Animator.StringToHash("Trun"), Animator.StringToHash("Fight"), Animator.StringToHash("Eat"), Animator.StringToHash("Steal"), Animator.StringToHash("Jump"), Animator.StringToHash("Land") };
 
     void Awake()
     {
@@ -114,7 +114,8 @@ public class PlayerAnimationController : MonoBehaviour
         if (isIdle)
         {
             if (!_idleFrozen && !_anim.IsInTransition(0)
-                && _anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 3f)
+                && _anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 3f
+                && !AnyActionTriggerPending())
             {
                 _idleFrozen = true;
                 _anim.speed = 0f;
@@ -132,6 +133,13 @@ public class PlayerAnimationController : MonoBehaviour
         if (!_idleFrozen) return;
         _idleFrozen = false;
         _anim.speed = 1f;
+    }
+
+    bool AnyActionTriggerPending()
+    {
+        foreach (var h in _actionTriggers)
+            if (_anim.GetBool(h)) return true;
+        return false;
     }
 
     // ── 외부 호출 — 점프 ─────────────────────────────────────────────────────
@@ -192,20 +200,8 @@ public class PlayerAnimationController : MonoBehaviour
         _anim.Play(H_HurtState);
     }
 
-    /// 던지기 모션 — 즉시 전환(isThrow bool 미사용 → CanTransitionToSelf 루프 차단)
-    public void SetThrow(bool value)
-    {
-        if (!value) return;
-        Unfreeze();
-        _anim.Play(H_ThrowState);
-    }
-
     // ── 상태 조회 ─────────────────────────────────────────────────────────────
 
-    /// 
-    /// Sleep·Hurt·Throw·Eat·Steal·Turn·Fight 중 하나가 재생 중이면 true.
-    /// Hungry·Fight는 항상 가능하므로 호출부에서 별도 처리.
-    /// 
     public bool IsActionPlaying()
     {
         var cur = _anim.GetCurrentAnimatorStateInfo(0);
@@ -232,9 +228,8 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     static bool IsActionState(AnimatorStateInfo info)
-        => info.IsName("Sleep") || info.IsName("Hurt") || info.IsName("Throw")
-        || info.IsName("Eat") || info.IsName("Steal") || info.IsName("Turn")
-        || info.IsName("Fight");
+        => info.IsName("Sleep") || info.IsName("Hurt") || info.IsName("Eat")
+        || info.IsName("Steal") || info.IsName("Turn") || info.IsName("Fight");
 
     // TODO: PlayerStats 작성 후 아래 구독 코드 추가
     // void Start()    { PlayerStats.OnHungerChanged += v => SetHungry(v < 0.3f); }

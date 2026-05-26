@@ -91,7 +91,7 @@ public partial class PlayerController
     void StartDash()
     {
         _isDashing = true;
-        _dashTimer = dashDuration;
+        _dashTimer = 0.2f;
         float dir = _facingRight ? 1f : -1f;
         _rb.linearVelocity = new Vector2(dir * dashForce, _rb.linearVelocity.y);
     }
