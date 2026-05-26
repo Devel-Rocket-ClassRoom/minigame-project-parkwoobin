@@ -15,7 +15,29 @@ public partial class PlayerController
         if (_anim != null && _anim.IsMovementBlocked()) return;  // Eat·Sleep 중 점프 차단
         if (_jumpHeld) return;
         _jumpHeld = true;
-        if (_isGrounded) Jump();
+
+        if (_isGrounded)                        Jump();
+        else if (_isOnWall && wallJumpEnabled)  WallJump();
+    }
+
+    /// <summary>벽에 매달린 상태에서 벽 반대 방향+위로 비스듬히 점프</summary>
+    void WallJump()
+    {
+        // _wallNormalX: 양수=왼쪽 벽(오른쪽으로 튕김), 음수=오른쪽 벽(왼쪽으로 튕김)
+        float dirX = _wallNormalX >= 0f ? 1f : -1f;
+
+        float v0 = 2f * maxJumpHeight / maxJumpApexTime;
+        _rb.gravityScale = CalculateJumpGravityScale(v0, maxJumpApexTime);
+        _rb.linearVelocity = new Vector2(dirX * wallJumpForceX, v0);
+
+        // 바라보는 방향을 튕겨나가는 방향으로 전환
+        if (dirX > 0f && !_facingRight) Flip();
+        else if (dirX < 0f && _facingRight) Flip();
+
+        // FixedUpdate가 수평 속도를 덮어쓰지 않도록 일정 시간 잠금
+        _wallJumpTimer = 0.25f;
+
+        _anim?.TriggerJump(true);
     }
 
     void ReleaseJump()
