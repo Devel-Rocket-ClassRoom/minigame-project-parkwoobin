@@ -16,8 +16,9 @@ public partial class PlayerController
         if (_jumpHeld) return;
         _jumpHeld = true;
 
-        if (_isGrounded)                        Jump();
-        else if (_isOnWall && wallJumpEnabled)  WallJump();
+        if (_isGrounded) Jump();
+        else if (_isOnWall && wallJumpEnabled && !_doubleJumpUsed) WallJump();
+        else if (doubleJumpEnabled && _hasDoubleJump && _wallJumpTimer <= 0f) DoubleJump();
     }
 
     /// <summary>벽에 매달린 상태에서 벽 반대 방향+위로 비스듬히 점프</summary>
@@ -36,6 +37,7 @@ public partial class PlayerController
 
         // FixedUpdate가 수평 속도를 덮어쓰지 않도록 일정 시간 잠금
         _wallJumpTimer = 0.25f;
+        _hasDoubleJump = false;  // 벽 점프 후 더블점프 불가 (착지해야 초기화)
 
         _anim?.TriggerJump(true);
     }
@@ -51,6 +53,17 @@ public partial class PlayerController
     void Jump()
     {
         float v0 = 2f * maxJumpHeight / maxJumpApexTime;
+        _rb.gravityScale = CalculateJumpGravityScale(v0, maxJumpApexTime);
+        _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, v0);
+        _hasDoubleJump = true;   // 지면 점프 후 더블점프 1회 부여
+        _anim?.TriggerJump(true);
+    }
+
+    void DoubleJump()
+    {
+        _hasDoubleJump = false;
+        _doubleJumpUsed = true;  // 착지 전까지 벽점프 차단
+        float v0 = 1.5f * maxJumpHeight / maxJumpApexTime;
         _rb.gravityScale = CalculateJumpGravityScale(v0, maxJumpApexTime);
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, v0);
         _anim?.TriggerJump(true);

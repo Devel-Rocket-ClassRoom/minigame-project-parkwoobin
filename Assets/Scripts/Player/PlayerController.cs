@@ -1,3 +1,4 @@
+using UnityEditor.EditorTools;
 using UnityEngine;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -37,7 +38,10 @@ public partial class PlayerController : MonoBehaviour
 
     [Header("Wall Jump")]
     [SerializeField] bool wallJumpEnabled = false;
-    [SerializeField] float wallJumpForceX = 5f;   // 벽 반대 방향 킥 강도
+    private float wallJumpForceX = 5f;
+
+    [Header("Double Jump")]
+    [SerializeField] bool doubleJumpEnabled = false;
 
     [Header("Attack HitBox")]
     [SerializeField] GameObject _attackHitBox;
@@ -46,7 +50,9 @@ public partial class PlayerController : MonoBehaviour
     [SerializeField] int attackPower = 1;
 
     [Header("Action Cooldowns")]
+    [Tooltip("공격·대시·턴 등 행동 후 재사용 가능해질 때까지의 시간")]
     [SerializeField] float actionResetTime = 0.6f;
+    [Tooltip("배고픈 상태에서 이동 속도 감소. 모바일에서 조이스틱 아래로 이동할 때 플레이어가 숨는 효과 연출")]
     [SerializeField] float turnDuration = 0.5f;  // 턴 모션 중 콜라이더 비활성 시간
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
@@ -74,8 +80,10 @@ public partial class PlayerController : MonoBehaviour
     float _wallNormalX;    // 벽 접촉 법선 X (양수=왼쪽 벽, 음수=오른쪽 벽)
     bool _isHiding;   // 조이스틱 아래 → hide 상태 (모바일 전용)
 
-    // ── 상태 (벽 점프) ──────────────────────────────────────────────────────
-    float _wallJumpTimer;  // 이 시간 동안 수평 속도를 FixedUpdate가 덮어쓰지 않음
+    // ── 상태 (벽 점프 / 더블 점프) ──────────────────────────────────────────
+    float _wallJumpTimer;    // 이 시간 동안 수평 속도를 FixedUpdate가 덮어쓰지 않음
+    bool _hasDoubleJump;    // 공중에서 한 번 더 점프할 수 있는지 여부
+    bool _doubleJumpUsed;   // 더블점프를 사용했으면 true → 착지 전까지 벽점프 차단
 
     // ── 상태 (전투) ─────────────────────────────────────────────────────────
     bool _isDead;
@@ -141,6 +149,7 @@ public partial class PlayerController : MonoBehaviour
             if (_dashTimer <= 0f) _isDashing = false;
         }
         if (_wallJumpTimer > 0f) _wallJumpTimer -= Time.deltaTime;
+        if (_isGrounded) _doubleJumpUsed = false;
 
         // ── 이동 입력 가공: rawMoveInput → moveInput (블록 중엔 0) ────────
         bool movementBlocked = _anim != null && _anim.IsMovementBlocked();
