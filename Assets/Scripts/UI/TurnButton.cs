@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class TurnButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class TurnButton : MonoBehaviour, IPointerDownHandler
 {
-    public JoystickValue value;
-    public void OnPointerDown(PointerEventData eventData)
+    [SerializeField] MobileInputBridge bridge;
+
+    void Start()
     {
-        value.isTurning = true;
+        if (bridge == null)
+            bridge = FindFirstObjectByType<MobileInputBridge>();
     }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        value.isTurning = false;
-    }
+    public void OnPointerDown(PointerEventData eventData) => bridge?.TryTurn();
 }

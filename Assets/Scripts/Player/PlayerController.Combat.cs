@@ -5,7 +5,7 @@ using UnityEngine;
 // PlayerController의 전투·액션 partial.
 // - HP 관리(Heal/TakeDamage/Die)
 // - 공격 HitBox 생성과 활성화 코루틴
-// - 액션 트리거 진입점(Eat/Sleep/Throw/Steal/Turn/Hurt/Hungry 토글 등)
+// - 액션 트리거 진입점(Eat/Sleep/Steal/Turn/Hurt/Hungry 토글 등)
 
 public partial class PlayerController
 {
@@ -160,14 +160,6 @@ public partial class PlayerController
         _hurtAnimTimer = actionResetTime;
     }
 
-    public void TriggerThrow()
-    {
-        if (_isDead) return;
-        if (_throwTimer > 0f) return;
-        _anim?.SetThrow(true);
-        _throwTimer = actionResetTime;
-    }
-
     public void TriggerEat()
     {
         if (!CanStartAction()) return;
@@ -181,19 +173,20 @@ public partial class PlayerController
         _anim?.TriggerSleep();
     }
 
-    public void TriggerTurn()
+    public bool TriggerTurn()
     {
-        if (!CanStartAction()) return;
-        if (!_isGrounded && !IsAscending) return;
+        if (_isDead) return false;
+        if (!_isGrounded && !IsAscending) return false;
         _anim?.TriggerTurn();
         if (_turnCoroutine != null) StopCoroutine(_turnCoroutine);
         _turnCoroutine = StartCoroutine(TurnPassthroughRoutine());
+        return true;
     }
 
     IEnumerator TurnPassthroughRoutine()
     {
         int playerLayer = gameObject.layer;
-        int enemyLayer  = LayerMask.NameToLayer("Enemy");
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
         if (enemyLayer >= 0)
             Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
 

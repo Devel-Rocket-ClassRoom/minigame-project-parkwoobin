@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DashButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class DashButton : MonoBehaviour, IPointerDownHandler
 {
-    public JoystickValue value;
-    public void OnPointerDown(PointerEventData eventData)
+    [SerializeField] MobileInputBridge bridge;
+
+    void Start()
     {
-        value.isDash = true;
+        if (bridge == null)
+            bridge = FindFirstObjectByType<MobileInputBridge>();
     }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        value.isDash = false;
-    }
+    public void OnPointerDown(PointerEventData eventData) => bridge?.TryDash();
 }
