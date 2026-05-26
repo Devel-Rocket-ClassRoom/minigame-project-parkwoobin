@@ -35,6 +35,10 @@ public partial class PlayerController : MonoBehaviour
     private float hurtDuration = 0.35f;
     private float invincibleDuration = 1f;
 
+    [Header("Wall Jump")]
+    [SerializeField] bool wallJumpEnabled = false;
+    [SerializeField] float wallJumpForceX = 5f;   // 벽 반대 방향 킥 강도
+
     [Header("Attack HitBox")]
     [SerializeField] GameObject _attackHitBox;
     [SerializeField] float _attackActiveDuration = 0.2f;
@@ -67,7 +71,11 @@ public partial class PlayerController : MonoBehaviour
     bool _aboutToLand;     // FixedUpdate에서 갱신 → Update의 애니메이션이 사용
     bool _isOnLadder;
     bool _isOnWall;
+    float _wallNormalX;    // 벽 접촉 법선 X (양수=왼쪽 벽, 음수=오른쪽 벽)
     bool _isHiding;   // 조이스틱 아래 → hide 상태 (모바일 전용)
+
+    // ── 상태 (벽 점프) ──────────────────────────────────────────────────────
+    float _wallJumpTimer;  // 이 시간 동안 수평 속도를 FixedUpdate가 덮어쓰지 않음
 
     // ── 상태 (전투) ─────────────────────────────────────────────────────────
     bool _isDead;
@@ -132,6 +140,7 @@ public partial class PlayerController : MonoBehaviour
             _dashTimer -= Time.deltaTime;
             if (_dashTimer <= 0f) _isDashing = false;
         }
+        if (_wallJumpTimer > 0f) _wallJumpTimer -= Time.deltaTime;
 
         // ── 이동 입력 가공: rawMoveInput → moveInput (블록 중엔 0) ────────
         bool movementBlocked = _anim != null && _anim.IsMovementBlocked();
@@ -152,7 +161,8 @@ public partial class PlayerController : MonoBehaviour
         UpdatePhysicsState();
 
         if (_isHurt) return;
-        if (_isDashing) return;  // 대시 중에는 속도를 덮어쓰지 않음
+        if (_isDashing) return;           // 대시 중에는 속도를 덮어쓰지 않음
+        if (_wallJumpTimer > 0f) return;  // 벽 점프 직후 수평 속도 보존
 
         // ── 2) 사다리: 중력 제거 + 수직 이동 ─────────────────────────────
         if (_isOnLadder)
@@ -209,12 +219,18 @@ public partial class PlayerController : MonoBehaviour
 
         // ── 벽 감지 (Enemy 태그 제외 — 적과 닿았을 때 Wall 오작동 방지) ──────
         _isOnWall = false;
+        _wallNormalX = 0f;
         if (!_isGrounded)
         {
             for (int i = 0; i < cnt; i++)
             {
                 if (_contacts[i].collider.CompareTag("Enemy")) continue;
-                if (Mathf.Abs(_contacts[i].normal.x) > 0.8f) { _isOnWall = true; break; }
+                if (Mathf.Abs(_contacts[i].normal.x) > 0.8f)
+                {
+                    _isOnWall = true;
+                    _wallNormalX = _contacts[i].normal.x;
+                    break;
+                }
             }
         }
 
