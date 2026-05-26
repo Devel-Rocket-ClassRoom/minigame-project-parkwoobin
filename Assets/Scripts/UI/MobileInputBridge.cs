@@ -9,17 +9,21 @@ public class MobileInputBridge : MonoBehaviour
     [Tooltip("JValue.asset을 연결하세요")]
     public JoystickValue joystickValue;
 
+    [Tooltip("Dash/Turn 쿨다운 UI. 없으면 UI 없이 쿨다운만 동작")]
+    [SerializeField] SkillCoolTime skillCoolTime;
+
     PlayerController _player;
     bool _prevJumping;
     bool _prevAttacking;
-    bool _prevDashing;
-    bool _prevTurning;
+
 
     void Start()
     {
         _player = GetComponent<PlayerController>();
         if (_player == null)
             _player = FindFirstObjectByType<PlayerController>();
+        if (skillCoolTime == null)
+            skillCoolTime = FindFirstObjectByType<SkillCoolTime>();
     }
 
     void Update()
@@ -49,17 +53,16 @@ public class MobileInputBridge : MonoBehaviour
         if (attacking && !_prevAttacking)
             _player.TriggerAttack();
         _prevAttacking = attacking;
+    }
 
-        // ── 대시: 누르는 순간 한 번만 트리거 ─────────────────────
-        bool dashing = joystickValue.isDash;
-        if (dashing && !_prevDashing)
-            _player.GamepadDashPress();
-        _prevDashing = dashing;
+    public void TryDash() => TrySkill(0, () => _player.GamepadDashPress());
+    public void TryTurn() => TrySkill(1, () => _player.TriggerTurn());
 
-        // ── 턴: 누르는 순간 한 번만 트리거 ──────────────────────
-        bool turning = joystickValue.isTurning;
-        if (turning && !_prevTurning)
-            _player.TriggerTurn();
-        _prevTurning = turning;
+    void TrySkill(int index, System.Func<bool> action)
+    {
+        if (_player == null) return;
+        if (skillCoolTime != null && skillCoolTime.IsOnCooldown(index)) return;
+        if (action())
+            skillCoolTime?.HideSkillSetting(index);
     }
 }

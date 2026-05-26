@@ -16,12 +16,13 @@ public partial class PlayerController
     public void GamepadJumpPress()                 => PressJump();
     public void GamepadJumpRelease()               => ReleaseJump();
     public void GamepadSetHide(bool hiding)        => _isHiding        = hiding;
-    public void GamepadDashPress()
+    public bool GamepadDashPress()
     {
-        if (_isHiding || _isDead) return;
-        if (_anim != null && _anim.IsActionPlaying()) return;
-        if (!_isGrounded && (_rb == null || _rb.linearVelocity.y <= 0f)) return;
-        if (!_isDashing) StartDash();
+        if (_isHiding || _isDead) return false;
+        if (!_isGrounded && _isOnWall) return false;
+        if (_isDashing) return false;
+        StartDash();
+        return true;
     }
 
     // ── 수직 입력 폴링 (사다리용) ───────────────────────────────────────────
