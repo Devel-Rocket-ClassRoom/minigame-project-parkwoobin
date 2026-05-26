@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PlayerController는 partial로 4개 파일에 분할:
@@ -11,13 +10,13 @@ using UnityEngine.InputSystem;
 // ─────────────────────────────────────────────────────────────────────────────
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(PlayerInput))]
 public partial class PlayerController : MonoBehaviour
 {
     // ── Inspector 노출 필드 ─────────────────────────────────────────────────
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 4f;
     [SerializeField] private float dashForce = 12f;
+    [SerializeField] private float hideSpeedMultiplier = 0.4f;
     private float dashDuration = 0.2f;
 
     [Header("Jump Feel")]
@@ -44,13 +43,12 @@ public partial class PlayerController : MonoBehaviour
 
     [Header("Action Cooldowns")]
     [SerializeField] float actionResetTime = 0.6f;
+    [SerializeField] float turnDuration = 0.5f;  // 턴 모션 중 콜라이더 비활성 시간
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     Rigidbody2D _rb;
     PlayerAnimationController _anim;
     Collider2D _col;
-    PlayerInput _playerInput;
-    InputAction _jumpAction;
 
     // ── 레이어 마스크 ────────────────────────────────────────────────────────
     int _groundMask;
@@ -69,7 +67,7 @@ public partial class PlayerController : MonoBehaviour
     bool _aboutToLand;     // FixedUpdate에서 갱신 → Update의 애니메이션이 사용
     bool _isOnLadder;
     bool _isOnWall;
-    bool _isDucking;
+    bool _isHiding;   // 조이스틱 아래 → hide 상태 (모바일 전용)
 
     // ── 상태 (전투) ─────────────────────────────────────────────────────────
     bool _isDead;
@@ -78,6 +76,7 @@ public partial class PlayerController : MonoBehaviour
     float _hurtTimer;
     float _invincibleTimer;
     Coroutine _attackCoroutine;
+    Coroutine _turnCoroutine;
 
     // ── 상태 (액션 쿨다운/토글) ──────────────────────────────────────────────
     bool _isHungry;
@@ -94,23 +93,7 @@ public partial class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _anim = GetComponent<PlayerAnimationController>();
         _col = GetComponent<Collider2D>();
-        _playerInput = GetComponent<PlayerInput>();
         _defaultGravityScale = _rb.gravityScale;
-    }
-
-    void OnEnable()
-    {
-        _jumpAction = _playerInput != null ? _playerInput.actions.FindAction("Jump", false) : null;
-        if (_jumpAction == null) return;
-        _jumpAction.started += OnJumpStarted;
-        _jumpAction.canceled += OnJumpCanceled;
-    }
-
-    void OnDisable()
-    {
-        if (_jumpAction == null) return;
-        _jumpAction.started -= OnJumpStarted;
-        _jumpAction.canceled -= OnJumpCanceled;
     }
 
     void Start()
@@ -140,9 +123,9 @@ public partial class PlayerController : MonoBehaviour
             if (_hurtTimer <= 0f) _isHurt = false;
         }
         if (_invincibleTimer > 0f) _invincibleTimer -= Time.deltaTime;
-        if (_throwTimer      > 0f) _throwTimer     -= Time.deltaTime;
-        if (_hurtAnimTimer   > 0f) _hurtAnimTimer  -= Time.deltaTime;
-        if (_fightCooldown   > 0f) _fightCooldown  -= Time.deltaTime;
+        if (_throwTimer > 0f) _throwTimer -= Time.deltaTime;
+        if (_hurtAnimTimer > 0f) _hurtAnimTimer -= Time.deltaTime;
+        if (_fightCooldown > 0f) _fightCooldown -= Time.deltaTime;
 
         if (_isDashing)
         {
@@ -151,13 +134,13 @@ public partial class PlayerController : MonoBehaviour
         }
 
         // ── 이동 입력 가공: rawMoveInput → moveInput (블록 중엔 0) ────────
-        bool movementBlocked = _isDucking || (_anim != null && _anim.IsMovementBlocked());
+        bool movementBlocked = _anim != null && _anim.IsMovementBlocked();
         _moveInput = movementBlocked ? 0f : _rawMoveInput;
 
         // ── 방향(스프라이트 플립) + 애니메이션 파라미터 ───────────────────
         UpdateFacing();
         _anim?.UpdateState(_moveInput, _isGrounded, _aboutToLand,
-                           _isDucking, _isDashing, _isOnLadder, _isOnWall);
+                           _isHiding, _isDashing, _isOnLadder, _isOnWall);
     }
 
     void FixedUpdate()
@@ -185,13 +168,6 @@ public partial class PlayerController : MonoBehaviour
         if (_rb.gravityScale == 0f)
             _rb.gravityScale = _defaultGravityScale;
 
-        // ── 3) 숙이기: 수평 이동 정지 ─────────────────────────────────────
-        if (_isDucking)
-        {
-            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
-            return;
-        }
-
         // ── 4) 점프/낙하 중력 스케일 조정 ─────────────────────────────────
         if (_isGrounded && _rb.linearVelocity.y <= 0f)
             _rb.gravityScale = _defaultGravityScale;
@@ -206,7 +182,8 @@ public partial class PlayerController : MonoBehaviour
         }
 
         // ── 6) 수평 이동 적용 ────────────────────────────────────────────
-        _rb.linearVelocity = new Vector2(_moveInput * moveSpeed, _rb.linearVelocity.y);
+        float speedScale = _isHiding ? hideSpeedMultiplier : 1f;
+        _rb.linearVelocity = new Vector2(_moveInput * moveSpeed * speedScale, _rb.linearVelocity.y);
     }
 
     // ── 물리 감지 ────────────────────────────────────────────────────────────
@@ -251,12 +228,12 @@ public partial class PlayerController : MonoBehaviour
 
     // ── 외부 참조용 프로퍼티 ─────────────────────────────────────────────────
     public bool IsGrounded => _isGrounded;
-    public bool IsDucking  => _isDucking;
     public bool IsOnLadder => _isOnLadder;
-    public bool IsOnWall   => _isOnWall;
-    public bool IsDead     => _isDead;
-    public int  Hp         => _hp;
-    public int  MaxHp      => maxHp;
+    public bool IsOnWall => _isOnWall;
+    public bool IsDead => _isDead;
+    public int Hp => _hp;
+    public int MaxHp => maxHp;
+    public bool IsHiding => _isHiding;
     /// <summary>공중에서 상승 중(점프)이면 true — Turn·Dash 허용 판단에 사용</summary>
     public bool IsAscending => !_isGrounded && _rb != null && _rb.linearVelocity.y > 0f;
 }

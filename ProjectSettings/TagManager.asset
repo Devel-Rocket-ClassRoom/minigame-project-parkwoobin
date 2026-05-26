@@ -10,39 +10,40 @@ TagManager:
   - Ground
   - Interactable
   - NPC
+  - Box
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  -
+  - Ground
   - Water
   - UI
   - Player
-  - Ground
-  - Enemy
   - Item
-  - Interactable
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
+  - Enemy
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   m_SortingLayers:
   - name: Default
     uniqueID: 0

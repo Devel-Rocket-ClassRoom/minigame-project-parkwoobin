@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        Application.targetFrameRate = 60;
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         // DontDestroyOnLoad는 루트 오브젝트에만 동작 — 자식이면 자동으로 루트로 이동

@@ -14,8 +14,8 @@ public class PlayerAnimationController : MonoBehaviour
     // ── Animator 파라미터 해시 캐싱 (GC 방지) ────────────────────────────────
     // Bool
     static readonly int H_IsWalking = Animator.StringToHash("isWalking");
-    static readonly int H_IsRunning = Animator.StringToHash("isRunning");
-    static readonly int H_IsDucking = Animator.StringToHash("isDucking");
+    static readonly int H_IsDashing = Animator.StringToHash("isDashing");
+    static readonly int H_IsHiding  = Animator.StringToHash("isHiding");
     static readonly int H_IsFalling = Animator.StringToHash("isFalling");
     static readonly int H_IsHighJump = Animator.StringToHash("isHighJump");
     static readonly int H_IsHungry = Animator.StringToHash("isHungry");
@@ -27,7 +27,7 @@ public class PlayerAnimationController : MonoBehaviour
     static readonly int H_ThrowState = Animator.StringToHash("Throw");
     static readonly int H_GameOverState = Animator.StringToHash("GameOver");
     static readonly int H_SleepState = Animator.StringToHash("Sleep");
-    static readonly int H_RunState = Animator.StringToHash("Run");
+    static readonly int H_DashState = Animator.StringToHash("Dashing");
 
     // Trigger  ※ Animator에서 Turn 파라미터명이 "Trun"으로 저장돼 있으므로 그대로 맞춤
     static readonly int H_Jump = Animator.StringToHash("Jump");
@@ -45,6 +45,7 @@ public class PlayerAnimationController : MonoBehaviour
     bool _wasAboutToLand;
     bool _landTriggeredThisFall;
     bool _eatPending;   // CrossFade 후 Eat 상태 진입 전까지 이동 bool 차단
+    bool _idleFrozen;   // idle 3회 반복 후 정지 상태
 
     void Awake()
     {
@@ -55,7 +56,7 @@ public class PlayerAnimationController : MonoBehaviour
     // ── 매 프레임 상태 업데이트 (PlayerController.Update 에서 호출) ────────────
 
     public void UpdateState(float moveInput, bool isGrounded, bool aboutToLand,
-                            bool isDucking, bool isDashing, bool isOnLadder, bool isOnWall)
+                            bool isHiding, bool isDashing, bool isOnLadder, bool isOnWall)
     {
         bool isMoving = Mathf.Abs(moveInput) > 0.01f;
 
@@ -67,15 +68,15 @@ public class PlayerAnimationController : MonoBehaviour
         bool blocked = IsMovementBlocked() || _eatPending;
 
         _anim.SetBool(H_IsWalking, !blocked && isMoving && !isDashing && isGrounded && !isOnLadder);
-        _anim.SetBool(H_IsRunning, !blocked && isDashing);
-        _anim.SetBool(H_IsDucking, !blocked && isDucking);
+        _anim.SetBool(H_IsDashing, !blocked && isDashing);
+        _anim.SetBool(H_IsHiding, !blocked && isHiding);
         _anim.SetBool(H_IsLadder, isOnLadder);
         _anim.SetBool(H_IsWall, isOnWall);
 
-        // 대시 중: 어느 상태에서든 Run으로 직접 전환 (공중 포함, Eat·Sleep 중 제외) — fix #3
-        if (isDashing && !blocked && !_anim.GetCurrentAnimatorStateInfo(0).IsName("Run")
+        // 대시 중: 어느 상태에서든 Dashing으로 직접 전환 (공중 포함, Eat·Sleep 중 제외) — fix #3
+        if (isDashing && !blocked && !_anim.GetCurrentAnimatorStateInfo(0).IsName("Dashing")
                       && !_anim.IsInTransition(0))
-            _anim.Play(H_RunState);
+            _anim.Play(H_DashState);
 
         // 낙하 감지 (사다리·벽 붙기 중엔 낙하 판정 제외)
         bool isFalling = !isGrounded && !isOnLadder && !isOnWall
@@ -106,6 +107,31 @@ public class PlayerAnimationController : MonoBehaviour
 
         _wasAboutToLand = fallingAboutToLand;
         _wasGrounded = isGrounded;
+
+        // ── idle 3회 후 정지 ────────────────────────────────────────────────
+        bool isIdle = !isMoving && !isDashing && !isHiding
+                      && isGrounded && !isOnLadder && !isOnWall && !blocked;
+        if (isIdle)
+        {
+            if (!_idleFrozen && !_anim.IsInTransition(0)
+                && _anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 3f)
+            {
+                _idleFrozen = true;
+                _anim.speed = 0f;
+            }
+        }
+        else
+        {
+            Unfreeze();
+        }
+    }
+
+    // ── idle 정지 해제 ────────────────────────────────────────────────────────
+    void Unfreeze()
+    {
+        if (!_idleFrozen) return;
+        _idleFrozen = false;
+        _anim.speed = 1f;
     }
 
     // ── 외부 호출 — 점프 ─────────────────────────────────────────────────────
@@ -113,6 +139,7 @@ public class PlayerAnimationController : MonoBehaviour
     /// 점프 시작 시 호출. isHighJump=true → Cat_jump_2, false → Cat_jump_1
     public void TriggerJump(bool isHighJump)
     {
+        Unfreeze();
         _anim.SetBool(H_IsHighJump, isHighJump);
         _anim.SetTrigger(H_Jump);
     }
@@ -123,21 +150,21 @@ public class PlayerAnimationController : MonoBehaviour
     // ── 외부 호출 — 트리거 ───────────────────────────────────────────────────
 
     /// Turn/Spin 모션 (Animator 파라미터명: Trun)
-    public void TriggerTurn() => _anim.SetTrigger(H_Turn);
+    public void TriggerTurn() { Unfreeze(); _anim.SetTrigger(H_Turn); }
 
     /// 스틸 모션
-    public void TriggerSteal() => _anim.SetTrigger(H_Steal);
+    public void TriggerSteal() { Unfreeze(); _anim.SetTrigger(H_Steal); }
 
     /// 공격 모션
-    public void TriggerFight() => _anim.SetTrigger(H_Fight);
+    public void TriggerFight() { Unfreeze(); _anim.SetTrigger(H_Fight); }
 
     /// 아이템 먹기 모션 — 이동 중에도 강제 전환
     public void TriggerEat()
     {
+        Unfreeze();
         _eatPending = true;
-        // 이동 bool을 즉시 꺼서 Animator 전환이 방해받지 않게 함
         _anim.SetBool(H_IsWalking, false);
-        _anim.SetBool(H_IsRunning, false);
+        _anim.SetBool(H_IsDashing, false);
         _anim.CrossFade(H_EatState, 0f, 0, 0f);
     }
 
@@ -146,11 +173,13 @@ public class PlayerAnimationController : MonoBehaviour
     /// 게임 오버 — CrossFade로 직접 진입(isDead bool 미사용 → CanTransitionToSelf 루프 차단)
     public void SetDead(bool value)
     {
-        if (value) _anim.Play(H_GameOverState);
+        if (!value) return;
+        Unfreeze();
+        _anim.Play(H_GameOverState);
     }
 
     /// 잠자기 모션 (애니메이션 끝나면 Idle로 자동 복귀)
-    public void TriggerSleep() => _anim.Play(H_SleepState);
+    public void TriggerSleep() { Unfreeze(); _anim.Play(H_SleepState); }
 
     /// 배고픈 모션 (HungerRatio &lt; 0.3f 기준은 호출부에서 판단)
     public void SetHungry(bool value) => _anim.SetBool(H_IsHungry, value);
@@ -158,13 +187,17 @@ public class PlayerAnimationController : MonoBehaviour
     /// 피격 시 true → 즉시 전환. false는 no-op(ExitTime으로 자동 복귀)
     public void SetHurt(bool value)
     {
-        if (value) _anim.Play(H_HurtState);
+        if (!value) return;
+        Unfreeze();
+        _anim.Play(H_HurtState);
     }
 
     /// 던지기 모션 — 즉시 전환(isThrow bool 미사용 → CanTransitionToSelf 루프 차단)
     public void SetThrow(bool value)
     {
-        if (value) _anim.Play(H_ThrowState);
+        if (!value) return;
+        Unfreeze();
+        _anim.Play(H_ThrowState);
     }
 
     // ── 상태 조회 ─────────────────────────────────────────────────────────────

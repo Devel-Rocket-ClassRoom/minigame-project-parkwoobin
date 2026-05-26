@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1848889924465497794}
   - component: {fileID: 489771928642133056}
   - component: {fileID: 4523038484303161365}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Chicken2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,7 +199,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6998648324316209827}
   - component: {fileID: 7929114666490558738}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Chicken2Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}

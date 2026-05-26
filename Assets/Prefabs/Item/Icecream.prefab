@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8761829149186180645}
   - component: {fileID: 4326778741239163933}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: IcecreamVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 8503526465352007629}
   - component: {fileID: 6018983464894819373}
   - component: {fileID: 2639984669783720287}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Icecream
   m_TagString: Untagged
   m_Icon: {fileID: 0}
