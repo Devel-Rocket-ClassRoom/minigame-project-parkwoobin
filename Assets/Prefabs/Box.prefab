@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5181886577711133151}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 6969711303258000733}
   - component: {fileID: 2487618013821485586}
   - component: {fileID: 8736858650411104760}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -203,7 +203,7 @@ GameObject:
   - component: {fileID: 6376960137914927927}
   - component: {fileID: 5066681581508201151}
   - component: {fileID: 7714626686287463741}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Locker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,9 +320,9 @@ GameObject:
   - component: {fileID: 2863632904886646492}
   - component: {fileID: 3846663114584875638}
   - component: {fileID: 3012097698383644822}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Box
-  m_TagString: Untagged
+  m_TagString: Box
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -365,11 +365,11 @@ Rigidbody2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &1002831632849922632
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -530,7 +530,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3755696480930049376}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BoxVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}

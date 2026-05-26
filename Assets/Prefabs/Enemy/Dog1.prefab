@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6244164942218788103}
   - component: {fileID: 3726642241356013562}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HealthSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7159572824000324199}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: VisualRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -134,7 +134,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2217763798800205212}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,7 +171,7 @@ GameObject:
   m_Component:
   - component: {fileID: 458696441761547336}
   - component: {fileID: 523320398379401609}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 1111459180372674403}
   - component: {fileID: 6064255250423813709}
   - component: {fileID: 6221932594051950029}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HealthBarCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -349,7 +349,7 @@ GameObject:
   - component: {fileID: 7053931707337197578}
   - component: {fileID: 6278040177997042244}
   - component: {fileID: 4812496021979924841}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -424,7 +424,7 @@ GameObject:
   - component: {fileID: 209475371541125273}
   - component: {fileID: 2630800066542888360}
   - component: {fileID: 1356268357708635697}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -596,7 +596,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4723107735738678597, guid: e1e0a71cd91d7e043b43ae319dc87e66, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -669,7 +669,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.012792528, y: -0.012792468}
+  m_Offset: {x: -0.021308303, y: -0.012792468}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -679,7 +679,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.9159354, y: 0.97441506}
+  m_Size: {x: 0.8648405, y: 0.97441506}
   m_EdgeRadius: 0
 --- !u!114 &4265866426007993117
 MonoBehaviour:
@@ -744,7 +744,7 @@ MonoBehaviour:
   idleMax: 2
   detectionRange: 7
   leashRange: 9
-  attackRange: 1.2
+  attackRange: 1
   attackCooldown: 1.2
   attackClipLength: 0.667
   hitRecoveryTime: 0.3

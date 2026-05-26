@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3186939421255277439}
   - component: {fileID: 1835760350271279061}
   - component: {fileID: 912690775923438181}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,7 +84,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8707468114229199736}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 2745811018005211356}
   - component: {fileID: 769212546450434155}
   - component: {fileID: 3869324369532178273}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HealthBarCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -219,7 +219,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7893166337335206753}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: VisualRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -256,7 +256,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1225599805796018541}
   - component: {fileID: 3626975832149495948}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HealthSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 5854897730257070308}
   - component: {fileID: 2852923999078006566}
   - component: {fileID: 6313820351894376887}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -650,7 +650,7 @@ MonoBehaviour:
   dropLaunchUp: {x: 3, y: 5}
   dropLaunchSide: {x: -1.5, y: 1.5}
   dropSpawnSpread: 0.08
-  enemyType: 0
+  enemyType: 1
   detectionRange: 4
   patrolRange: 3
   attackCooldown: 2
@@ -669,7 +669,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8424147564392099674}
   - component: {fileID: 7519546194775394483}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}

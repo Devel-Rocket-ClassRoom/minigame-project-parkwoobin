@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5207686880165933703}
   - component: {fileID: 1364391483319050534}
   - component: {fileID: 2501638355073581199}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Dounot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,7 +179,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3957094654533825013}
   - component: {fileID: 6189853653774463343}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: DounotVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}

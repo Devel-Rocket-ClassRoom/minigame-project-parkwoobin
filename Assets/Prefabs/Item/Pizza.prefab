@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 967668302456755993}
   - component: {fileID: 5486667310544036610}
   - component: {fileID: 1044373134026566364}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Pizza
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,7 +199,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3961526684801854478}
   - component: {fileID: 1071537970912079868}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: PizzaVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
