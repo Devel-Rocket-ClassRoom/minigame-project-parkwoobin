@@ -8510,8 +8510,9 @@ MonoBehaviour:
   dashForce: 12
   hideSpeedMultiplier: 0.4
   maxHp: 20
-  wallJumpEnabled: 0
+  wallJumpEnabled: 1
   wallJumpForceX: 5
+  doubleJumpEnabled: 1
   _attackHitBox: {fileID: 626736221}
   _attackActiveDuration: 0.2
   attackPower: 1
