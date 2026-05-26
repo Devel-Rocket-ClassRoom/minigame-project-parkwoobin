@@ -1,4 +1,3 @@
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -18,7 +17,7 @@ public partial class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 4f;
     [SerializeField] private float dashForce = 12f;
     [SerializeField] private float hideSpeedMultiplier = 0.4f;
-    private float dashDuration = 0.2f;
+
 
     [Header("Jump Feel")]
     private float maxJumpHeight = 2.5f;
@@ -96,7 +95,6 @@ public partial class PlayerController : MonoBehaviour
 
     // ── 상태 (액션 쿨다운/토글) ──────────────────────────────────────────────
     bool _isHungry;
-    float _throwTimer;
     float _hurtAnimTimer;
     float _fightCooldown;
 
@@ -120,6 +118,20 @@ public partial class PlayerController : MonoBehaviour
         _hp = maxHp;
         if (_attackHitBox == null) _attackHitBox = BuildAttackHitBox();
         _attackHitBox.SetActive(false);
+        HungerSystem.OnHungerChanged += OnHungerChanged;
+    }
+
+    void OnDestroy()
+    {
+        HungerSystem.OnHungerChanged -= OnHungerChanged;
+    }
+
+    void OnHungerChanged(float current, float max)
+    {
+        bool hungry = current <= 0f;
+        if (_isHungry == hungry) return;
+        _isHungry = hungry;
+        _anim?.SetHungry(_isHungry);
     }
 
     // ── 업데이트 ─────────────────────────────────────────────────────────────
@@ -139,7 +151,6 @@ public partial class PlayerController : MonoBehaviour
             if (_hurtTimer <= 0f) _isHurt = false;
         }
         if (_invincibleTimer > 0f) _invincibleTimer -= Time.deltaTime;
-        if (_throwTimer > 0f) _throwTimer -= Time.deltaTime;
         if (_hurtAnimTimer > 0f) _hurtAnimTimer -= Time.deltaTime;
         if (_fightCooldown > 0f) _fightCooldown -= Time.deltaTime;
 
