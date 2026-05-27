@@ -1,4 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -39,14 +41,20 @@ public class SettingPanelController : MonoBehaviour
 
     void OnMainClicked()
     {
-        // TODO: 메인 씬 로드 구현 시 여기서 처리
-        // SceneManager.LoadScene("MainScene");
-        Debug.Log("메인 버튼 — 미구현");
+        SceneManager.LoadScene("MainScene");
+        Debug.Log("메인 메뉴로 이동");
     }
 
     void OnGameOverClicked()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
         Debug.Log("게임 종료");
         GameManager.Instance?.GameOver();
     }
+
+
 }
