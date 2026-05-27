@@ -11,6 +11,12 @@
 **/[Uu]ser[Ss]ettings/
 **/[Aa]ssets/[Ii]mported/
 
+# Android 네이티브 빌드 임시 파일 (CMake/NDK 중간 산출물)
+.utmp/
+
+# AI 에셋 생성 캐시 (MCP 에셋 생성 도구 임시 결과물)
+GeneratedAssets/
+
 # 메모리 캡처 (용량 크고 민감한 데이터 포함 가능)
 **/[Mm]emoryCaptures/
 
@@ -75,6 +81,12 @@ crashlytics-build.properties
 
 # Rider 플러그인 자동 생성
 **/[Aa]ssets/Plugins/Editor/JetBrains*
+
+####################
+# Node.js
+####################
+node_modules/
+package-lock.json
 
 ####################
 # Python
