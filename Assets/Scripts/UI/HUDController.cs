@@ -10,15 +10,15 @@ public class HUDController : MonoBehaviour
     [Header("Hunger")]
     [SerializeField] Slider hungerSlider;
 
-    [Header("Stage")]
-    [SerializeField] TextMeshProUGUI stageText;
-
-    [Header("Minimap")]
-    [SerializeField] RawImage minimapImage;
-
     [Header("Coin / Key")]
     [SerializeField] TextMeshProUGUI coinText;
     [SerializeField] TextMeshProUGUI keyText;
+
+    [Header("Setting")]
+    [SerializeField] GameObject settingPanel;
+    [SerializeField] Button settingButton;
+    [SerializeField] Button settingCloseButton;
+    [SerializeField] Image dimOverlay;
 
     PlayerController _player;
 
@@ -42,7 +42,29 @@ public class HUDController : MonoBehaviour
     {
         _player = FindFirstObjectByType<PlayerController>();
         RefreshHP();
-        SetStage(1);
+
+        if (settingPanel != null) settingPanel.SetActive(false);
+        if (settingButton != null) settingButton.onClick.AddListener(OnSettingClick);
+        if (settingCloseButton != null) settingCloseButton.onClick.AddListener(CloseSettingPanel);
+    }
+
+    public void OnSettingClick()
+    {
+        bool open = !settingPanel.activeSelf;
+        settingPanel?.SetActive(open);
+        SetPause(open);
+    }
+
+    public void CloseSettingPanel()
+    {
+        settingPanel?.SetActive(false);
+        SetPause(false);
+    }
+
+    void SetPause(bool pause)
+    {
+        Time.timeScale = pause ? 0f : 1f;
+        if (dimOverlay != null) dimOverlay.gameObject.SetActive(pause);
     }
 
     void Update()
@@ -73,10 +95,4 @@ public class HUDController : MonoBehaviour
     }
 
     void OnStateChanged(GameManager.GameState state) { }
-
-    public void SetStage(int stage)
-    {
-        if (stageText != null)
-            stageText.text = $"[Stage {stage}]";
-    }
 }
