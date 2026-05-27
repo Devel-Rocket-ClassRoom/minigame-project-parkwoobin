@@ -12,19 +12,22 @@ public class JoystickM : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
 
     float widthHalf;
     public JoystickValue value;
+    private float offset = 0.15f; // 중심에서 이 범위 안은 (0,0)으로 처리
 
     public void Start()
     {
         rect = GetComponent<RectTransform>();
-        widthHalf = rect.sizeDelta.x * 0.5f;
     }
     public void OnDrag(PointerEventData eventData)
     {
+        widthHalf = rect.rect.width * 0.5f;
         Vector2 localPoint;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             rect, eventData.position, eventData.pressEventCamera, out localPoint);
-        touch = localPoint / widthHalf;
-        if (touch.magnitude > 1f)
+        touch = (localPoint - rect.rect.center) / widthHalf;
+        if (touch.magnitude < offset)
+            touch = Vector2.zero;
+        else if (touch.magnitude > 1f)
             touch = touch.normalized;
         value.joyTouch = touch;
         handle.anchoredPosition = touch * widthHalf;
