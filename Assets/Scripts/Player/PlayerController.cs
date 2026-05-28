@@ -81,6 +81,8 @@ public partial class PlayerController : MonoBehaviour
 
     // ── 상태 (벽 점프 / 더블 점프) ──────────────────────────────────────────
     float _wallJumpTimer;    // 이 시간 동안 수평 속도를 FixedUpdate가 덮어쓰지 않음
+    float _wallJumpDirX;     // 벽 점프 방향 (+1 오른쪽 / -1 왼쪽), 착지 전까지 벽 방향 입력 차단에 사용
+    bool _isWallJumping;     // 착지 전까지 true — 벽 방향 입력 차단
     bool _hasDoubleJump;    // 공중에서 한 번 더 점프할 수 있는지 여부
     bool _doubleJumpUsed;   // 더블점프를 사용했으면 true → 착지 전까지 벽점프 차단
 
@@ -212,8 +214,19 @@ public partial class PlayerController : MonoBehaviour
         }
 
         // ── 6) 수평 이동 적용 ────────────────────────────────────────────
+        // 벽 점프 중 착지 감지: 상승이 끝나고 지면에 닿을 때만 해제
+        if (_isWallJumping && _isGrounded && _rb.linearVelocity.y <= 0f)
+            _isWallJumping = false;
+
         float speedScale = _isHiding ? hideSpeedMultiplier : 1f;
-        _rb.linearVelocity = new Vector2(_moveInput * moveSpeed * speedScale, _rb.linearVelocity.y);
+        float moveX = _moveInput;
+        if (_isWallJumping)
+        {
+            // 벽 방향으로는 입력 불가, 반대 방향과 중립만 허용
+            if (_wallJumpDirX > 0f && moveX < 0f) moveX = 0f;
+            else if (_wallJumpDirX < 0f && moveX > 0f) moveX = 0f;
+        }
+        _rb.linearVelocity = new Vector2(moveX * moveSpeed * speedScale, _rb.linearVelocity.y);
     }
 
     // ── 물리 감지 ────────────────────────────────────────────────────────────
