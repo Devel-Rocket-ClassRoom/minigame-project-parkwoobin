@@ -1,6 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 using UnityEngine.UI;
 
 /// <summary>
@@ -42,7 +42,14 @@ public class SettingPanelController : MonoBehaviour
     void OnMainClicked()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainScene");
+        // 진행 중이던 런 포기 — GameState 초기화해서 재시작 시 오염 방지
+        if (GameState.Instance != null)
+        {
+            GameState.Instance.ClearTransitionEntry();
+            GameState.Instance.savedMaxHP = 0;
+            GameState.Instance.savedMaxHunger = 0f;
+        }
+        SceneTransitionManager.Instance.TransitionTo("Main");
         Debug.Log("메인 메뉴로 이동");
     }
 

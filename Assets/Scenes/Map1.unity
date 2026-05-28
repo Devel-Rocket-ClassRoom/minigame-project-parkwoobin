@@ -19385,7 +19385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e981d58b7918fd749b86f54119202b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::playerSpawnPoint
-  entryID: Tutorial
+  entryID: Map1
   boxAnimator: {fileID: 1458916357}
   openStateName: CatBoxOpen
   openDuration: 0.6
@@ -27655,7 +27655,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: -5610897310513728006, guid: 7ad333d7eee3c724fbb0180844f2a67b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -35740,7 +35740,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 150, y: 70}
+  m_AnchoredPosition: {x: 150, y: 100}
   m_SizeDelta: {x: 300, y: 300}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &2139672210
@@ -35847,10 +35847,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 733255460}
     m_Modifications:
-    - target: {fileID: 216236834413473498, guid: 7660e464f6600454f8774c940c8c8b4c, type: 3}
-      propertyPath: m_SortingOrder
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1958127385050736974, guid: 7660e464f6600454f8774c940c8c8b4c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 43.51188
