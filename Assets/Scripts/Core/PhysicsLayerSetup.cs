@@ -16,5 +16,8 @@ public static class PhysicsLayerSetup
 
         // 적이 아이템을 밀지 않도록
         Physics2D.IgnoreLayerCollision(enemyLayer, itemLayer, true);
+
+        // 아이템끼리 서로 밀지 않도록
+        Physics2D.IgnoreLayerCollision(itemLayer, itemLayer, true);
     }
 }
