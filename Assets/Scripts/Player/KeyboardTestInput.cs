@@ -3,16 +3,20 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// 에디터 키보드 테스트 입력
-/// 방향키: 이동 | Space: 점프 | A: 공격 | S: 턴 | D: 대시
+/// 방향키: 이동 | 아래: 숙이기 | Space: 점프 | A: 공격 | S: 턴 | D: 대시
 /// 빌드 배포 시 이 컴포넌트를 비활성화하거나 제거하세요.
 /// </summary>
 public class KeyboardTestInput : MonoBehaviour
 {
     PlayerController _player;
+    MobileInputBridge _bridge;
 
     void Start()
     {
         _player = GetComponent<PlayerController>();
+        _bridge = GetComponent<MobileInputBridge>();
+        if (_bridge == null)
+            _bridge = FindFirstObjectByType<MobileInputBridge>();
         if (_player == null)
             Debug.LogWarning("[KeyboardTestInput] PlayerController를 찾을 수 없습니다.");
     }
@@ -28,11 +32,17 @@ public class KeyboardTestInput : MonoBehaviour
         float h = 0f;
         if (kb.leftArrowKey.isPressed) h -= 1f;
         if (kb.rightArrowKey.isPressed) h += 1f;
-        // 키 입력이 있거나 방금 뗀 경우에만 GamepadSetMove 호출.
-        // 키 미입력 시 매 프레임 0으로 덮어써서 조이스틱 입력을 무효화하는 버그 방지.
         bool kbMoveUsed = kb.leftArrowKey.isPressed || kb.rightArrowKey.isPressed
                           || kb.leftArrowKey.wasReleasedThisFrame || kb.rightArrowKey.wasReleasedThisFrame;
         if (kbMoveUsed) _player.GamepadSetMove(h);
+
+        // ── 숙이기 (아래 방향키) ─────────────────────────────────────────────
+        bool downUsed = kb.downArrowKey.isPressed || kb.downArrowKey.wasReleasedThisFrame;
+        if (downUsed)
+        {
+            bool hiding = kb.downArrowKey.isPressed && _player.IsGrounded && !_player.IsOnLadder;
+            _player.GamepadSetHide(hiding);
+        }
 
         // ── 점프 (Space) — 누를 때 / 뗄 때 모두 전달해 가변 점프 유지 ────────
         if (kb.spaceKey.wasPressedThisFrame) _player.GamepadJumpPress();
@@ -41,10 +51,18 @@ public class KeyboardTestInput : MonoBehaviour
         // ── 공격 (A) ─────────────────────────────────────────────────────────
         if (kb.aKey.wasPressedThisFrame) _player.TriggerAttack();
 
-        // ── 턴 (S) ───────────────────────────────────────────────────────────
-        if (kb.sKey.wasPressedThisFrame) _player.TriggerTurn();
+        // ── 턴 (S) — 쿨타임 UI 포함 ─────────────────────────────────────────
+        if (kb.sKey.wasPressedThisFrame)
+        {
+            if (_bridge != null) _bridge.TryTurn();
+            else _player.TriggerTurn();
+        }
 
-        // ── 대시 (D) ─────────────────────────────────────────────────────────
-        if (kb.dKey.wasPressedThisFrame) _player.GamepadDashPress();
+        // ── 대시 (D) — 쿨타임 UI 포함 ───────────────────────────────────────
+        if (kb.dKey.wasPressedThisFrame)
+        {
+            if (_bridge != null) _bridge.TryDash();
+            else _player.GamepadDashPress();
+        }
     }
 }
