@@ -32,6 +32,13 @@ public class MainMenuManager : MonoBehaviour
 
     void OnNewGameClick()
     {
+        // 이전 씬 전환에서 남은 GameState를 초기화해 새 게임을 깨끗하게 시작
+        if (GameState.Instance != null)
+        {
+            GameState.Instance.ClearTransitionEntry();
+            GameState.Instance.savedMaxHP = 0;
+            GameState.Instance.savedMaxHunger = 0f;
+        }
         SceneManager.LoadScene(gameSceneName);
     }
 

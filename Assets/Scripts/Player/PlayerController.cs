@@ -86,6 +86,9 @@ public partial class PlayerController : MonoBehaviour
     bool _hasDoubleJump;    // 공중에서 한 번 더 점프할 수 있는지 여부
     bool _doubleJumpUsed;   // 더블점프를 사용했으면 true → 착지 전까지 벽점프 차단
 
+    // ── 스폰 연출 차단 ──────────────────────────────────────────────────────
+    bool _isSpawning;
+
     // ── 상태 (전투) ─────────────────────────────────────────────────────────
     bool _isDead;
     int _hp;
@@ -145,6 +148,7 @@ public partial class PlayerController : MonoBehaviour
     {
         if (!GameManager.Instance.IsPlaying) return;
         if (_isDead) return;
+        if (_isSpawning) return;
 
         // ── 타이머 감소 (비물리) ──────────────────────────────────────────
         if (_hurtTimer > 0f)
@@ -178,6 +182,7 @@ public partial class PlayerController : MonoBehaviour
     {
         if (!GameManager.Instance.IsPlaying) return;
         if (_isDead) return;
+        if (_isSpawning) return;
 
         // ── 1) 물리 상태 갱신: 지면 / 벽 / 착지 예측 / 사다리 ─────────────
         UpdatePhysicsState();
@@ -282,6 +287,22 @@ public partial class PlayerController : MonoBehaviour
     public bool IsDead => _isDead;
     public int Hp => _hp;
     public int MaxHp => maxHp;
+    public bool IsFacingLeft => !_facingRight;
+
+    /// <summary>스폰 연출 중 입력·물리를 차단한다. PlayerSpawner에서 호출.</summary>
+    public void SetSpawning(bool spawning)
+    {
+        _isSpawning = spawning;
+        if (spawning)
+        {
+            _rb.linearVelocity = Vector2.zero;
+            _rb.gravityScale = 0f;          // 공중에 떠 있지 않도록 중력 차단
+        }
+        else
+        {
+            _rb.gravityScale = _defaultGravityScale;
+        }
+    }
     public bool IsHiding => _isHiding;
     /// <summary>공중에서 상승 중(점프)이면 true — Turn·Dash 허용 판단에 사용</summary>
     public bool IsAscending => !_isGrounded && _rb != null && _rb.linearVelocity.y > 0f;

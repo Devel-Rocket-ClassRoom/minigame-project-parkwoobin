@@ -10,6 +10,7 @@ public partial class PlayerController
 
     void PressJump()
     {
+        if (_isSpawning) return;
         if (_isHiding) return;
         if (_isDead) return;
         if (_anim != null && _anim.IsMovementBlocked()) return;  // Eat·Sleep 중 점프 차단
@@ -87,6 +88,9 @@ public partial class PlayerController
         apexTime = Mathf.Max(0.01f, apexTime);
         return jumpVelocity / (Mathf.Abs(Physics2D.gravity.y) * apexTime);
     }
+
+    /// <summary>씬 진입 시 스폰 연출용. 지면에서 점프하는 것처럼 위로 솟아오른다.</summary>
+    public void SpawnJump() => Jump();
 
     // ── 대시 ─────────────────────────────────────────────────────────────────
 
