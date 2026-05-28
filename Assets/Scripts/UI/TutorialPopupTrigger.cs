@@ -1,0 +1,93 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class TutorialPopupTrigger : MonoBehaviour
+{
+    [SerializeField] SkillType skillToUnlock = SkillType.None;
+    [SerializeField] GameObject popupPanel;
+    [SerializeField] GameObject dimOverlay;
+    [SerializeField] Button closeButton;
+
+    static TutorialPopupTrigger _current;
+
+    bool _triggered;
+    bool _waiting;
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (_triggered) return;
+        if (!other.CompareTag("Player")) return;
+
+        if (_current != null) { _waiting = true; return; }
+
+        Activate();
+    }
+    void Start()
+    {
+
+    }
+
+    void Activate()
+    {
+        _triggered = true;
+        _waiting = false;
+        _current = this;
+
+        // 연결 안 된 필드는 다른 트리거에서 자동으로 빌려옴
+        if (popupPanel == null || dimOverlay == null || closeButton == null)
+        {
+            foreach (var t in FindObjectsByType<TutorialPopupTrigger>(FindObjectsSortMode.None))
+            {
+                if (t == this) continue;
+                if (popupPanel == null && t.popupPanel != null) popupPanel = t.popupPanel;
+                if (dimOverlay == null && t.dimOverlay != null) dimOverlay = t.dimOverlay;
+                if (closeButton == null && t.closeButton != null) closeButton = t.closeButton;
+                if (popupPanel != null && dimOverlay != null && closeButton != null) break;
+            }
+        }
+
+        if (popupPanel != null) popupPanel.SetActive(true);
+        if (dimOverlay != null) dimOverlay.SetActive(true);
+        if (closeButton != null) closeButton.onClick.AddListener(OnClose);
+
+        PlayTipAnimation();
+
+        Time.timeScale = 0f;
+        GameManager.Instance?.PauseGame();
+    }
+
+    void PlayTipAnimation()
+    {
+        if (popupPanel == null) return;
+        var animator = popupPanel.GetComponentInChildren<Animator>(true);
+        if (animator == null) return;
+
+        if (animator.runtimeAnimatorController == null) return;
+
+        // timeScale=0 중에도 재생되도록 UnscaledTime 모드 설정
+        animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+
+        string stateName = skillToUnlock == SkillType.None ? "Move" : skillToUnlock.ToString();
+        animator.Play(stateName, 0, 0f);
+    }
+
+    void OnClose()
+    {
+        if (closeButton != null) closeButton.onClick.RemoveListener(OnClose);
+        if (popupPanel != null) popupPanel.SetActive(false);
+        if (dimOverlay != null) dimOverlay.SetActive(false);
+
+        Time.timeScale = 1f;
+        GameManager.Instance?.ResumeGame();
+
+        _current = null;
+
+        SkillUnlockManager.Instance?.UnlockSkill(skillToUnlock);
+
+        // 대기 중인 트리거 다음 것 실행
+        foreach (var t in FindObjectsByType<TutorialPopupTrigger>(FindObjectsSortMode.None))
+        {
+            if (t._waiting && !t._triggered) { t.Activate(); return; }
+        }
+    }
+}

@@ -285,4 +285,7 @@ public partial class PlayerController : MonoBehaviour
     public bool IsHiding => _isHiding;
     /// <summary>공중에서 상승 중(점프)이면 true — Turn·Dash 허용 판단에 사용</summary>
     public bool IsAscending => !_isGrounded && _rb != null && _rb.linearVelocity.y > 0f;
+
+    public void SetDoubleJump(bool enabled) => doubleJumpEnabled = enabled;
+    public void SetWallJump(bool enabled)   => wallJumpEnabled   = enabled;
 }
