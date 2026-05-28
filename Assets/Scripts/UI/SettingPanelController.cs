@@ -41,6 +41,7 @@ public class SettingPanelController : MonoBehaviour
 
     void OnMainClicked()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MainScene");
         Debug.Log("메인 메뉴로 이동");
     }
