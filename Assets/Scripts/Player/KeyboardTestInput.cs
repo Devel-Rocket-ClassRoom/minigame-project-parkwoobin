@@ -26,12 +26,16 @@ public class KeyboardTestInput : MonoBehaviour
 
         // ── 이동 (좌/우 방향키) ───────────────────────────────────────────────
         float h = 0f;
-        if (kb.leftArrowKey.isPressed)  h -= 1f;
+        if (kb.leftArrowKey.isPressed) h -= 1f;
         if (kb.rightArrowKey.isPressed) h += 1f;
-        _player.GamepadSetMove(h);
+        // 키 입력이 있거나 방금 뗀 경우에만 GamepadSetMove 호출.
+        // 키 미입력 시 매 프레임 0으로 덮어써서 조이스틱 입력을 무효화하는 버그 방지.
+        bool kbMoveUsed = kb.leftArrowKey.isPressed || kb.rightArrowKey.isPressed
+                          || kb.leftArrowKey.wasReleasedThisFrame || kb.rightArrowKey.wasReleasedThisFrame;
+        if (kbMoveUsed) _player.GamepadSetMove(h);
 
         // ── 점프 (Space) — 누를 때 / 뗄 때 모두 전달해 가변 점프 유지 ────────
-        if (kb.spaceKey.wasPressedThisFrame)  _player.GamepadJumpPress();
+        if (kb.spaceKey.wasPressedThisFrame) _player.GamepadJumpPress();
         if (kb.spaceKey.wasReleasedThisFrame) _player.GamepadJumpRelease();
 
         // ── 공격 (A) ─────────────────────────────────────────────────────────
