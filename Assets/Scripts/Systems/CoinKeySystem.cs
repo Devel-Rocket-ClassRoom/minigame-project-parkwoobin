@@ -39,4 +39,12 @@ public class CoinKeySystem : MonoBehaviour
         OnKeyChanged?.Invoke(_keys);
         return true;
     }
+
+    public void SetCoinsAndKeys(int coins, int keys)
+    {
+        _coins = coins;
+        _keys = keys;
+        OnCoinChanged?.Invoke(_coins);
+        OnKeyChanged?.Invoke(_keys);
+    }
 }

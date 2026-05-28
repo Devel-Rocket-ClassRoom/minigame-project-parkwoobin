@@ -45,6 +45,7 @@ public class PlayerAnimationController : MonoBehaviour
     bool _landTriggeredThisFall;
     bool _eatPending;   // CrossFade 후 Eat 상태 진입 전까지 이동 bool 차단
     bool _idleFrozen;   // idle 3회 반복 후 정지 상태
+    int  _lastUnfreezeFrame = -1;  // Unfreeze 호출 프레임 — 같은 프레임 재동결 방지
     static readonly int[] _actionTriggers = { Animator.StringToHash("Trun"), Animator.StringToHash("Fight"), Animator.StringToHash("Eat"), Animator.StringToHash("Steal"), Animator.StringToHash("Jump"), Animator.StringToHash("Land") };
 
     void Awake()
@@ -115,7 +116,8 @@ public class PlayerAnimationController : MonoBehaviour
         {
             if (!_idleFrozen && !_anim.IsInTransition(0)
                 && _anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 3f
-                && !AnyActionTriggerPending())
+                && !AnyActionTriggerPending()
+                && Time.frameCount != _lastUnfreezeFrame)  // 피격 등 직후 같은 프레임 재동결 방지
             {
                 _idleFrozen = true;
                 _anim.speed = 0f;
@@ -133,6 +135,7 @@ public class PlayerAnimationController : MonoBehaviour
         if (!_idleFrozen) return;
         _idleFrozen = false;
         _anim.speed = 1f;
+        _lastUnfreezeFrame = Time.frameCount;  // 같은 프레임 재동결 방지용 마킹
     }
 
     bool AnyActionTriggerPending()

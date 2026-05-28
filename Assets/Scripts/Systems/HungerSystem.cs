@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,9 +14,11 @@ public class HungerSystem : MonoBehaviour
     public float Hunger => _hunger;
     public float MaxHunger => maxHunger;
 
-    void Start()
+    IEnumerator Start()
     {
         _hunger = maxHunger;
+        yield return null;  // 한 프레임 대기: 모든 OnEnable 구독 완료 보장
+        OnHungerChanged?.Invoke(_hunger, maxHunger);
     }
 
     void Update()
@@ -31,6 +34,12 @@ public class HungerSystem : MonoBehaviour
     public void Eat(float amount)
     {
         _hunger = Mathf.Min(maxHunger, _hunger + amount);
+        OnHungerChanged?.Invoke(_hunger, maxHunger);
+    }
+
+    public void SetHunger(float hunger)
+    {
+        _hunger = Mathf.Clamp(hunger, 0f, maxHunger);
         OnHungerChanged?.Invoke(_hunger, maxHunger);
     }
 }

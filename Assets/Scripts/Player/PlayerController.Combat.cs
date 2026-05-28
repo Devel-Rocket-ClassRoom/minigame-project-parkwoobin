@@ -17,6 +17,12 @@ public partial class PlayerController
         _hp = Mathf.Min(maxHp, _hp + amount);
     }
 
+    public void SetHp(int hp, int newMaxHp)
+    {
+        maxHp = newMaxHp;
+        _hp = Mathf.Clamp(hp, 0, maxHp);
+    }
+
     public void TakeDamage(int amount, float attackerX = 0f)
     {
         if (_isDead || _invincibleTimer > 0f) return;
