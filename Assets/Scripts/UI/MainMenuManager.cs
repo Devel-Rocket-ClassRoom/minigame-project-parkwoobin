@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 using UnityEngine.UI;
 
 /// <summary>
@@ -32,7 +32,14 @@ public class MainMenuManager : MonoBehaviour
 
     void OnNewGameClick()
     {
-        SceneManager.LoadScene(gameSceneName);
+        // 이전 씬 전환에서 남은 GameState를 초기화해 새 게임을 깨끗하게 시작
+        if (GameState.Instance != null)
+        {
+            GameState.Instance.ClearTransitionEntry();
+            GameState.Instance.savedMaxHP = 0;
+            GameState.Instance.savedMaxHunger = 0f;
+        }
+        SceneTransitionManager.Instance.TransitionTo(gameSceneName);
     }
 
     void OnLoadGameClick()
@@ -42,7 +49,7 @@ public class MainMenuManager : MonoBehaviour
             ShowNoSaveDataPopup();
             return;
         }
-        SceneManager.LoadScene(gameSceneName);
+        SceneTransitionManager.Instance.TransitionTo(gameSceneName);
     }
 
     void OnQuitClick()
