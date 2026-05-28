@@ -38,6 +38,9 @@ public class SceneTransitionManager : MonoBehaviour
 
     [SerializeField] private Image fadeImage;
     [SerializeField] private float fadeDuration = 1f;
+    [Header("Fade 설정 (체크 = 해당 페이드 비활성화)")]
+    [SerializeField] private bool disableFadeIn  = false;
+    [SerializeField] private bool disableFadeOut = false;
 
     public bool IsTransitioning { get; private set; }
 
@@ -49,9 +52,50 @@ public class SceneTransitionManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // 게임 시작 시 화면이 검정(불투명)에서 페이드 인되도록 준비
-        SetAlpha(1f);
-        if (fadeImage != null) fadeImage.gameObject.SetActive(true);
+        // fadeImage가 없거나 이 오브젝트의 자식이 아니면 코드로 생성.
+        // Inspector에서 씬 오브젝트를 연결하면 씬 언로드 시 참조가 파괴되므로
+        // DDOL 자식 Canvas를 항상 직접 만들어 사용한다.
+        if (fadeImage == null || !fadeImage.transform.IsChildOf(transform))
+            fadeImage = CreateFadeCanvas();
+
+        // FadeIn 활성: 시작 시 검정(불투명) 준비 → Start()에서 FadeIn
+        // FadeIn 비활성: 투명 상태로 숨김
+        if (!disableFadeIn)
+        {
+            SetAlpha(1f);
+            fadeImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            SetAlpha(0f);
+            fadeImage.gameObject.SetActive(false);
+        }
+    }
+
+    Image CreateFadeCanvas()
+    {
+        var canvasGO = new GameObject("FadeCanvas");
+        canvasGO.transform.SetParent(transform, false);
+
+        var canvas = canvasGO.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 999;
+        canvasGO.AddComponent<UnityEngine.UI.CanvasScaler>();
+
+        var imgGO = new GameObject("FadeImage");
+        imgGO.transform.SetParent(canvasGO.transform, false);
+
+        // Image를 먼저 추가해야 RectTransform이 자동 생성됨
+        var img = imgGO.AddComponent<Image>();
+        img.color = Color.black;
+        img.raycastTarget = false;
+
+        var rt = img.rectTransform;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.sizeDelta   = Vector2.zero;
+        rt.anchoredPosition = Vector2.zero;
+        return img;
     }
 
     private void Start()
@@ -93,7 +137,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     public IEnumerator FadeInCoroutine()
     {
-        if (fadeImage == null) yield break;
+        if (disableFadeIn || fadeImage == null) yield break;
         fadeImage.gameObject.SetActive(true);
         yield return StartCoroutine(Fade(1f, 0f));
         fadeImage.gameObject.SetActive(false);
@@ -101,7 +145,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     public IEnumerator FadeOutCoroutine()
     {
-        if (fadeImage == null) yield break;
+        if (disableFadeOut || fadeImage == null) yield break;
         fadeImage.gameObject.SetActive(true);
         yield return StartCoroutine(Fade(0f, 1f));
     }

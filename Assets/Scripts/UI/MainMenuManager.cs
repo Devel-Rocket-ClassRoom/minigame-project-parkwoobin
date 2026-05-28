@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 using UnityEngine.UI;
 
 /// <summary>
@@ -39,7 +39,7 @@ public class MainMenuManager : MonoBehaviour
             GameState.Instance.savedMaxHP = 0;
             GameState.Instance.savedMaxHunger = 0f;
         }
-        SceneManager.LoadScene(gameSceneName);
+        SceneTransitionManager.Instance.TransitionTo(gameSceneName);
     }
 
     void OnLoadGameClick()
@@ -49,7 +49,7 @@ public class MainMenuManager : MonoBehaviour
             ShowNoSaveDataPopup();
             return;
         }
-        SceneManager.LoadScene(gameSceneName);
+        SceneTransitionManager.Instance.TransitionTo(gameSceneName);
     }
 
     void OnQuitClick()

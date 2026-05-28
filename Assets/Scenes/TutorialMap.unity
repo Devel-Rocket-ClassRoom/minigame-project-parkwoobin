@@ -33435,6 +33435,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1771799692}
+  - component: {fileID: 1771799693}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -33459,6 +33460,20 @@ Transform:
   - {fileID: 803761179}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1771799693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771799691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dd9a62f4184d174b8a9916cf26ff3b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneTransitionManager
+  fadeImage: {fileID: 1035534444}
+  fadeDuration: 1
 --- !u!1 &1777097987
 GameObject:
   m_ObjectHideFlags: 0

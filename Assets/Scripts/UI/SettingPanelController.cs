@@ -1,6 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 using UnityEngine.UI;
 
 /// <summary>
@@ -49,7 +49,7 @@ public class SettingPanelController : MonoBehaviour
             GameState.Instance.savedMaxHP = 0;
             GameState.Instance.savedMaxHunger = 0f;
         }
-        SceneManager.LoadScene("Main");
+        SceneTransitionManager.Instance.TransitionTo("Main");
         Debug.Log("메인 메뉴로 이동");
     }
 
