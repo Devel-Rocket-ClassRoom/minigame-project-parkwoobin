@@ -1557,7 +1557,7 @@ MonoBehaviour:
   noSaveDataPopup: {fileID: 1451630302}
   DimOverlay: {fileID: 1196411092}
   confirmPopupButton: {fileID: 658844121}
-  gameSceneName: SampleScene
+  gameSceneName: TutorialMap
 --- !u!114 &1429820325
 MonoBehaviour:
   m_ObjectHideFlags: 0
