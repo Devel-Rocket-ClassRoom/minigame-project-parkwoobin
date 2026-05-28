@@ -26,6 +26,7 @@ public partial class PlayerController
     {
         // _wallNormalX: 양수=왼쪽 벽(오른쪽으로 튕김), 음수=오른쪽 벽(왼쪽으로 튕김)
         float dirX = _wallNormalX >= 0f ? 1f : -1f;
+        _wallJumpDirX = dirX;
 
         float v0 = 2f * maxJumpHeight / maxJumpApexTime;
         _rb.gravityScale = CalculateJumpGravityScale(v0, maxJumpApexTime);
@@ -37,6 +38,7 @@ public partial class PlayerController
 
         // FixedUpdate가 수평 속도를 덮어쓰지 않도록 일정 시간 잠금
         _wallJumpTimer = 0.25f;
+        _isWallJumping = true;   // 착지 전까지 벽 방향 입력 차단
         _hasDoubleJump = false;  // 벽 점프 후 더블점프 불가 (착지해야 초기화)
 
         _anim?.TriggerJump(true);
