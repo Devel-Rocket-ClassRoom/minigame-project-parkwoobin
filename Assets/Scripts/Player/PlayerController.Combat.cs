@@ -47,6 +47,7 @@ public partial class PlayerController
         _rb.gravityScale = _defaultGravityScale;
         DisableAttackHitBox();
         _anim?.SetDead(true);
+        GameManager.Instance?.GameOver();
     }
 
     // ── 공격 HitBox ─────────────────────────────────────────────────────────

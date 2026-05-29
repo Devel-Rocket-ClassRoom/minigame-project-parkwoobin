@@ -31,7 +31,7 @@ public partial class PlayerController : MonoBehaviour
     private LayerMask ladderMask;            // Inspector에서 Ladder 레이어 지정
 
     [Header("Combat")]
-    [SerializeField] private int maxHp = 5;
+    [SerializeField] private int maxHp = 20;
     private float hurtDuration = 0.35f;
     private float invincibleDuration = 1f;
 
@@ -52,7 +52,7 @@ public partial class PlayerController : MonoBehaviour
     [Tooltip("공격·대시·턴 등 행동 후 재사용 가능해질 때까지의 시간")]
     [SerializeField] float actionResetTime = 0.6f;
     [Tooltip("배고픈 상태에서 이동 속도 감소. 모바일에서 조이스틱 아래로 이동할 때 플레이어가 숨는 효과 연출")]
-    [SerializeField] float turnDuration = 0.5f;  // 턴 모션 중 콜라이더 비활성 시간
+    [SerializeField] float turnDuration = 0.6f;  // 턴 모션 중 콜라이더 비활성 시간
 
     // ── 컴포넌트 참조 ────────────────────────────────────────────────────────
     Rigidbody2D _rb;
@@ -350,7 +350,7 @@ public partial class PlayerController : MonoBehaviour
                     new Vector2(transform.position.x, groundY + 1.1f), wDir, 0.5f, _groundMask).collider != null;
                 if (!wallAboveStair)
                 {
-                    _isOnWall    = false;
+                    _isOnWall = false;
                     _wallNormalX = 0f;
                 }
             }
