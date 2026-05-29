@@ -44,10 +44,6 @@ public class PlayerAnimationController : MonoBehaviour
     bool _wasAboutToLand;
     bool _landTriggeredThisFall;
     bool _eatPending;   // CrossFade 후 Eat 상태 진입 전까지 이동 bool 차단
-    bool _idleFrozen;   // idle 3회 반복 후 정지 상태
-    int  _lastUnfreezeFrame = -1;  // Unfreeze 호출 프레임 — 같은 프레임 재동결 방지
-    static readonly int[] _actionTriggers = { Animator.StringToHash("Trun"), Animator.StringToHash("Fight"), Animator.StringToHash("Eat"), Animator.StringToHash("Steal"), Animator.StringToHash("Jump"), Animator.StringToHash("Land") };
-
     void Awake()
     {
         _anim = GetComponent<Animator>();
@@ -109,40 +105,6 @@ public class PlayerAnimationController : MonoBehaviour
         _wasAboutToLand = fallingAboutToLand;
         _wasGrounded = isGrounded;
 
-        // ── idle 3회 후 정지 ────────────────────────────────────────────────
-        bool isIdle = !isMoving && !isDashing && !isHiding
-                      && isGrounded && !isOnLadder && !isOnWall && !blocked;
-        if (isIdle)
-        {
-            if (!_idleFrozen && !_anim.IsInTransition(0)
-                && _anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 3f
-                && !AnyActionTriggerPending()
-                && Time.frameCount != _lastUnfreezeFrame)  // 피격 등 직후 같은 프레임 재동결 방지
-            {
-                _idleFrozen = true;
-                _anim.speed = 0f;
-            }
-        }
-        else
-        {
-            Unfreeze();
-        }
-    }
-
-    // ── idle 정지 해제 ────────────────────────────────────────────────────────
-    void Unfreeze()
-    {
-        if (!_idleFrozen) return;
-        _idleFrozen = false;
-        _anim.speed = 1f;
-        _lastUnfreezeFrame = Time.frameCount;  // 같은 프레임 재동결 방지용 마킹
-    }
-
-    bool AnyActionTriggerPending()
-    {
-        foreach (var h in _actionTriggers)
-            if (_anim.GetBool(h)) return true;
-        return false;
     }
 
     // ── 외부 호출 — 점프 ─────────────────────────────────────────────────────
@@ -150,7 +112,6 @@ public class PlayerAnimationController : MonoBehaviour
     /// 점프 시작 시 호출. isHighJump=true → Cat_jump_2, false → Cat_jump_1
     public void TriggerJump(bool isHighJump)
     {
-        Unfreeze();
         _anim.SetBool(H_IsHighJump, isHighJump);
         _anim.SetTrigger(H_Jump);
     }
@@ -161,18 +122,17 @@ public class PlayerAnimationController : MonoBehaviour
     // ── 외부 호출 — 트리거 ───────────────────────────────────────────────────
 
     /// Turn/Spin 모션 (Animator 파라미터명: Trun)
-    public void TriggerTurn() { Unfreeze(); _anim.SetTrigger(H_Turn); }
+    public void TriggerTurn() { _anim.SetTrigger(H_Turn); }
 
     /// 스틸 모션
-    public void TriggerSteal() { Unfreeze(); _anim.SetTrigger(H_Steal); }
+    public void TriggerSteal() { _anim.SetTrigger(H_Steal); }
 
     /// 공격 모션
-    public void TriggerFight() { Unfreeze(); _anim.SetTrigger(H_Fight); }
+    public void TriggerFight() { _anim.SetTrigger(H_Fight); }
 
     /// 아이템 먹기 모션 — 이동 중에도 강제 전환
     public void TriggerEat()
     {
-        Unfreeze();
         _eatPending = true;
         _anim.SetBool(H_IsWalking, false);
         _anim.SetBool(H_IsDashing, false);
@@ -185,12 +145,11 @@ public class PlayerAnimationController : MonoBehaviour
     public void SetDead(bool value)
     {
         if (!value) return;
-        Unfreeze();
         _anim.Play(H_GameOverState);
     }
 
     /// 잠자기 모션 (애니메이션 끝나면 Idle로 자동 복귀)
-    public void TriggerSleep() { Unfreeze(); _anim.Play(H_SleepState); }
+    public void TriggerSleep() { _anim.Play(H_SleepState); }
 
     /// 배고픈 모션 (HungerRatio &lt; 0.3f 기준은 호출부에서 판단)
     public void SetHungry(bool value) => _anim.SetBool(H_IsHungry, value);
@@ -199,7 +158,6 @@ public class PlayerAnimationController : MonoBehaviour
     public void SetHurt(bool value)
     {
         if (!value) return;
-        Unfreeze();
         _anim.Play(H_HurtState);
     }
 
