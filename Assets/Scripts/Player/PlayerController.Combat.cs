@@ -23,18 +23,19 @@ public partial class PlayerController
         _hp = Mathf.Clamp(hp, 0, maxHp);
     }
 
-    public void TakeDamage(int amount, float attackerX = 0f)
+    public bool TakeDamage(int amount, float attackerX = 0f)
     {
-        if (_isDead || _invincibleTimer > 0f) return;
+        if (_isDead || _invincibleTimer > 0f) return false;
         _hp = Mathf.Max(0, _hp - amount);
         _invincibleTimer = invincibleDuration;
         Debug.Log($"[Player] HP: {_hp}/{maxHp}");
         _anim?.SetHurt(true);
-        if (_hp <= 0) { Die(); return; }
+        if (_hp <= 0) { Die(); return true; }
         _isHurt = true;
         _hurtTimer = hurtDuration;
         float dir = transform.position.x >= attackerX ? 1f : -1f;
         transform.position += new Vector3(dir * (3f / 32f), 0f, 0f);
+        return true;
     }
 
     /// <summary>게임 오버 처리 — 이동·입력을 즉시 차단하고 속도를 0으로 만듦</summary>
@@ -184,6 +185,7 @@ public partial class PlayerController
         if (_isDead) return false;
         if (!_isGrounded && !IsAscending) return false;
         _anim?.TriggerTurn();
+        _invincibleTimer = Mathf.Max(_invincibleTimer, turnDuration);
         if (_turnCoroutine != null) StopCoroutine(_turnCoroutine);
         _turnCoroutine = StartCoroutine(TurnPassthroughRoutine());
         return true;

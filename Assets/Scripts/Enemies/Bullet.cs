@@ -101,8 +101,8 @@ public class Bullet : MonoBehaviour
         var player = other.GetComponentInParent<PlayerController>();
         if (player != null)
         {
-            player.TakeDamage(damage, transform.position.x);
-            Destroy(gameObject);
+            if (player.TakeDamage(damage, transform.position.x))
+                Destroy(gameObject);
             return;
         }
 

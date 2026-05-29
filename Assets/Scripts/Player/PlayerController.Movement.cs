@@ -26,6 +26,8 @@ public partial class PlayerController
     void WallJump()
     {
         // _wallNormalX: 양수=왼쪽 벽(오른쪽으로 튕김), 음수=오른쪽 벽(왼쪽으로 튕김)
+        _dashWallStick = false;
+        _wallGripTimer = 0f;
         float dirX = _wallNormalX >= 0f ? 1f : -1f;
         _wallJumpDirX = dirX;
 
