@@ -85,6 +85,11 @@ public partial class PlayerController : MonoBehaviour
     bool _isWallJumping;     // 착지 전까지 true — 벽 방향 입력 차단
     bool _hasDoubleJump;    // 공중에서 한 번 더 점프할 수 있는지 여부
     bool _doubleJumpUsed;   // 더블점프를 사용했으면 true → 착지 전까지 벽점프 차단
+    float _wallGripTimer;      // 반대방향키 입력 시 벽 점프 대기 창
+    float _savedWallNormalX;   // 대기 창 중 벽 방향 기억
+    bool _wallGripUsed;       // 대기 창을 한 번 소모했으면 true → 벽 방향키로 초기화
+    bool _dashWallStick;     // 공중 대시 종료 후 벽에 닿아 있을 때 고정
+    bool _dashJustEnded;     // 대시 타이머 만료 직후 한 프레임만 true
 
     // ── 스폰 연출 차단 ──────────────────────────────────────────────────────
     bool _isSpawning;
@@ -163,9 +168,15 @@ public partial class PlayerController : MonoBehaviour
         if (_isDashing)
         {
             _dashTimer -= Time.deltaTime;
-            if (_dashTimer <= 0f) _isDashing = false;
+            if (_dashTimer <= 0f) { _isDashing = false; _dashJustEnded = true; }
         }
         if (_wallJumpTimer > 0f) _wallJumpTimer -= Time.deltaTime;
+        if (_wallGripTimer > 0f)
+        {
+            _wallGripTimer -= Time.deltaTime;
+            if (_wallGripTimer <= 0f) _wallGripUsed = true;  // 만료 → 소모 표시
+        }
+        if (_isGrounded) { _wallGripTimer = 0f; _wallGripUsed = false; }
         if (_isGrounded) _doubleJumpUsed = false;
 
         // ── 이동 입력 가공: rawMoveInput → moveInput (블록 중엔 0) ────────
@@ -173,7 +184,16 @@ public partial class PlayerController : MonoBehaviour
         _moveInput = movementBlocked ? 0f : _rawMoveInput;
 
         // ── 방향(스프라이트 플립) + 애니메이션 파라미터 ───────────────────
-        UpdateFacing();
+        // 벽에 붙어있거나 그립 타이머 중에는 벽 방향 유지
+        float wallNormalForFacing = _wallGripTimer > 0f ? _savedWallNormalX : _wallNormalX;
+        bool pressingAwayNow = _isOnWall && _moveInput != 0f && _wallNormalX * _moveInput > 0f;
+        if ((pressingAwayNow || _wallGripTimer > 0f) && wallNormalForFacing != 0f)
+        {
+            bool wallToRight = wallNormalForFacing < 0f;
+            if (wallToRight && !_facingRight) Flip();
+            else if (!wallToRight && _facingRight) Flip();
+        }
+        else UpdateFacing();
         _anim?.UpdateState(_moveInput, _isGrounded, _aboutToLand,
                            _isHiding, _isDashing, _isOnLadder, _isOnWall);
     }
@@ -187,8 +207,39 @@ public partial class PlayerController : MonoBehaviour
         // ── 1) 물리 상태 갱신: 지면 / 벽 / 착지 예측 / 사다리 ─────────────
         UpdatePhysicsState();
 
+
+
+        // ── 대시 벽 고정: 대시 종료 시점에 벽에 닿아 있으면 고정 ──────────────
+        if (_dashJustEnded)
+        {
+            _dashJustEnded = false;
+            if (_isOnWall && !_isGrounded)
+                _dashWallStick = true;
+            else if (!_isGrounded)        // 공중 대시 종료 → 아래로 낙하 시작
+                _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, -2f);
+        }
+        if (_dashWallStick)
+        {
+            if (_isGrounded || !_isOnWall)
+                _dashWallStick = false;
+            else
+            {
+                _rb.gravityScale = 0f;
+                _rb.linearVelocity = Vector2.zero;
+                return;
+            }
+        }
+
         if (_isHurt) return;
-        if (_isDashing) return;           // 대시 중에는 속도를 덮어쓰지 않음
+        if (_isDashing)
+        {
+            if (!_isGrounded)             // 공중 대시: 중력 제거 → 직선 운동
+            {
+                _rb.gravityScale = 0f;
+                _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, 0f);
+            }
+            return;
+        }
         if (_wallJumpTimer > 0f) return;  // 벽 점프 직후 수평 속도 보존
 
         // ── 2) 사다리: 중력 제거 + 수직 이동 ─────────────────────────────
@@ -211,11 +262,26 @@ public partial class PlayerController : MonoBehaviour
         else if (!_isGrounded && _rb.linearVelocity.y < 0f)
             _rb.gravityScale = _defaultGravityScale * fallMultiplier;
 
-        // ── 5) 벽 슬라이드: 낙하 속도 제한 ───────────────────────────────
-        if (_isOnWall && _rb.linearVelocity.y < 0f)
+        // ── 5) 벽 고정 ────────────────────────────────────────────────────
+        if (_isOnWall && !_isGrounded)
         {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x,
-                                             Mathf.Max(_rb.linearVelocity.y, -2f));
+            bool pressingInto = _moveInput != 0f && _wallNormalX * _moveInput < 0f;
+            bool pressingAway = _moveInput != 0f && _wallNormalX * _moveInput > 0f;
+
+            if (pressingInto) { _wallGripTimer = 0f; _wallGripUsed = false; }  // 벽 방향키 → 초기화
+            if (pressingAway && _wallGripTimer <= 0f && !_wallGripUsed)        // 소모 전에만 시작
+            { _wallGripTimer = 0.1f; _savedWallNormalX = _wallNormalX; }
+
+            // 벽 방향키: 중력·수직속도만 고정, 수평은 이동 코드가 벽쪽으로 밀어줌
+            if (pressingInto) { _rb.gravityScale = 0f; _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, 0f); }
+        }
+
+        // 타이머 중: 벽 방향으로 밀어서 물리 접촉 유지 → _isOnWall = true 복원
+        if (_wallGripTimer > 0f && !_isGrounded)
+        {
+            _rb.gravityScale = 0f;
+            _rb.linearVelocity = new Vector2(-_savedWallNormalX * 2f, 0f);
+            return;
         }
 
         // ── 6) 수평 이동 적용 ────────────────────────────────────────────
@@ -271,6 +337,24 @@ public partial class PlayerController : MonoBehaviour
                 }
             }
         }
+        // ── 계단 1타일 제외: 지면 기준 1타일 위에 벽이 없으면 계단 → 벽 판정 해제 ─
+        if (_isOnWall)
+        {
+            var groundDown = Physics2D.Raycast(
+                new Vector2(transform.position.x, transform.position.y), Vector2.down, 10f, _groundMask);
+            if (groundDown.collider != null)
+            {
+                float groundY = groundDown.point.y;
+                var wDir = new Vector2(-_wallNormalX, 0f);
+                bool wallAboveStair = Physics2D.Raycast(
+                    new Vector2(transform.position.x, groundY + 1.1f), wDir, 0.5f, _groundMask).collider != null;
+                if (!wallAboveStair)
+                {
+                    _isOnWall    = false;
+                    _wallNormalX = 0f;
+                }
+            }
+        }
 
         // ── 사다리 감지 (OverlapPoint로 Ladder 레이어 확인) ─────────────────
         if (ladderMask != 0)
@@ -308,5 +392,5 @@ public partial class PlayerController : MonoBehaviour
     public bool IsAscending => !_isGrounded && _rb != null && _rb.linearVelocity.y > 0f;
 
     public void SetDoubleJump(bool enabled) => doubleJumpEnabled = enabled;
-    public void SetWallJump(bool enabled)   => wallJumpEnabled   = enabled;
+    public void SetWallJump(bool enabled) => wallJumpEnabled = enabled;
 }

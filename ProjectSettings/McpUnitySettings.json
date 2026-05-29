@@ -1,5 +1,5 @@
 {
-    "Port": 8001,
+    "Port": 8000,
     "RequestTimeoutSeconds": 10,
     "AutoStartServer": true,
     "EnableInfoLogs": true,
