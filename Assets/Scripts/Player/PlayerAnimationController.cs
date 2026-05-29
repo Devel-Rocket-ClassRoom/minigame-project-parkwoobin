@@ -28,10 +28,9 @@ public class PlayerAnimationController : MonoBehaviour
     static readonly int H_SleepState = Animator.StringToHash("Sleep");
     static readonly int H_DashState = Animator.StringToHash("Dashing");
 
-    // Trigger  ※ Animator에서 Turn 파라미터명이 "Trun"으로 저장돼 있으므로 그대로 맞춤
     static readonly int H_Jump = Animator.StringToHash("Jump");
     static readonly int H_Land = Animator.StringToHash("Land");
-    static readonly int H_Turn = Animator.StringToHash("Trun");   // Animator 오타 "Trun" 유지
+    static readonly int H_Turn = Animator.StringToHash("Turn");
     static readonly int H_Steal = Animator.StringToHash("Steal");
     static readonly int H_Fight = Animator.StringToHash("Fight");
     static readonly int H_Eat = Animator.StringToHash("Eat");

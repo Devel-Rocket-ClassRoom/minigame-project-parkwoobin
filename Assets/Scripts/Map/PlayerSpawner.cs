@@ -95,6 +95,9 @@ public class PlayerSpawner : MonoBehaviour
         player?.SetSpawning(false);
         if (sr != null) sr.enabled = true;
         if (indicator != null) indicator.gameObject.SetActive(true);
+
+        // 한 프레임 대기: UpdateState가 실행돼 _wasGrounded가 올바르게 초기화된 뒤 점프
+        yield return null;
         player?.SpawnJump();
     }
 }
