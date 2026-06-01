@@ -393,4 +393,7 @@ public partial class PlayerController : MonoBehaviour
 
     public void SetDoubleJump(bool enabled) => doubleJumpEnabled = enabled;
     public void SetWallJump(bool enabled) => wallJumpEnabled = enabled;
+
+    public int AttackPower => attackPower;
+    public void SetAttackPower(int value) => attackPower = value;
 }

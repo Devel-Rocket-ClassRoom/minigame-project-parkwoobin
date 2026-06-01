@@ -1,5 +1,4 @@
 using UnityEngine;
-
 using UnityEngine.UI;
 
 /// <summary>
@@ -17,14 +16,15 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] GameObject DimOverlay;
     [SerializeField] Button confirmPopupButton;
 
-    [Header("씬 설정")]
-    [SerializeField] string gameSceneName = "SampleScene";
+    [Header("슬롯 선택 패널")]
+    [SerializeField] SaveSlotPanel saveSlotPanel;
+    [SerializeField] NewGamePanel newGamePanel;
 
     void Start()
     {
-        if (newGameButton != null) newGameButton.onClick.AddListener(OnNewGameClick);
-        if (loadGameButton != null) loadGameButton.onClick.AddListener(OnLoadGameClick);
-        if (quitButton != null) quitButton.onClick.AddListener(OnQuitClick);
+        if (newGameButton != null)      newGameButton.onClick.AddListener(OnNewGameClick);
+        if (loadGameButton != null)     loadGameButton.onClick.AddListener(OnLoadGameClick);
+        if (quitButton != null)         quitButton.onClick.AddListener(OnQuitClick);
         if (confirmPopupButton != null) confirmPopupButton.onClick.AddListener(OnConfirmPopupClick);
 
         if (noSaveDataPopup != null) noSaveDataPopup.SetActive(false);
@@ -32,24 +32,18 @@ public class MainMenuManager : MonoBehaviour
 
     void OnNewGameClick()
     {
-        // 이전 씬 전환에서 남은 GameState를 초기화해 새 게임을 깨끗하게 시작
-        if (GameState.Instance != null)
-        {
-            GameState.Instance.ClearTransitionEntry();
-            GameState.Instance.savedMaxHP = 0;
-            GameState.Instance.savedMaxHunger = 0f;
-        }
-        SceneTransitionManager.Instance.TransitionTo(gameSceneName);
+        if (newGamePanel != null)
+            newGamePanel.Open();
     }
 
     void OnLoadGameClick()
     {
-        if (SaveManager.Instance == null || !SaveManager.Instance.HasSaveData())
+        if (saveSlotPanel == null || !saveSlotPanel.HasAnySaveData())
         {
             ShowNoSaveDataPopup();
             return;
         }
-        SceneTransitionManager.Instance.TransitionTo(gameSceneName);
+        saveSlotPanel.Open();
     }
 
     void OnQuitClick()
@@ -64,12 +58,12 @@ public class MainMenuManager : MonoBehaviour
     void ShowNoSaveDataPopup()
     {
         if (noSaveDataPopup != null) noSaveDataPopup.SetActive(true);
-        if (DimOverlay != null) DimOverlay.SetActive(true);
+        if (DimOverlay != null)      DimOverlay.SetActive(true);
     }
 
     void OnConfirmPopupClick()
     {
         if (noSaveDataPopup != null) noSaveDataPopup.SetActive(false);
-        if (DimOverlay != null) DimOverlay.SetActive(false);
+        if (DimOverlay != null)      DimOverlay.SetActive(false);
     }
 }
