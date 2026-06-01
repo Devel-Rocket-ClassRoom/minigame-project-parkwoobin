@@ -46,11 +46,11 @@ public class ZoneTransition : MonoBehaviour
                 GameState.Instance.savedFacingLeft = player.IsFacingLeft;
             }
 
-            // 배고픔 보관
+            // 배고픔 보관 — 다음 맵 진입 시 최대치로 리셋
             var hunger = FindFirstObjectByType<HungerSystem>();
             if (hunger != null)
             {
-                GameState.Instance.savedHunger = hunger.Hunger;
+                GameState.Instance.savedHunger = hunger.MaxHunger;
                 GameState.Instance.savedMaxHunger = hunger.MaxHunger;
             }
 

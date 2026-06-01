@@ -17,8 +17,21 @@ public class PlayerSpawner : MonoBehaviour
     [Tooltip("처음 시작 씬처럼 entryID가 없을 때 사용할 기본 스폰 포인트")]
     [SerializeField] private playerSpawnPoint defaultSpawnPoint;
 
+    void Awake()
+    {
+        // 씬 로드 직후 첫 프레임부터 입력 차단 — 박스 연출이 끝날 때 해제
+        GetComponent<PlayerController>()?.SetSpawning(true);
+    }
+
     IEnumerator Start()
     {
+        // 세이브 불러오기: 박스가 물리로 낙하하기 전에 비활성화 (FixedUpdate 이전)
+        if (GameState.Instance != null && GameState.Instance.hasSavedPosition)
+        {
+            if (defaultSpawnPoint != null)
+                defaultSpawnPoint.gameObject.SetActive(false);
+        }
+
         // 같은 프레임의 모든 Awake/Start가 끝난 뒤 실행 (SpawnPoint 등록 순서 보장)
         yield return null;
 
@@ -31,9 +44,12 @@ public class PlayerSpawner : MonoBehaviour
         var hunger = FindFirstObjectByType<HungerSystem>();
 
         // ── 스탯 즉시 복원/초기화 — 박스 연출 전에 HUD가 올바른 값을 표시하도록 ──
-        if (!string.IsNullOrEmpty(entryID) && GameState.Instance != null)
+        bool restoringFromSave = GameState.Instance != null && GameState.Instance.hasSavedPosition;
+        bool restoringFromTransition = !string.IsNullOrEmpty(entryID);
+
+        if ((restoringFromSave || restoringFromTransition) && GameState.Instance != null)
         {
-            // 씬 전환: GameState 저장값 복원
+            // HP 복원
             if (GameState.Instance.savedMaxHP > 0)
                 player?.SetHp(GameState.Instance.savedHP, GameState.Instance.savedMaxHP);
 
@@ -42,6 +58,10 @@ public class PlayerSpawner : MonoBehaviour
 
             CoinKeySystem.Instance?.SetCoinsAndKeys(GameState.Instance.savedCoins,
                                                    GameState.Instance.savedKeys);
+
+            // 세이브 파일 불러오기: 저장된 공격력 복원
+            if (restoringFromSave)
+                player?.SetAttackPower(GameState.Instance.savedAttack);
         }
         else
         {
@@ -53,12 +73,28 @@ public class PlayerSpawner : MonoBehaviour
         if (GameState.Instance != null)
             GameState.Instance.ClearTransitionEntry();
 
-        // ── 스폰 포인트 없으면 연출 없이 종료 ───────────────────────────────
+        // ── 세이브 파일 불러오기: 저장된 위치로 직접 스폰 (연출 없이) ─────────
+        if (restoringFromSave && GameState.Instance != null)
+        {
+            transform.position = new Vector3(
+                GameState.Instance.savedPositionX,
+                GameState.Instance.savedPositionY,
+                transform.position.z);
+            GameState.Instance.hasSavedPosition = false;
+            player?.SetSpawning(false);
+            yield break;
+        }
+
+        // ── 스폰 포인트 결정 ─────────────────────────────────────────────────
         playerSpawnPoint spawnPoint = !string.IsNullOrEmpty(entryID)
             ? playerSpawnPoint.Get(entryID)
             : defaultSpawnPoint;
 
-        if (spawnPoint == null) yield break;
+        // entryID·defaultSpawnPoint 모두 없으면 씬에서 첫 번째 SpawnPoint 자동 탐색
+        if (spawnPoint == null)
+            spawnPoint = FindFirstObjectByType<playerSpawnPoint>();
+
+        if (spawnPoint == null) { player?.SetSpawning(false); yield break; }
 
         // ── 스폰 연출 ────────────────────────────────────────────────────────
 
@@ -75,10 +111,12 @@ public class PlayerSpawner : MonoBehaviour
         if (playerCol != null && boxCol != null)
             Physics2D.IgnoreCollision(playerCol, boxCol, true);
 
-        // 3) 박스가 착지할 때까지 대기 (Rigidbody2D 속도가 멈출 때까지, 최대 5초)
+        // 3) 박스가 착지할 때까지 대기
         var boxRb = spawnPoint.GetComponent<Rigidbody2D>();
         if (boxRb != null)
         {
+            // physics가 시작되기 전엔 velocity=0이라 즉시 통과하므로 FixedUpdate 1회 대기
+            yield return new WaitForFixedUpdate();
             float timeout = 5f;
             while (Mathf.Abs(boxRb.linearVelocity.y) > 0.05f && timeout > 0f)
             {
@@ -99,5 +137,9 @@ public class PlayerSpawner : MonoBehaviour
         // 한 프레임 대기: UpdateState가 실행돼 _wasGrounded가 올바르게 초기화된 뒤 점프
         yield return null;
         player?.SpawnJump();
+
+        // zone transition으로 도착한 경우 현재 씬·위치로 저장
+        if (restoringFromTransition)
+            SaveManager.Instance?.AutoSave();
     }
 }
