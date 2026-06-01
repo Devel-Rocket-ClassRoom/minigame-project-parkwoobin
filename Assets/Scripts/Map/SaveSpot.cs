@@ -27,7 +27,8 @@ public class SaveSpot : MonoBehaviour
         _activated = true;
         _anim?.Play(activeStateName);
 
-        SaveManager.Instance?.AutoSave();
+        var player = other.GetComponent<PlayerController>();
+        SaveManager.Instance?.AutoSave(player);
         Debug.Log($"[SaveSpot] {name} — 게임 저장 완료");
     }
 }

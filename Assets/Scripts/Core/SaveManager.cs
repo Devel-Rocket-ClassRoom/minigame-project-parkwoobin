@@ -45,11 +45,13 @@ public class SaveManager : MonoBehaviour
         Debug.Log($"[SaveManager] 슬롯 {slot} 저장 완료 ({data.sceneName})");
     }
 
-    /// <summary>SaveSpot 통과 시 현재 슬롯에 저장.</summary>
-    public void AutoSave()
-    {
+    void OnApplicationQuit() => PlayerPrefs.Save();
+    void OnApplicationPause(bool pause) { if (pause) PlayerPrefs.Save(); }
 
-        var player = FindFirstObjectByType<PlayerController>();
+    /// <summary>SaveSpot 통과 시 현재 슬롯에 저장.</summary>
+    public void AutoSave(PlayerController player = null)
+    {
+        if (player == null) player = FindFirstObjectByType<PlayerController>();
         var hunger = FindFirstObjectByType<HungerSystem>();
         var coinKey = CoinKeySystem.Instance;
         var gs = GameState.Instance;
