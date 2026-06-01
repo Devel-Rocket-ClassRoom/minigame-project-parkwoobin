@@ -22,7 +22,7 @@ public class NewGamePanel : MonoBehaviour
     [SerializeField] Button deleteToggleButton;
     [SerializeField] Button closeButton;
 
-    const string START_SCENE = "TutorialMap";
+    const string START_SCENE = "Prologue";
 
     bool _deleteMode;
 
