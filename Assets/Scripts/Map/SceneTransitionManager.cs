@@ -100,8 +100,9 @@ public class SceneTransitionManager : MonoBehaviour
 
     private void Start()
     {
-        // 최초 씬 진입 페이드 인
-        StartCoroutine(FadeInCoroutine());
+        // 최초 씬 진입 페이드 인 (disableFadeIn이 체크되어 있으면 건너뜀)
+        if (!disableFadeIn)
+            StartCoroutine(FadeInCoroutine());
     }
 
     // ── 외부 호출 ──────────────────────────────────────────────────────────
@@ -137,7 +138,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     public IEnumerator FadeInCoroutine()
     {
-        if (disableFadeIn || fadeImage == null) yield break;
+        if (fadeImage == null) yield break;
         fadeImage.gameObject.SetActive(true);
         yield return StartCoroutine(Fade(1f, 0f));
         fadeImage.gameObject.SetActive(false);

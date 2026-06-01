@@ -1,13 +1,15 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-/// <summary>
-/// 게임 저장/불러오기 시스템 (PlayerPrefs + JSON 기반)
-/// </summary>
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
 
-    private const string SAVE_KEY = "CatGame_SaveData";
+    const string SAVE_KEY_PREFIX = "CatGame_Save_";
+    const int SLOT_COUNT = 3;
+
+    /// <summary>현재 진행 중인 슬롯 (0~2). 기본값 0.</summary>
+    public int ActiveSlot { get; private set; } = 0;
 
     void Awake()
     {
@@ -17,49 +19,110 @@ public class SaveManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    /// <summary>저장 데이터 존재 여부 확인</summary>
-    public bool HasSaveData()
+    // ── 슬롯 조회 ─────────────────────────────────────────────────────────────
+
+    public bool HasSaveData(int slot) => PlayerPrefs.HasKey(Key(slot));
+
+    public SaveData LoadGame(int slot)
     {
-        return PlayerPrefs.HasKey(SAVE_KEY);
+        if (!HasSaveData(slot)) return null;
+        return JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString(Key(slot)));
     }
 
-    /// <summary>게임 저장</summary>
-    public void SaveGame(SaveData data)
+    public void DeleteSave(int slot)
     {
-        string json = JsonUtility.ToJson(data);
-        PlayerPrefs.SetString(SAVE_KEY, json);
+        PlayerPrefs.DeleteKey(Key(slot));
         PlayerPrefs.Save();
-        Debug.Log("[SaveManager] 게임 저장 완료");
     }
 
-    /// <summary>게임 불러오기 — 없으면 null 반환</summary>
-    public SaveData LoadGame()
-    {
-        if (!HasSaveData()) return null;
-        string json = PlayerPrefs.GetString(SAVE_KEY);
-        return JsonUtility.FromJson<SaveData>(json);
-    }
+    // ── 저장 ──────────────────────────────────────────────────────────────────
 
-    /// <summary>저장 데이터 삭제</summary>
-    public void DeleteSave()
+    public void SaveGame(int slot, SaveData data)
     {
-        PlayerPrefs.DeleteKey(SAVE_KEY);
+        data.savedAt = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+        PlayerPrefs.SetString(Key(slot), JsonUtility.ToJson(data));
         PlayerPrefs.Save();
-        Debug.Log("[SaveManager] 저장 데이터 삭제 완료");
+        Debug.Log($"[SaveManager] 슬롯 {slot} 저장 완료 ({data.sceneName})");
     }
+
+    /// <summary>SaveSpot 통과 시 현재 슬롯에 저장.</summary>
+    public void AutoSave()
+    {
+
+        var player = FindFirstObjectByType<PlayerController>();
+        var hunger = FindFirstObjectByType<HungerSystem>();
+        var coinKey = CoinKeySystem.Instance;
+        var gs = GameState.Instance;
+
+        var data = new SaveData
+        {
+            sceneName = SceneManager.GetActiveScene().name,
+            posX      = player != null ? player.transform.position.x : 0f,
+            posY      = player != null ? player.transform.position.y : 0f,
+            stage     = gs != null ? gs.savedStage : 1,
+            coins     = coinKey != null ? coinKey.Coins : 0,
+            hp        = player != null ? player.Hp : 0,
+            maxHp     = player != null ? player.MaxHp : 0,
+            key       = coinKey != null ? coinKey.Keys : 0,
+            hunger    = hunger != null ? hunger.Hunger : 0f,
+            attack    = player != null ? player.AttackPower : 1,
+        };
+
+        SaveGame(ActiveSlot, data);
+    }
+
+    // ── 불러오기 → 씬 전환 ────────────────────────────────────────────────────
+
+    /// <summary>슬롯을 활성화하고 저장된 씬으로 이동한다.</summary>
+    public void LoadAndApply(int slot)
+    {
+        var data = LoadGame(slot);
+        if (data == null) { Debug.LogWarning($"[SaveManager] 슬롯 {slot} 데이터 없음"); return; }
+
+        ActiveSlot = slot;
+
+        // GameState에 스탯 + 위치 복원 정보 세팅
+        var gs = GameState.Instance;
+        gs.savedHP         = Mathf.RoundToInt(data.hp);
+        gs.savedMaxHP      = data.maxHp > 0 ? data.maxHp : Mathf.RoundToInt(data.hp);
+        gs.savedHunger     = data.hunger;
+        gs.savedMaxHunger  = 100f;
+        gs.savedCoins      = data.coins;
+        gs.savedKeys       = data.key;
+        gs.savedAttack     = data.attack;
+        gs.savedStage      = data.stage;
+        gs.savedPositionX  = data.posX;
+        gs.savedPositionY  = data.posY;
+        gs.hasSavedPosition = true;
+
+        SceneTransitionManager.Instance.TransitionTo(data.sceneName, null);
+    }
+
+    /// <summary>새 게임 시작 시 슬롯을 지정한다.</summary>
+    public void StartNewGame(int slot)
+    {
+        ActiveSlot = slot;
+        DeleteSave(slot);
+        if (GameState.Instance != null) GameState.Instance.hasSavedPosition = false;
+    }
+
+    // ── 내부 유틸 ─────────────────────────────────────────────────────────────
+
+    static string Key(int slot) => SAVE_KEY_PREFIX + slot;
 }
 
 [System.Serializable]
 public class SaveData
 {
-    public int stage;
-    public int coins;
-    public float hp;
-
-    public SaveData()
-    {
-        stage = 1;
-        coins = 0;
-        hp = 100f;
-    }
+    public string sceneName;
+    public float  posX;
+    public float  posY;
+    public int    stage;
+    public int    coins;
+    public float  hp;
+    public int    maxHp;
+    public int    key;
+    public float  hunger;
+    public int    attack;
+    public string savedAt;
 }

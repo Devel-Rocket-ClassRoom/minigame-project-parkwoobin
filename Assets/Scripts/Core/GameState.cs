@@ -30,6 +30,11 @@ public class GameState : MonoBehaviour
     public int savedCoins;
     public int savedKeys;
     public bool savedFacingLeft;
+    public int savedAttack;
+    public int savedStage;
+    public float savedPositionX;
+    public float savedPositionY;
+    public bool hasSavedPosition;
 
     private string _transitionEntryID;
 
