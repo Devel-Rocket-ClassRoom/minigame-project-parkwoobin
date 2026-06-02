@@ -2,12 +2,11 @@ using UnityEngine;
 
 /// <summary>
 /// 플레이어가 지나가면 게임을 저장하는 스팟.
-/// 평소엔 "Flag_idle" 애니메이션, 플레이어 통과 시 "Flag" 애니메이션으로 전환.
+/// 평소엔 "Flag_Idle" 애니메이션, 플레이어 통과 시 "Flag" 애니메이션으로 전환.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class SaveSpot : MonoBehaviour
 {
-    string idleStateName = "Flag_idle";
     string activeStateName = "Flag";
 
     bool _activated;

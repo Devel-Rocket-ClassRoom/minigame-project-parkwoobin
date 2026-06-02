@@ -55,19 +55,26 @@ public class SaveManager : MonoBehaviour
         var hunger = FindFirstObjectByType<HungerSystem>();
         var coinKey = CoinKeySystem.Instance;
         var gs = GameState.Instance;
+        var skill = SkillUnlockManager.Instance;
 
         var data = new SaveData
         {
-            sceneName = SceneManager.GetActiveScene().name,
-            posX      = player != null ? player.transform.position.x : 0f,
-            posY      = player != null ? player.transform.position.y : 0f,
-            stage     = gs != null ? gs.savedStage : 1,
-            coins     = coinKey != null ? coinKey.Coins : 0,
-            hp        = player != null ? player.Hp : 0,
-            maxHp     = player != null ? player.MaxHp : 0,
-            key       = coinKey != null ? coinKey.Keys : 0,
-            hunger    = hunger != null ? hunger.Hunger : 0f,
-            attack    = player != null ? player.AttackPower : 1,
+            sceneName   = SceneManager.GetActiveScene().name,
+            posX        = player != null ? player.transform.position.x : 0f,
+            posY        = player != null ? player.transform.position.y : 0f,
+            stage       = gs != null ? gs.savedStage : 1,
+            coins       = coinKey != null ? coinKey.Coins : 0,
+            hp          = player != null ? player.Hp : 0,
+            maxHp       = player != null ? player.MaxHp : 0,
+            key         = coinKey != null ? coinKey.Keys : 0,
+            hunger      = hunger != null ? hunger.Hunger : 0f,
+            attack      = player != null ? player.AttackPower : 1,
+            skillAttack     = skill != null && skill.attack,
+            skillJump       = skill != null && skill.jump,
+            skillDash       = skill != null && skill.dash,
+            skillTurn       = skill != null && skill.turn,
+            skillDoubleJump = skill != null && skill.doubleJump,
+            skillWallJump   = skill != null && skill.wallJump,
         };
 
         SaveGame(ActiveSlot, data);
@@ -96,6 +103,17 @@ public class SaveManager : MonoBehaviour
         gs.savedPositionX  = data.posX;
         gs.savedPositionY  = data.posY;
         gs.hasSavedPosition = true;
+
+        gs.savedSkillAttack     = data.skillAttack;
+        gs.savedSkillJump       = data.skillJump;
+        gs.savedSkillDash       = data.skillDash;
+        gs.savedSkillTurn       = data.skillTurn;
+        gs.savedSkillDoubleJump = data.skillDoubleJump;
+        gs.savedSkillWallJump   = data.skillWallJump;
+
+        // spawnAtDefault가 true면 저장된 좌표 대신 씬 기본 스폰 포인트 사용
+        if (data.spawnAtDefault)
+            gs.hasSavedPosition = false;
 
         SceneTransitionManager.Instance.TransitionTo(data.sceneName, null);
     }
@@ -127,4 +145,11 @@ public class SaveData
     public float  hunger;
     public int    attack;
     public string savedAt;
+    public bool spawnAtDefault;
+    public bool skillAttack;
+    public bool skillJump;
+    public bool skillDash;
+    public bool skillTurn;
+    public bool skillDoubleJump;
+    public bool skillWallJump;
 }

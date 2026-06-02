@@ -153,10 +153,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HUDController
   hpSlider: {fileID: 2010060681}
   hungerSlider: {fileID: 291241798}
-  stageText: {fileID: 1035630488}
-  minimapImage: {fileID: 54563506}
   coinText: {fileID: 1885992011}
   keyText: {fileID: 79742279}
+  settingPanel: {fileID: 0}
+  settingButton: {fileID: 0}
+  settingCloseButton: {fileID: 0}
+  dimOverlay: {fileID: 0}
 --- !u!114 &26294456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -440,8 +442,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC5C6\uC74C"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: cc4987927c2e9f14b9baa6ba8c813f2c, type: 2}
-  m_sharedMaterial: {fileID: -4346299084832587088, guid: cc4987927c2e9f14b9baa6ba8c813f2c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4580,8 +4582,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Stage 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: cc4987927c2e9f14b9baa6ba8c813f2c, type: 2}
-  m_sharedMaterial: {fileID: -4346299084832587088, guid: cc4987927c2e9f14b9baa6ba8c813f2c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4752,9 +4754,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f82c67143d4e3104692952e29481aaeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  moveSpeed: 4
+  dashForce: 12
+  hideSpeedMultiplier: 0.4
+  maxHp: 20
+  wallJumpEnabled: 0
+  doubleJumpEnabled: 0
   _attackHitBox: {fileID: 626736221}
   _attackActiveDuration: 0.2
+  attackPower: 1
   actionResetTime: 0.6
+  turnDuration: 0.6
 --- !u!114 &1083857968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5897,8 +5907,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: cc4987927c2e9f14b9baa6ba8c813f2c, type: 2}
-  m_sharedMaterial: {fileID: -4346299084832587088, guid: cc4987927c2e9f14b9baa6ba8c813f2c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
