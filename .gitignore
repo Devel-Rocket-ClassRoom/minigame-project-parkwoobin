@@ -158,3 +158,5 @@ lightning_logs/
 **.mcp.**
 
 .vsconfig
+# Tip 스프라이트는 로컬 개발용으로만 유지 (Git LFS 포인터 충돌 방지)
+Assets/Imported/Tip/

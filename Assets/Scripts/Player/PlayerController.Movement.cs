@@ -45,6 +45,7 @@ public partial class PlayerController
         _hasDoubleJump = false;  // 벽 점프 후 더블점프 불가 (착지해야 초기화)
 
         _anim?.TriggerJump(true);
+        PlaySfxJump();
     }
 
     void ReleaseJump()
@@ -62,6 +63,7 @@ public partial class PlayerController
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, v0);
         _hasDoubleJump = true;   // 지면 점프 후 더블점프 1회 부여
         _anim?.TriggerJump(true);
+        PlaySfxJump();
     }
 
     void DoubleJump()
@@ -72,6 +74,7 @@ public partial class PlayerController
         _rb.gravityScale = CalculateJumpGravityScale(v0, maxJumpApexTime);
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, v0);
         _anim?.TriggerJump(true);
+        PlaySfxJump();
     }
 
     /// <summary>점프 버튼을 일찍 떼면 상승 속도를 minJumpHeight 기준으로 잘라 가변 점프 구현</summary>
@@ -92,7 +95,15 @@ public partial class PlayerController
     }
 
     /// <summary>씬 진입 시 스폰 연출용. 지면에서 점프하는 것처럼 위로 솟아오른다.</summary>
-    public void SpawnJump() => Jump();
+    public void SpawnJump()
+    {
+        float v0 = 2f * maxJumpHeight / maxJumpApexTime;
+        _rb.gravityScale = CalculateJumpGravityScale(v0, maxJumpApexTime);
+        _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, v0);
+        _hasDoubleJump = true;
+        _anim?.TriggerJump(true);
+        PlaySfxJump();
+    }
 
     // ── 대시 ─────────────────────────────────────────────────────────────────
 
@@ -102,6 +113,7 @@ public partial class PlayerController
         _dashTimer = 0.2f;
         float dir = _facingRight ? 1f : -1f;
         _rb.linearVelocity = new Vector2(dir * dashForce, _rb.linearVelocity.y);
+        PlaySfxDash();
     }
 
     // ── 방향 전환 ────────────────────────────────────────────────────────────

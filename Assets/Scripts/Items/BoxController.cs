@@ -5,6 +5,10 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Collider2D))]
 public class BoxController : MonoBehaviour
 {
+    [Header("SFX")]
+    [SerializeField] AudioClip sfxOpen;
+    [SerializeField] AudioClip sfxLocked;
+
     [Header("Lock / Box Animators")]
     [SerializeField] Animator lockerAnimator;
     [SerializeField] GameObject lockerObject;
@@ -33,6 +37,20 @@ public class BoxController : MonoBehaviour
 
     bool _isPlayerInRange;
     bool _isOpened;
+    AudioSource _sfxSource;
+
+    void Awake()
+    {
+        _sfxSource = gameObject.AddComponent<AudioSource>();
+        _sfxSource.playOnAwake = false;
+    }
+
+    void PlaySfx(AudioClip clip)
+    {
+        if (clip == null || _sfxSource == null) return;
+        float vol = AudioManager.Instance != null ? AudioManager.Instance.SfxVolume : 1f;
+        _sfxSource.PlayOneShot(clip, vol);
+    }
 
     void Update()
     {
@@ -51,6 +69,7 @@ public class BoxController : MonoBehaviour
         {
             // 키 없음 → Locked 애니메이션 (CrossFade로 항상 처음부터 재생)
             lockerAnimator?.CrossFade("Locked", 0f, 0, 0f);
+            PlaySfx(sfxLocked);
             return;
         }
 
@@ -59,6 +78,7 @@ public class BoxController : MonoBehaviour
         Current = null;   // 열렸으니 버튼 아이콘 원복
         lockerAnimator?.CrossFade("UnLock", 0f, 0, 0f);
         boxAnimator?.CrossFade("Box_Open", 0f, 0, 0f);
+        PlaySfx(sfxOpen);
 
         if (lockerObject != null)
             StartCoroutine(HideLockerAfterUnlock());

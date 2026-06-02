@@ -36,8 +36,8 @@ public class FoodItem : MonoBehaviour
 
     void Apply(GameObject playerGO)
     {
-        // 코인·열쇠 포함 모든 아이템에 Eat 모션 재생
-        playerGO.GetComponent<PlayerAnimationController>()?.TriggerEat();
+        // 코인·열쇠 포함 모든 아이템에 Eat 모션 + 효과음 재생
+        playerGO.GetComponent<PlayerController>()?.TriggerEat();
 
         // HP 회복
         if (hpDelta != 0)
