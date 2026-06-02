@@ -11,12 +11,12 @@ public class SkillUnlockManager : MonoBehaviour
     public static SkillUnlockManager Instance { get; private set; }
 
     [Header("스킬 활성화")]
-    [SerializeField] bool attack;
-    [SerializeField] bool jump;
-    [SerializeField] bool dash;
-    [SerializeField] bool turn;
-    [SerializeField] bool doubleJump;
-    [SerializeField] bool wallJump;
+    [SerializeField] public bool attack;
+    [SerializeField] public bool jump;
+    [SerializeField] public bool dash;
+    [SerializeField] public bool turn;
+    [SerializeField] public bool doubleJump;
+    [SerializeField] public bool wallJump;
 
     [Header("버튼 오브젝트 (조이스틱 캔버스)")]
     [SerializeField] GameObject attackButton;
@@ -35,6 +35,18 @@ public class SkillUnlockManager : MonoBehaviour
     void Start()
     {
         if (player == null) player = FindFirstObjectByType<PlayerController>();
+
+        var gs = GameState.Instance;
+        if (gs != null && gs.HasSavedState)
+        {
+            attack     = gs.savedSkillAttack;
+            jump       = gs.savedSkillJump;
+            dash       = gs.savedSkillDash;
+            turn       = gs.savedSkillTurn;
+            doubleJump = gs.savedSkillDoubleJump;
+            wallJump   = gs.savedSkillWallJump;
+        }
+
         ApplyAll();
     }
 
