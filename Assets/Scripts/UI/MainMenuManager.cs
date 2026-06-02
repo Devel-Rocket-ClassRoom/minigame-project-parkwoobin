@@ -20,6 +20,9 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] SaveSlotPanel saveSlotPanel;
     [SerializeField] NewGamePanel newGamePanel;
 
+    [Header("BGM")]
+    [SerializeField] AudioClip mainBgm;
+
     void Start()
     {
         if (newGameButton != null)      newGameButton.onClick.AddListener(OnNewGameClick);
@@ -28,6 +31,10 @@ public class MainMenuManager : MonoBehaviour
         if (confirmPopupButton != null) confirmPopupButton.onClick.AddListener(OnConfirmPopupClick);
 
         if (noSaveDataPopup != null) noSaveDataPopup.SetActive(false);
+
+        // Main 씬 BGM 재생
+        if (mainBgm != null && AudioManager.Instance != null)
+            AudioManager.Instance.PlayBgm(mainBgm);
     }
 
     void OnNewGameClick()
