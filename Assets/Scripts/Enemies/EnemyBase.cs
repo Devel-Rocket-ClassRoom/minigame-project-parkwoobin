@@ -35,6 +35,7 @@ public abstract class EnemyBase : MonoBehaviour
     protected Rigidbody2D _rb;
     protected EnemyAnimationController _anim;
     protected Collider2D _col;
+    static Plane[] _cameraPlanes = new Plane[6];
 
     protected bool _isGrounded;
     protected bool _isOnWall;
@@ -45,6 +46,8 @@ public abstract class EnemyBase : MonoBehaviour
 
     int _hp;
     protected int _groundMask;
+
+    AudioSource _sfxSource;
 
     public System.Action<int, int> OnHealthChanged;
 
@@ -160,6 +163,24 @@ public abstract class EnemyBase : MonoBehaviour
             float vx = Random.Range(dropLaunchSide.x, dropLaunchSide.y);
             rb.linearVelocity = new Vector2(vx, vy);
         }
+    }
+
+    protected void PlaySfx(AudioClip clip)
+    {
+        if (clip == null) return;
+        if (Camera.main != null)
+        {
+            GeometryUtility.CalculateFrustumPlanes(Camera.main, _cameraPlanes);
+            var bounds = _col != null ? _col.bounds : new Bounds(transform.position, Vector3.one);
+            if (!GeometryUtility.TestPlanesAABB(_cameraPlanes, bounds)) return;
+        }
+        if (_sfxSource == null)
+        {
+            _sfxSource = gameObject.AddComponent<AudioSource>();
+            _sfxSource.playOnAwake = false;
+        }
+        float vol = AudioManager.Instance != null ? AudioManager.Instance.SfxVolume : 1f;
+        _sfxSource.PlayOneShot(clip, vol);
     }
 
     protected void Flip()

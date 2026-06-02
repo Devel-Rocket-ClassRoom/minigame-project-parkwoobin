@@ -21,6 +21,10 @@ public class PrologueManager : MonoBehaviour
     [SerializeField] GameObject startText;
     [SerializeField] Button startTextButton;
 
+    [Header("BGM")]
+    [SerializeField] AudioClip bgmClip;
+    [SerializeField] Toggle bgmMuteToggle;   // cut9 등장 시 표시되는 뮤트 토글
+
     [Header("씬 전환")]
     [SerializeField] string nextScene = "TutorialMap";
 
@@ -44,6 +48,12 @@ public class PrologueManager : MonoBehaviour
         startTextButton?.onClick.AddListener(EndPrologue);
 
         if (startText != null) startText.SetActive(false);
+        if (bgmMuteToggle != null)
+        {
+            bgmMuteToggle.gameObject.SetActive(false);
+            bgmMuteToggle.isOn = true;  // 기본: BGM 켜짐
+            bgmMuteToggle.onValueChanged.AddListener(OnBgmToggleChanged);
+        }
 
         for (int i = 0; i < pages.Length; i++)
             SetPageActive(i, false);
@@ -134,6 +144,8 @@ public class PrologueManager : MonoBehaviour
         {
             if (skipButton != null) skipButton.gameObject.SetActive(false);
             if (startText != null) startText.SetActive(true);
+            if (bgmMuteToggle != null) bgmMuteToggle.gameObject.SetActive(true);
+            PlayBgm();
             _ended = true;
             if (_autoCoroutine != null) StopCoroutine(_autoCoroutine);
         }
@@ -182,6 +194,30 @@ public class PrologueManager : MonoBehaviour
         }
         _cutIndex = 1;
         _busy = false;
+    }
+
+    void OnBgmToggleChanged(bool isOn)
+    {
+        AudioManager.Instance?.SetBgm(isOn ? 1f : 0f);
+    }
+
+    void PlayBgm()
+    {
+        if (bgmClip == null) return;
+
+        // AudioManager가 있으면 우선 사용
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBgm(bgmClip);
+            return;
+        }
+
+        // AudioManager가 없으면 자체 AudioSource 생성
+        var src = gameObject.AddComponent<AudioSource>();
+        src.clip = bgmClip;
+        src.loop = true;
+        src.volume = 1f;
+        src.Play();
     }
 
     void EndPrologue()

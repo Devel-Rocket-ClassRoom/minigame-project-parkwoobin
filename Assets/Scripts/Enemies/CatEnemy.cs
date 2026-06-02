@@ -11,6 +11,10 @@ public class CatEnemy : EnemyBase
     [SerializeField] float patrolRange = 3f;
     [SerializeField] float attackCooldown = 1.5f;
 
+    [Header("SFX")]
+    [SerializeField] AudioClip sfxJump;
+    [SerializeField] AudioClip sfxAttack;
+
     [Header("Jump / Land")]
     [SerializeField] float jumpForce = 7f;
     [SerializeField] float jumpCooldown = 2f;
@@ -230,6 +234,7 @@ public class CatEnemy : EnemyBase
                     {
                         _attackTimer = attackCooldown;
                         _anim?.TriggerAttack();
+                        PlaySfx(sfxAttack);
                         // 데미지는 Animation Event(OnAttackHitFrame)에서 처리
                     }
                     break;
@@ -275,6 +280,7 @@ public class CatEnemy : EnemyBase
         _jumpTimer = jumpCooldown;
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
         _anim?.TriggerJump();
+        PlaySfx(sfxJump);
     }
 
     void MovePatrol()

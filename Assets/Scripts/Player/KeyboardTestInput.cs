@@ -17,8 +17,14 @@ public class KeyboardTestInput : MonoBehaviour
         _bridge = GetComponent<MobileInputBridge>();
         if (_bridge == null)
             _bridge = FindFirstObjectByType<MobileInputBridge>();
+
+        Debug.Log($"[KeyboardTestInput] Start — _player={_player}, gameObject={gameObject.name}, enabled={enabled}");
         if (_player == null)
-            Debug.LogWarning("[KeyboardTestInput] PlayerController를 찾을 수 없습니다.");
+        {
+            // 같은 오브젝트에 없으면 씬 전체에서 탐색
+            _player = FindFirstObjectByType<PlayerController>();
+            Debug.LogWarning($"[KeyboardTestInput] GetComponent 실패, FindFirstObjectByType 결과: {_player}");
+        }
     }
 
     void Update()

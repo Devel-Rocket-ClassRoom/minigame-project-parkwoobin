@@ -17,6 +17,17 @@ public class PlayerSpawner : MonoBehaviour
     [Tooltip("처음 시작 씬처럼 entryID가 없을 때 사용할 기본 스폰 포인트")]
     [SerializeField] private playerSpawnPoint defaultSpawnPoint;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip sfxBoxLand;
+
+    void PlayBoxLandSfx()
+    {
+        if (sfxBoxLand == null || AudioManager.Instance == null) return;
+        var src = gameObject.AddComponent<AudioSource>();
+        src.playOnAwake = false;
+        src.PlayOneShot(sfxBoxLand, AudioManager.Instance.SfxVolume);
+    }
+
     void Awake()
     {
         // 씬 로드 직후 첫 프레임부터 입력 차단 — 박스 연출이 끝날 때 해제
@@ -115,7 +126,8 @@ public class PlayerSpawner : MonoBehaviour
         var boxRb = spawnPoint.GetComponent<Rigidbody2D>();
         if (boxRb != null)
         {
-            // physics가 시작되기 전엔 velocity=0이라 즉시 통과하므로 FixedUpdate 1회 대기
+            spawnPoint.OnLanded += PlayBoxLandSfx;
+
             yield return new WaitForFixedUpdate();
             float timeout = 5f;
             while (Mathf.Abs(boxRb.linearVelocity.y) > 0.05f && timeout > 0f)
@@ -123,10 +135,15 @@ public class PlayerSpawner : MonoBehaviour
                 timeout -= Time.deltaTime;
                 yield return null;
             }
+            Debug.Log($"[PlayerSpawner] 박스 착지 완료 (timeout={timeout:F2})");
+
+            spawnPoint.OnLanded -= PlayBoxLandSfx;
         }
 
         // 4) 박스 열기 애니메이션 대기
+        Debug.Log("[PlayerSpawner] OpenBox 시작");
         yield return StartCoroutine(spawnPoint.OpenBox());
+        Debug.Log("[PlayerSpawner] OpenBox 완료 → SetSpawning(false)");
 
         // 5) 착지한 박스 위치로 플레이어 이동 → 차단 해제 → 점프 등장
         transform.position = spawnPoint.transform.position;

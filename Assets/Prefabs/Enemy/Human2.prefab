@@ -627,6 +627,9 @@ MonoBehaviour:
   bulletPrefab: {fileID: 0}
   bulletSpawnXOffset: 0.7
   bulletSpawnYOffset: 0.1
+  sfxJump: {fileID: 8300000, guid: 98a16a9f549a65641a1328de78a0dfab, type: 3}
+  sfxMeleeAttack: {fileID: 8300000, guid: 61156ca10e7bed4439d933225663a730, type: 3}
+  sfxShoot: {fileID: 8300000, guid: 446825bdc9f36404c8d37d56c8cf42b6, type: 3}
   jumpForce: 6
   jumpCooldown: 2.5
   randomJumpChance: 0.012

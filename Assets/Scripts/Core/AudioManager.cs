@@ -18,11 +18,27 @@ public class AudioManager : MonoBehaviour
     public float BgmVolume => bgmSource != null ? bgmSource.volume : 1f;
     public float SfxVolume => sfxSource != null ? sfxSource.volume : 1f;
 
+    AudioClip currentBgmClip;
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
+        transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
+
+        // Inspector에 연결 안 됐으면 자동 생성
+        if (bgmSource == null)
+        {
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.playOnAwake = false;
+            bgmSource.loop = true;
+        }
+        if (sfxSource == null)
+        {
+            sfxSource = gameObject.AddComponent<AudioSource>();
+            sfxSource.playOnAwake = false;
+        }
     }
 
     void Start()
@@ -39,10 +55,32 @@ public class AudioManager : MonoBehaviour
         PlayerPrefs.SetFloat(KEY_BGM, volume);
     }
 
+    public void PlayBgm(AudioClip clip)
+    {
+        if (clip == null || bgmSource == null) return;
+
+        currentBgmClip = clip;
+        bgmSource.clip = clip;
+        bgmSource.loop = true;
+        bgmSource.Play();
+    }
+
+    public void StopBgm()
+    {
+        if (bgmSource != null) bgmSource.Stop();
+        currentBgmClip = null;
+    }
+
     public void SetSfx(float volume)
     {
         volume = Mathf.Clamp01(volume);
         if (sfxSource != null) sfxSource.volume = volume;
         PlayerPrefs.SetFloat(KEY_SFX, volume);
+    }
+
+    public void PlaySfx(AudioClip clip)
+    {
+        if (clip == null || sfxSource == null) return;
+        sfxSource.PlayOneShot(clip);
     }
 }

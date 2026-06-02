@@ -130,6 +130,7 @@ public class NewGamePanel : MonoBehaviour
             GameState.Instance.hasSavedPosition = false;
         }
 
+        GameManager.Instance?.StartGame();
         SaveManager.Instance?.StartNewGame(slot);
         SceneTransitionManager.Instance.TransitionTo(START_SCENE);
     }

@@ -47,6 +47,9 @@ public class DogEnemy : EnemyBase
     [SerializeField] float attackClipLength = 0.667f;
 
     // ── 피격 ─────────────────────────────────────────────────────────────────
+    [Header("SFX")]
+    [SerializeField] AudioClip sfxAttack;
+
     [Header("Hit Recovery")]
     [SerializeField] float hitRecoveryTime = 0.3f;
 
@@ -220,6 +223,7 @@ public class DogEnemy : EnemyBase
         _state = State.Attack;
         if (_hitBoxCol != null) _hitBoxCol.gameObject.SetActive(true);   // HitBox ON
         _dogAnim?.TriggerAttack();
+        PlaySfx(sfxAttack);
         Invoke(nameof(EndAttackState), attackClipLength);
     }
 

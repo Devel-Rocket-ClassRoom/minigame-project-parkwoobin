@@ -29,6 +29,7 @@ public partial class PlayerController
         _hp = Mathf.Max(0, _hp - amount);
         _invincibleTimer = invincibleDuration;
         Debug.Log($"[Player] HP: {_hp}/{maxHp}");
+        PlaySfxHit();
         _anim?.SetHurt(true);
         if (_hp <= 0) { Die(); return true; }
         _isHurt = true;
@@ -78,6 +79,7 @@ public partial class PlayerController
         if (_fightCooldown > 0f) return;
         _anim?.TriggerFight();
         _fightCooldown = actionResetTime;
+        PlaySfxAttack();
         // HitBox는 Animation Event(OnAttackHitFrame)에서 활성화
     }
 
@@ -172,6 +174,7 @@ public partial class PlayerController
     {
         if (!CanStartAction()) return;
         _anim?.TriggerEat();
+        PlaySfxEat();
     }
 
     public void TriggerSleep()
@@ -187,6 +190,7 @@ public partial class PlayerController
         if (!_isGrounded && !IsAscending) return false;
         _anim?.TriggerTurn();
         _invincibleTimer = Mathf.Max(_invincibleTimer, turnDuration);
+        PlaySfxTurn();
         if (_turnCoroutine != null) StopCoroutine(_turnCoroutine);
         _turnCoroutine = StartCoroutine(TurnPassthroughRoutine());
         return true;

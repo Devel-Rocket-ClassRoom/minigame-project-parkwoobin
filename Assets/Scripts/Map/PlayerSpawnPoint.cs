@@ -61,6 +61,12 @@ public class playerSpawnPoint : MonoBehaviour
         return sp != null ? (Vector2?)sp.transform.position : null;
     }
 
+    // ── 착지 감지 ──────────────────────────────────────────────────────────
+
+    public event System.Action OnLanded;
+
+    void OnCollisionEnter2D(Collision2D col) => OnLanded?.Invoke();
+
     // ── 박스 연출 ──────────────────────────────────────────────────────────
 
     /// <summary>Open 애니메이션을 재생하고 openDuration만큼 대기한다.</summary>
