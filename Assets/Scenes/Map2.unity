@@ -26886,7 +26886,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e981d58b7918fd749b86f54119202b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::playerSpawnPoint
-  entryID: Map1
+  entryID: Map2
   boxAnimator: {fileID: 1458916357}
   openStateName: CatBoxOpen
   openDuration: 0.6
@@ -39865,8 +39865,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd6e5b121325b8499e7a1b35a47849d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZoneTransition
-  targetScene: Map2
-  targetEntryID: Map2
+  targetScene: Map3
+  targetEntryID: Map3
 --- !u!61 &1495363961
 BoxCollider2D:
   m_ObjectHideFlags: 0
