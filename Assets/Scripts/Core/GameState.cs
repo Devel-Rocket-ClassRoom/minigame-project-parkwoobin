@@ -36,6 +36,14 @@ public class GameState : MonoBehaviour
     public float savedPositionY;
     public bool hasSavedPosition;
 
+    // ── 스킬 잠금 해제 상태 ───────────────────────────────────────────────────
+    public bool savedSkillAttack;
+    public bool savedSkillJump;
+    public bool savedSkillDash;
+    public bool savedSkillTurn;
+    public bool savedSkillDoubleJump;
+    public bool savedSkillWallJump;
+
     private string _transitionEntryID;
 
     private void Awake()
