@@ -44,6 +44,11 @@ public class HumanEnemy : EnemyBase
     [SerializeField] float bulletSpawnXOffset = 0.7f;
     [SerializeField] float bulletSpawnYOffset = 0.1f;
 
+    [Header("SFX")]
+    [SerializeField] AudioClip sfxJump;
+    [SerializeField] AudioClip sfxMeleeAttack;
+    [SerializeField] AudioClip sfxShoot;
+
     [Header("Jump")]
     [SerializeField] float jumpForce = 6f;
     [SerializeField] float jumpCooldown = 2.5f;
@@ -335,6 +340,7 @@ public class HumanEnemy : EnemyBase
         _state = State.MeleeAttack;
         int meleeVariantUsed = (variant == HumanVariant.Type2) ? Random.Range(0, 3) : 0;
         _humanAnim?.TriggerFight(meleeVariantUsed);
+        PlaySfx(sfxMeleeAttack);
         Invoke(nameof(EndMeleeState), meleeStateDuration);
     }
 
@@ -428,6 +434,7 @@ public class HumanEnemy : EnemyBase
 
     void FireBullet()
     {
+        PlaySfx(sfxShoot);
         if (bulletPrefab != null && _player != null)
         {
             Vector3 origin = BulletOrigin();
@@ -471,6 +478,7 @@ public class HumanEnemy : EnemyBase
         _jumpTimer = jumpCooldown;
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
         _humanAnim?.TriggerJump();
+        PlaySfx(sfxJump);
     }
 
     // ── 피격 / 사망 ─────────────────────────────────────────────────────────

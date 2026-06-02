@@ -22,6 +22,9 @@ public class ZoneTransition : MonoBehaviour
     [SerializeField] private string targetScene;
     [SerializeField] private string targetEntryID;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip sfxTransition;
+
     // ── 트리거 ────────────────────────────────────────────────────────────
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -34,6 +37,14 @@ public class ZoneTransition : MonoBehaviour
             return;
         }
         if (SceneTransitionManager.Instance.IsTransitioning) return;
+
+        if (sfxTransition != null && AudioManager.Instance != null)
+        {
+            float vol = AudioManager.Instance.SfxVolume;
+            var src = gameObject.AddComponent<AudioSource>();
+            src.playOnAwake = false;
+            src.PlayOneShot(sfxTransition, vol);
+        }
 
         if (GameState.Instance != null)
         {

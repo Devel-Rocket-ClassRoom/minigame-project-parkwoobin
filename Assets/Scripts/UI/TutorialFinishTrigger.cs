@@ -8,6 +8,9 @@ public class TutorialFinishTrigger : MonoBehaviour
     [SerializeField] Button nextMapButton;
     [SerializeField] string nextSceneName;
 
+    [Header("SFX")]
+    [SerializeField] AudioClip sfxClear;
+
     bool _triggered;
 
     void OnTriggerEnter2D(Collider2D other)
@@ -16,6 +19,14 @@ public class TutorialFinishTrigger : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         _triggered = true;
+
+        if (sfxClear != null && AudioManager.Instance != null)
+        {
+            float vol = AudioManager.Instance.SfxVolume;
+            var src = gameObject.AddComponent<AudioSource>();
+            src.playOnAwake = false;
+            src.PlayOneShot(sfxClear, vol);
+        }
 
         if (dimOverlay != null)
         {

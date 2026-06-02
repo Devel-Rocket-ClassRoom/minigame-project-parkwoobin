@@ -9,13 +9,19 @@ public class SaveSpot : MonoBehaviour
 {
     string activeStateName = "Flag";
 
+    [SerializeField] AudioClip sfxSave;
+
     bool _activated;
     Animator _anim;
+    AudioSource _sfxSource;
 
     void Awake()
     {
         _anim = GetComponent<Animator>();
         GetComponent<Collider2D>().isTrigger = true;
+
+        _sfxSource = gameObject.AddComponent<AudioSource>();
+        _sfxSource.playOnAwake = false;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -25,6 +31,12 @@ public class SaveSpot : MonoBehaviour
 
         _activated = true;
         _anim?.Play(activeStateName);
+
+        if (sfxSave != null)
+        {
+            float vol = AudioManager.Instance != null ? AudioManager.Instance.SfxVolume : 1f;
+            _sfxSource.PlayOneShot(sfxSave, vol);
+        }
 
         var player = other.GetComponent<PlayerController>();
         SaveManager.Instance?.AutoSave(player);

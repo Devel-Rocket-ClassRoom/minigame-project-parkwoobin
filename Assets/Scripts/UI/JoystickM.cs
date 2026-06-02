@@ -26,11 +26,23 @@ public class JoystickM : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
             rect, eventData.position, eventData.pressEventCamera, out localPoint);
         touch = (localPoint - rect.rect.center) / widthHalf;
         if (touch.magnitude < offset)
+        {
             touch = Vector2.zero;
-        else if (touch.magnitude > 1f)
-            touch = touch.normalized;
-        value.joyTouch = touch;
-        handle.anchoredPosition = touch * widthHalf;
+            value.joyTouch = Vector2.zero;
+        }
+        else
+        {
+            // 핸들 시각 위치는 원 안에 유지
+            Vector2 handleTouch = touch.magnitude > 1f ? touch.normalized : touch;
+            handle.anchoredPosition = handleTouch * widthHalf;
+
+            // 입력 값은 x, y 각각 독립 클램프 → 대각선 입력 시 수평 속도 손실 없음
+            value.joyTouch = new Vector2(
+                Mathf.Clamp(touch.x, -1f, 1f),
+                Mathf.Clamp(touch.y, -1f, 1f)
+            );
+        }
+        return;
     }
     public void OnPointerDown(PointerEventData eventData)
     {

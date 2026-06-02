@@ -15,6 +15,7 @@ public class MobileInputBridge : MonoBehaviour
     PlayerController _player;
     bool _prevJumping;
     bool _prevAttacking;
+    bool _prevMoveActive;
 
 
     void Start()
@@ -31,7 +32,11 @@ public class MobileInputBridge : MonoBehaviour
         if (_player == null || joystickValue == null) return;
 
         // ── 조이스틱 이동 ─────────────────────────────────────
-        _player.GamepadSetMove(joystickValue.joyTouch.x);
+        // 조이스틱이 실제로 움직일 때만 전달 (0일 때 계속 보내면 키보드 입력을 덮어씀)
+        bool moveActive = Mathf.Abs(joystickValue.joyTouch.x) > 0.01f;
+        if (moveActive || _prevMoveActive)
+            _player.GamepadSetMove(joystickValue.joyTouch.x);
+        _prevMoveActive = moveActive;
         _player.GamepadSetVertical(joystickValue.joyTouch.y);
 
         // ── hide: 조이스틱 아래 + 지면 + 사다리 아님 ─────────

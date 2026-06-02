@@ -119,6 +119,7 @@ public class SaveSlotPanel : MonoBehaviour
     {
         if (_deleteMode) return;
         Close();
+        GameManager.Instance?.StartGame();
         SaveManager.Instance?.LoadAndApply(slot);
     }
 

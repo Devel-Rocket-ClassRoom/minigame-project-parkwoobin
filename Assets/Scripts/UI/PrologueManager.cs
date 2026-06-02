@@ -21,6 +21,9 @@ public class PrologueManager : MonoBehaviour
     [SerializeField] GameObject startText;
     [SerializeField] Button startTextButton;
 
+    [Header("BGM")]
+    [SerializeField] AudioClip bgmClip;
+
     [Header("씬 전환")]
     [SerializeField] string nextScene = "TutorialMap";
 
@@ -134,6 +137,7 @@ public class PrologueManager : MonoBehaviour
         {
             if (skipButton != null) skipButton.gameObject.SetActive(false);
             if (startText != null) startText.SetActive(true);
+            PlayBgm();
             _ended = true;
             if (_autoCoroutine != null) StopCoroutine(_autoCoroutine);
         }
@@ -182,6 +186,25 @@ public class PrologueManager : MonoBehaviour
         }
         _cutIndex = 1;
         _busy = false;
+    }
+
+    void PlayBgm()
+    {
+        if (bgmClip == null) return;
+
+        // AudioManager가 있으면 우선 사용
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBgm(bgmClip);
+            return;
+        }
+
+        // AudioManager가 없으면 자체 AudioSource 생성
+        var src = gameObject.AddComponent<AudioSource>();
+        src.clip = bgmClip;
+        src.loop = true;
+        src.volume = 1f;
+        src.Play();
     }
 
     void EndPrologue()
