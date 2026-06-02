@@ -20,13 +20,18 @@ public class SettingPanelController : MonoBehaviour
     void Start()
     {
         // 저장된 볼륨 값으로 슬라이더 초기화
-        bgmSlider.value = PlayerPrefs.GetFloat("BGMVolume", 1f);
-        sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
-
-        bgmSlider.onValueChanged.AddListener(OnBgmChanged);
-        sfxSlider.onValueChanged.AddListener(OnSfxChanged);
-        mainButton.onClick.AddListener(OnMainClicked);
-        gameOverButton.onClick.AddListener(OnGameOverClicked);
+        if (bgmSlider != null)
+        {
+            bgmSlider.value = PlayerPrefs.GetFloat("BGMVolume", 1f);
+            bgmSlider.onValueChanged.AddListener(OnBgmChanged);
+        }
+        if (sfxSlider != null)
+        {
+            sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
+            sfxSlider.onValueChanged.AddListener(OnSfxChanged);
+        }
+        mainButton?.onClick.AddListener(OnMainClicked);
+        gameOverButton?.onClick.AddListener(OnGameOverClicked);
     }
 
     void OnBgmChanged(float value)
@@ -42,6 +47,7 @@ public class SettingPanelController : MonoBehaviour
     void OnMainClicked()
     {
         Time.timeScale = 1f;
+        GameManager.Instance?.ResumeGame();   // Paused 상태 해제
         // 진행 중이던 런 포기 — GameState 초기화해서 재시작 시 오염 방지
         if (GameState.Instance != null)
         {

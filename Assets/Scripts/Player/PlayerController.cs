@@ -151,7 +151,7 @@ public partial class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!GameManager.Instance.IsPlaying) return;
+        if (GameManager.Instance == null || !GameManager.Instance.IsPlaying) return;
         if (_isDead) return;
         if (_isSpawning) return;
 
@@ -200,7 +200,7 @@ public partial class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!GameManager.Instance.IsPlaying) return;
+        if (GameManager.Instance == null || !GameManager.Instance.IsPlaying) return;
         if (_isDead) return;
         if (_isSpawning) return;
 
@@ -377,6 +377,7 @@ public partial class PlayerController : MonoBehaviour
     public void SetSpawning(bool spawning)
     {
         _isSpawning = spawning;
+        if (_rb == null) return;
         if (spawning)
         {
             _rb.linearVelocity = Vector2.zero;

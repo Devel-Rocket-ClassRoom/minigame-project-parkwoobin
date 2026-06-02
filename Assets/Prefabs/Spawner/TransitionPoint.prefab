@@ -93,3 +93,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ZoneTransition
   targetScene: Map1
   targetEntryID: Map1
+  sfxTransition: {fileID: 8300000, guid: bf47d9a80564a584e9c52b100487483c, type: 3}

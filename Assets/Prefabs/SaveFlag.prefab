@@ -174,3 +174,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd0c1201f12fc684f91562a393273c57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveSpot
+  sfxSave: {fileID: 8300000, guid: 83c6e58c888a34a4d8e1f52fc5b2a822, type: 3}

@@ -130,6 +130,7 @@ public class SceneTransitionManager : MonoBehaviour
         IsTransitioning = true;
 
         yield return StartCoroutine(FadeOutCoroutine());
+        AudioManager.Instance?.StopBgm();
         yield return SceneManager.LoadSceneAsync(sceneName);
         yield return StartCoroutine(FadeInCoroutine());
 

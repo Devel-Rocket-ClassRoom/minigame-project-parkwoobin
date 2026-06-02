@@ -654,6 +654,8 @@ MonoBehaviour:
   detectionRange: 4
   patrolRange: 3
   attackCooldown: 2
+  sfxJump: {fileID: 8300000, guid: 98a16a9f549a65641a1328de78a0dfab, type: 3}
+  sfxAttack: {fileID: 8300000, guid: b82a75525d034f849b261c1502b373ec, type: 3}
   jumpForce: 5
   jumpCooldown: 2
   randomJumpChance: 0.014
