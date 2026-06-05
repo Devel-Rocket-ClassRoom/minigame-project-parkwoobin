@@ -5,8 +5,8 @@ public enum UpgradeType
     Speed,        // 스피드
     DashSpeed,    // 대시 빠르게
     JumpHeight,   // 점프 높게
-    MaxHP,        // HP 상승
-    MaxHunger,    // 배고픔 상승
+    HPup,        // 현재 HP 회복
+    Eating,    // 현재 배고픔 회복
     DashCooldown, // 대시 쿨타임 감소
     TurnCooldown, // 턴 쿨타임 감소
 }
@@ -19,20 +19,20 @@ public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
 
-    public const int MaxLevel     = 5;
+    public const int MaxLevel = 5;
     public const int UpgradeCount = 7;
 
     // ── 업그레이드별 기본 비용 (레벨당 baseCost * (level+1)) ─────────────────
-    static readonly int[] BaseCosts = { 30, 30, 30, 40, 30, 35, 35 };
+    static readonly int[] BaseCosts = { 5, 5, 5, 5, 5, 10, 10 };
 
     // ── 레벨당 증가량 ────────────────────────────────────────────────────────
-    public static readonly float[] SpeedPerLevel        = { 0f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f };
-    public static readonly float[] DashSpeedPerLevel    = { 0f, 2f,   2f,   2f,   2f,   2f   };
-    public static readonly float[] JumpHeightPerLevel   = { 0f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
-    public static readonly int[]   MaxHPPerLevel        = { 0,  3,    3,    3,    3,    3    };
-    public static readonly float[] MaxHungerPerLevel    = { 0f, 10f,  10f,  10f,  10f,  10f  };
-    public static readonly float[] DashCoolPerLevel     = { 0f, 0.06f,0.06f,0.06f,0.06f,0.06f};
-    public static readonly float[] TurnCoolPerLevel     = { 0f, 0.06f,0.06f,0.06f,0.06f,0.06f};
+    public static readonly float[] SpeedPerLevel = { 0f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f };
+    public static readonly float[] DashSpeedPerLevel = { 0f, 2f, 2f, 2f, 2f, 2f };
+    public static readonly float[] JumpHeightPerLevel = { 0f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
+    public const int HpRestoreAmount = 3;
+    public const float HungerRestoreAmount = 50f;
+    public static readonly float[] DashCoolPerLevel = { 0f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f };
+    public static readonly float[] TurnCoolPerLevel = { 0f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f };
 
     int[] _levels = new int[UpgradeCount];
 
@@ -65,49 +65,59 @@ public class UpgradeManager : MonoBehaviour
     public bool CanBuy(UpgradeType t)
     {
         if (_levels[(int)t] >= MaxLevel) return false;
-        return CoinKeySystem.Instance != null &&
-               CoinKeySystem.Instance.Coins >= GetCost(t);
+        var coinKey = GetCoinKeySystem();
+        return coinKey != null && coinKey.Coins >= GetCost(t);
     }
 
-    public void Buy(UpgradeType t)
+    public bool Buy(UpgradeType t)
     {
-        if (!CanBuy(t)) return;
-        CoinKeySystem.Instance.SpendCoins(GetCost(t));
+        if (_levels[(int)t] >= MaxLevel) return false;
+
+        int cost = GetCost(t);
+        var coinKey = GetCoinKeySystem();
+        if (coinKey == null || !coinKey.SpendCoins(cost)) return false;
+
         _levels[(int)t]++;
         OnUpgraded?.Invoke(t, _levels[(int)t]);
+        if (t == UpgradeType.HPup)
+            UnityEngine.Object.FindFirstObjectByType<PlayerController>()?.Heal(HpRestoreAmount);
+        if (t == UpgradeType.Eating)
+            UnityEngine.Object.FindFirstObjectByType<HungerSystem>()?.Eat(HungerRestoreAmount);
         ApplyToPlayer();
+        return true;
     }
 
     /// <summary>맵 진입 시 플레이어에 모든 업그레이드 효과 적용.</summary>
     public void ApplyToPlayer()
     {
         var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
-        var hunger = UnityEngine.Object.FindFirstObjectByType<HungerSystem>();
         if (player == null) return;
 
         // 누적 합계로 적용
-        float speedBonus     = Sum(SpeedPerLevel,     _levels[(int)UpgradeType.Speed]);
-        float dashBonus      = Sum(DashSpeedPerLevel, _levels[(int)UpgradeType.DashSpeed]);
-        float jumpBonus      = Sum(JumpHeightPerLevel,_levels[(int)UpgradeType.JumpHeight]);
-        int   hpBonus        = SumInt(MaxHPPerLevel,  _levels[(int)UpgradeType.MaxHP]);
-        float hungerBonus    = Sum(MaxHungerPerLevel, _levels[(int)UpgradeType.MaxHunger]);
-        float dashCoolBonus  = Sum(DashCoolPerLevel,  _levels[(int)UpgradeType.DashCooldown]);
-        float turnCoolBonus  = Sum(TurnCoolPerLevel,  _levels[(int)UpgradeType.TurnCooldown]);
+        float speedBonus = Sum(SpeedPerLevel, _levels[(int)UpgradeType.Speed]);
+        float dashBonus = Sum(DashSpeedPerLevel, _levels[(int)UpgradeType.DashSpeed]);
+        float jumpBonus = Sum(JumpHeightPerLevel, _levels[(int)UpgradeType.JumpHeight]);
+        float dashCoolBonus = Sum(DashCoolPerLevel, _levels[(int)UpgradeType.DashCooldown]);
+        float turnCoolBonus = Sum(TurnCoolPerLevel, _levels[(int)UpgradeType.TurnCooldown]);
 
-        player.SetUpgradeBonuses(speedBonus, dashBonus, jumpBonus, hpBonus, dashCoolBonus, turnCoolBonus);
-        hunger?.AddMaxHungerBonus(hungerBonus);
+        player.SetUpgradeBonuses(speedBonus, dashBonus, jumpBonus, 0, dashCoolBonus, turnCoolBonus);
     }
 
     /// <summary>현재 스테이지용 3개 업그레이드 제안 반환.</summary>
     public UpgradeType[] GetOffers()
     {
         int stage = GameState.Instance != null ? GameState.Instance.savedStage : 0;
-        if (stage != _lastOfferedStage)
+        if (stage != _lastOfferedStage || !AreCurrentOffersValid())
         {
             _lastOfferedStage = stage;
-            GenerateOffers(stage);
+            GenerateOffers();
         }
         return _currentOffers;
+    }
+
+    public void InvalidateOffers()
+    {
+        _lastOfferedStage = -1;
     }
 
     /// <summary>런 초기화 (새 게임 시 호출).</summary>
@@ -119,18 +129,54 @@ public class UpgradeManager : MonoBehaviour
 
     // ── 내부 ─────────────────────────────────────────────────────────────────
 
-    void GenerateOffers(int seed)
+    void GenerateOffers()
     {
-        // 0~6 인덱스를 Fisher-Yates 셔플 후 앞 3개 선택
-        int[] indices = { 0, 1, 2, 3, 4, 5, 6 };
-        var rng = new System.Random(seed * 31 + 7);
-        for (int i = 6; i > 0; i--)
+        UpgradeType[] candidates = new UpgradeType[UpgradeCount];
+        int count = 0;
+        for (int i = 0; i < UpgradeCount; i++)
         {
-            int j = rng.Next(i + 1);
-            (indices[i], indices[j]) = (indices[j], indices[i]);
+            var type = (UpgradeType)i;
+            if (CanOffer(type))
+                candidates[count++] = type;
         }
+
+        for (int i = count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (candidates[i], candidates[j]) = (candidates[j], candidates[i]);
+        }
+
         for (int i = 0; i < 3; i++)
-            _currentOffers[i] = (UpgradeType)indices[i];
+            _currentOffers[i] = candidates[Mathf.Min(i, Mathf.Max(0, count - 1))];
+    }
+
+    bool AreCurrentOffersValid()
+    {
+        for (int i = 0; i < _currentOffers.Length; i++)
+        {
+            if (!CanOffer(_currentOffers[i]))
+                return false;
+        }
+        return true;
+    }
+
+    bool CanOffer(UpgradeType type)
+    {
+        switch (type)
+        {
+            case UpgradeType.DashSpeed:
+            case UpgradeType.DashCooldown:
+                return SkillUnlockManager.Instance != null &&
+                       SkillUnlockManager.Instance.IsSkillActive(SkillType.Dash);
+            case UpgradeType.JumpHeight:
+                return SkillUnlockManager.Instance != null &&
+                       SkillUnlockManager.Instance.IsSkillActive(SkillType.Jump);
+            case UpgradeType.TurnCooldown:
+                return SkillUnlockManager.Instance != null &&
+                       SkillUnlockManager.Instance.IsSkillActive(SkillType.Turn);
+            default:
+                return true;
+        }
     }
 
     static float Sum(float[] perLevel, int level)
@@ -147,5 +193,12 @@ public class UpgradeManager : MonoBehaviour
         for (int i = 1; i <= Mathf.Min(level, perLevel.Length - 1); i++)
             total += perLevel[i];
         return total;
+    }
+
+    static CoinKeySystem GetCoinKeySystem()
+    {
+        return CoinKeySystem.Instance != null
+            ? CoinKeySystem.Instance
+            : UnityEngine.Object.FindFirstObjectByType<CoinKeySystem>();
     }
 }

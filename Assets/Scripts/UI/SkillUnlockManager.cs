@@ -64,6 +64,27 @@ public class SkillUnlockManager : MonoBehaviour
         ApplyAll();
     }
 
+    public bool IsSkillActive(SkillType type)
+    {
+        switch (type)
+        {
+            case SkillType.Attack:
+                return attack;
+            case SkillType.Jump:
+                return jump;
+            case SkillType.Dash:
+                return dash;
+            case SkillType.Turn:
+                return turn;
+            case SkillType.DoubleJump:
+                return doubleJump;
+            case SkillType.WallJump:
+                return wallJump;
+            default:
+                return true;
+        }
+    }
+
     void ApplyAll()
     {
         if (attackButton != null) attackButton.SetActive(attack);
@@ -76,6 +97,8 @@ public class SkillUnlockManager : MonoBehaviour
             player.SetDoubleJump(doubleJump);
             player.SetWallJump(wallJump);
         }
+
+        UpgradeManager.Instance?.InvalidateOffers();
     }
 
 #if UNITY_EDITOR

@@ -45,6 +45,8 @@ public partial class PlayerController : MonoBehaviour
     [Header("Hunger Debuff")]
     [Tooltip("Hunger 0 시 속도·점프에 곱할 배율 (0~1). 기본 0.6 = 40% 감소")]
     [SerializeField] float hungerDebuffMultiplier = 0.6f;
+    [Tooltip("이동 중 배고픔 감소 확률을 체크하는 간격")]
+    [SerializeField] float moveHungerCheckInterval = 0.2f;
 
     [Header("Attack HitBox")]
     [SerializeField] GameObject _attackHitBox;
@@ -62,6 +64,7 @@ public partial class PlayerController : MonoBehaviour
     Rigidbody2D _rb;
     PlayerAnimationController _anim;
     Collider2D _col;
+    HungerSystem _hungerSystem;
 
     // ── 레이어 마스크 ────────────────────────────────────────────────────────
     int _groundMask;
@@ -117,6 +120,7 @@ public partial class PlayerController : MonoBehaviour
     bool _isStarving;
     float _hurtAnimTimer;
     float _fightCooldown;
+    float _moveHungerTimer;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -145,6 +149,7 @@ public partial class PlayerController : MonoBehaviour
         _hp = maxHp;
         if (_attackHitBox == null) _attackHitBox = BuildAttackHitBox();
         _attackHitBox.SetActive(false);
+        _hungerSystem = FindFirstObjectByType<HungerSystem>();
         HungerSystem.OnHungerChanged += OnHungerChanged;
     }
 
@@ -321,6 +326,7 @@ public partial class PlayerController : MonoBehaviour
             else if (_wallJumpDirX < 0f && moveX > 0f) moveX = 0f;
         }
         _rb.linearVelocity = new Vector2(moveX * moveSpeed * speedScale, _rb.linearVelocity.y);
+        ConsumeMoveHunger(moveX);
     }
 
     // ── 물리 감지 ────────────────────────────────────────────────────────────
@@ -443,4 +449,26 @@ public partial class PlayerController : MonoBehaviour
 
     public int AttackPower => attackPower;
     public void SetAttackPower(int value) => attackPower = value;
+
+    void ConsumeHunger(HungerAction action)
+    {
+        if (_hungerSystem == null)
+            _hungerSystem = FindFirstObjectByType<HungerSystem>();
+        _hungerSystem?.TryDepleteForAction(action);
+    }
+
+    void ConsumeMoveHunger(float moveX)
+    {
+        if (Mathf.Abs(moveX) <= 0.01f)
+        {
+            _moveHungerTimer = 0f;
+            return;
+        }
+
+        _moveHungerTimer += Time.fixedDeltaTime;
+        if (_moveHungerTimer < moveHungerCheckInterval) return;
+
+        _moveHungerTimer = 0f;
+        ConsumeHunger(HungerAction.Move);
+    }
 }

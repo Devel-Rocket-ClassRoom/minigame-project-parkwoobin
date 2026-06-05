@@ -46,6 +46,7 @@ public partial class PlayerController
 
         _anim?.TriggerJump(true);
         PlaySfxJump();
+        ConsumeHunger(HungerAction.Jump);
     }
 
     void ReleaseJump()
@@ -64,6 +65,7 @@ public partial class PlayerController
         _hasDoubleJump = true;   // 지면 점프 후 더블점프 1회 부여
         _anim?.TriggerJump(true);
         PlaySfxJump();
+        ConsumeHunger(HungerAction.Jump);
     }
 
     void DoubleJump()
@@ -75,6 +77,7 @@ public partial class PlayerController
         _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, v0);
         _anim?.TriggerJump(true);
         PlaySfxJump();
+        ConsumeHunger(HungerAction.Jump);
     }
 
     /// <summary>점프 버튼을 일찍 떼면 상승 속도를 minJumpHeight 기준으로 잘라 가변 점프 구현</summary>
@@ -114,6 +117,7 @@ public partial class PlayerController
         float dir = _facingRight ? 1f : -1f;
         _rb.linearVelocity = new Vector2(dir * dashForce, _rb.linearVelocity.y);
         PlaySfxDash();
+        ConsumeHunger(HungerAction.Skill);
     }
 
     // ── 방향 전환 ────────────────────────────────────────────────────────────

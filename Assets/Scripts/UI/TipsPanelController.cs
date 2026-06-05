@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,9 @@ public class TipsPanelController : MonoBehaviour
     [SerializeField] string[] tipKeys;
 
     readonly List<GameObject> _items = new();
+    public event Action OnShown;
+    public event Action OnHidden;
+    public bool IsVisible => panelRoot != null && panelRoot.activeSelf;
 
     void Awake()
     {
@@ -37,13 +41,19 @@ public class TipsPanelController : MonoBehaviour
 
     public void Show()
     {
+        if (IsBlockedByHudPanel()) return;
+
         if (panelRoot != null) panelRoot.SetActive(true);
         RefreshItems();
+        NotifyHudControllers(true);
+        OnShown?.Invoke();
     }
 
     public void Hide()
     {
         if (panelRoot != null) panelRoot.SetActive(false);
+        NotifyHudControllers(false);
+        OnHidden?.Invoke();
     }
 
     void RefreshItems()
@@ -82,7 +92,7 @@ public class TipsPanelController : MonoBehaviour
             var tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.fontSize = 30;
             tmp.color = Color.white;
-            tmp.enableWordWrapping = true;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.margin = new Vector4(20, 8, 20, 8);
 
             // ContentSizeFitter: 텍스트 길이에 맞게 높이 자동 조절
@@ -95,4 +105,17 @@ public class TipsPanelController : MonoBehaviour
 
         return go;
     }
+
+    bool IsBlockedByHudPanel()
+    {
+        foreach (var shop in FindObjectsByType<ShopPanel>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (shop != null && shop.IsVisible) return true;
+
+        foreach (var hud in FindObjectsByType<HUDController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (hud != null && hud.IsAnyPanelOpen()) return true;
+
+        return false;
+    }
+
+    void NotifyHudControllers(bool visible) { /* 도움말은 HUDController를 거치지 않음 */ }
 }

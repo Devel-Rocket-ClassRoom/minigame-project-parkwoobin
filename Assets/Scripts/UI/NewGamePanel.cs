@@ -132,6 +132,8 @@ public class NewGamePanel : MonoBehaviour
             GameState.Instance.ClearTransitionEntry();
             GameState.Instance.savedMaxHP = 0;
             GameState.Instance.savedMaxHunger = 0f;
+            GameState.Instance.savedCoins = 10;
+            GameState.Instance.savedKeys = 0;
             GameState.Instance.hasSavedPosition = false;
         }
 
