@@ -46,6 +46,10 @@ public class PlayerSpawner : MonoBehaviour
         // 같은 프레임의 모든 Awake/Start가 끝난 뒤 실행 (SpawnPoint 등록 순서 보장)
         yield return null;
 
+        // ── 인트로 컷씬 대기 ─────────────────────────────────────────────────
+        if (MapCutsceneManager.Instance != null && !MapCutsceneManager.Instance.IntroComplete)
+            yield return new WaitUntil(() => MapCutsceneManager.Instance.IntroComplete);
+
         // ── 스폰 포인트 결정 ────────────────────────────────────────────────
         string entryID = GameState.Instance != null
             ? GameState.Instance.GetTransitionEntry()

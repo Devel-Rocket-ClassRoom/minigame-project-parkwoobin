@@ -10,6 +10,10 @@ using System.Collections.Generic;
 /// </summary>
 public abstract class EnemySpawnerBase : MonoBehaviour
 {
+    [Header("Enemy Settings")]
+    [Tooltip("체크 해제 시 이 스포너에서 나오는 적은 점프하지 않음")]
+    [SerializeField] private bool canJump = true;
+
     [Header("Spawn Settings")]
     [Tooltip("한 번에 스폰할 최소 마리 수")]
     private int spawnCountMin = 1;
@@ -53,7 +57,11 @@ public abstract class EnemySpawnerBase : MonoBehaviour
                 var prefab = NextPrefab();
                 if (prefab == null) yield break;
 
-                wave.Add(Instantiate(prefab, transform.position, Quaternion.identity));
+                var enemy = Instantiate(prefab, transform.position, Quaternion.identity);
+                var enemyBase = enemy.GetComponent<EnemyBase>();
+                enemyBase?.SetSpawnPoint(transform.position);
+                enemyBase?.SetCanJump(canJump);
+                wave.Add(enemy);
                 _totalSpawned++;
             }
 

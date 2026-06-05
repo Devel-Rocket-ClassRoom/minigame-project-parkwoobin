@@ -10,6 +10,7 @@ public class MainMenuSettingPanel : MonoBehaviour
 {
     [Header("패널")]
     [SerializeField] GameObject panelRoot;
+    [SerializeField] GameObject dimOverlay;  // 패널 뒤 어두운 배경
     [SerializeField] Button openButton;    // 세팅 버튼
     [SerializeField] Button closeButton;   // 닫기 버튼
 
@@ -24,6 +25,7 @@ public class MainMenuSettingPanel : MonoBehaviour
     {
         // 패널 기본 숨김
         if (panelRoot != null) panelRoot.SetActive(false);
+        if (dimOverlay != null) dimOverlay.SetActive(false);
 
         openButton?.onClick.AddListener(Open);
         closeButton?.onClick.AddListener(Close);
@@ -46,8 +48,7 @@ public class MainMenuSettingPanel : MonoBehaviour
             languageDropdown.ClearOptions();
             languageDropdown.AddOptions(new System.Collections.Generic.List<string> { "한국어", "English" });
 
-            int idx = LanguageManager.Instance != null &&
-                      LanguageManager.Instance.Current == LanguageManager.Language.English ? 1 : 0;
+            int idx = LanguageManager.CurrentLanguage == LanguageManager.Language.English ? 1 : 0;
             languageDropdown.SetValueWithoutNotify(idx);
             languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
         }
@@ -55,17 +56,19 @@ public class MainMenuSettingPanel : MonoBehaviour
 
     public void Open()
     {
+        if (dimOverlay != null) dimOverlay.SetActive(true);
         if (panelRoot != null) panelRoot.SetActive(true);
     }
 
     public void Close()
     {
         if (panelRoot != null) panelRoot.SetActive(false);
+        if (dimOverlay != null) dimOverlay.SetActive(false);
     }
 
     void OnLanguageChanged(int index)
     {
         var lang = index == 1 ? LanguageManager.Language.English : LanguageManager.Language.Korean;
-        LanguageManager.Instance?.SetLanguage(lang);
+        LanguageManager.SetLanguageStatic(lang);
     }
 }

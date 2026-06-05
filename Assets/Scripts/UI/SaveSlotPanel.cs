@@ -23,6 +23,10 @@ public class SaveSlotPanel : MonoBehaviour
 
     bool _deleteMode;
 
+    void OnEnable()  => LanguageManager.OnLanguageChanged += OnLanguageChanged;
+    void OnDisable() => LanguageManager.OnLanguageChanged -= OnLanguageChanged;
+    void OnLanguageChanged(LanguageManager.Language _) { if (panelRoot != null && panelRoot.activeSelf) RefreshSlotTexts(); }
+
     void Start()
     {
         if (deleteToggleButton != null) deleteToggleButton.onClick.AddListener(OnDeleteToggle);
@@ -99,14 +103,15 @@ public class SaveSlotPanel : MonoBehaviour
 
             if (slotTexts != null && i < slotTexts.Length && slotTexts[i] != null)
             {
+                string slotLabel = LocalizationManager.Get("menu_slot");
                 if (hasData)
                 {
                     var data = SaveManager.Instance.LoadGame(i);
-                    slotTexts[i].text = $"슬롯 {i + 1}\n{data.sceneName}";
+                    slotTexts[i].text = $"{slotLabel} {i + 1}\n{data.sceneName}";
                 }
                 else
                 {
-                    slotTexts[i].text = $"슬롯 {i + 1}\n— 빈 슬롯 —";
+                    slotTexts[i].text = $"{slotLabel} {i + 1}\n{LocalizationManager.Get("menu_slot_empty")}";
                 }
             }
 

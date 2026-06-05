@@ -10,6 +10,10 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] Button newGameButton;
     [SerializeField] Button loadGameButton;
     [SerializeField] Button quitButton;
+    [SerializeField] Button helpButton;
+
+    [Header("도움말 패널")]
+    [SerializeField] MainMenuTipsPanel tipsPanel;
 
     [Header("저장 데이터 없음 팝업")]
     [SerializeField] GameObject noSaveDataPopup;
@@ -29,6 +33,7 @@ public class MainMenuManager : MonoBehaviour
         if (loadGameButton != null)     loadGameButton.onClick.AddListener(OnLoadGameClick);
         if (quitButton != null)         quitButton.onClick.AddListener(OnQuitClick);
         if (confirmPopupButton != null) confirmPopupButton.onClick.AddListener(OnConfirmPopupClick);
+        helpButton?.onClick.AddListener(() => tipsPanel?.Show());
 
         if (noSaveDataPopup != null) noSaveDataPopup.SetActive(false);
 

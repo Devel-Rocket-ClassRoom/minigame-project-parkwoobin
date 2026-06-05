@@ -20,7 +20,15 @@ public class HUDController : MonoBehaviour
     [SerializeField] Button settingCloseButton;
     [SerializeField] Image dimOverlay;
 
+    [Header("상점 / 도움말")]
+    [SerializeField] Button shopButton;
+    [SerializeField] ShopPanel shopPanel;
+    [SerializeField] Button helpButton;
+    [SerializeField] TipsPanelController tipsPanel;
+
     PlayerController _player;
+
+    int _keys;  // 언어 변경 시 키 텍스트 재구성용
 
     void OnEnable()
     {
@@ -28,6 +36,7 @@ public class HUDController : MonoBehaviour
         GameManager.OnStateChanged += OnStateChanged;
         CoinKeySystem.OnCoinChanged += OnCoinChanged;
         CoinKeySystem.OnKeyChanged += OnKeyChanged;
+        LanguageManager.OnLanguageChanged += OnLanguageChanged;
     }
 
     void OnDisable()
@@ -36,7 +45,10 @@ public class HUDController : MonoBehaviour
         GameManager.OnStateChanged -= OnStateChanged;
         CoinKeySystem.OnCoinChanged -= OnCoinChanged;
         CoinKeySystem.OnKeyChanged -= OnKeyChanged;
+        LanguageManager.OnLanguageChanged -= OnLanguageChanged;
     }
+
+    void OnLanguageChanged(LanguageManager.Language _) => RefreshKeyText();
 
     void Start()
     {
@@ -46,6 +58,12 @@ public class HUDController : MonoBehaviour
         if (settingPanel != null) settingPanel.SetActive(false);
         if (settingButton != null) settingButton.onClick.AddListener(OnSettingClick);
         if (settingCloseButton != null) settingCloseButton.onClick.AddListener(CloseSettingPanel);
+
+        shopButton?.onClick.AddListener(() => shopPanel?.Show());
+        helpButton?.onClick.AddListener(() => tipsPanel?.Show());
+
+        // 씬 진입 시 업그레이드 효과 적용
+        UpgradeManager.Instance?.ApplyToPlayer();
     }
 
     public void OnSettingClick()
@@ -91,7 +109,16 @@ public class HUDController : MonoBehaviour
 
     void OnKeyChanged(int keys)
     {
-        if (keyText != null) keyText.text = keys > 0 ? $"{keys.ToString()}개" : "키 없음";
+        _keys = keys;
+        RefreshKeyText();
+    }
+
+    void RefreshKeyText()
+    {
+        if (keyText == null) return;
+        keyText.text = _keys > 0
+            ? string.Format(LocalizationManager.Get("hud_key_count"), _keys)
+            : LocalizationManager.Get("hud_no_key");
     }
 
     void OnStateChanged(GameManager.GameState state) { }
