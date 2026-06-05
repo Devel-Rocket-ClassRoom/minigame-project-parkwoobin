@@ -150,7 +150,7 @@ public class CatEnemy : EnemyBase
 
     void TryRandomJump(float chance)
     {
-        if (chance <= 0f) return;
+        if (!canJump || chance <= 0f) return;
         if (!_isGrounded || _jumpTimer > 0f) return;
         if (Random.value < chance) Jump();
     }
@@ -265,6 +265,7 @@ public class CatEnemy : EnemyBase
 
     void TryJump()
     {
+        if (!canJump) return;
         if (!_isGrounded || _jumpTimer > 0f) return;
 
         float heightDiff = _player.position.y - transform.position.y;
@@ -287,6 +288,16 @@ public class CatEnemy : EnemyBase
     {
         float targetX = _patrolOriginX + _patrolDir * patrolRange;
         FaceToward(targetX);
+
+        // validGroundLayers 설정 시: 앞에 유효한 바닥이 없으면 방향 전환
+        if (!IsValidGroundAhead(_patrolDir))
+        {
+            _patrolDir *= -1;
+            _state = State.Idle;
+            _idleTimer = Random.Range(0.5f, 1.5f);
+            return;
+        }
+
         _rb.linearVelocity = new Vector2(_patrolDir * MoveSpeed * 0.6f, _rb.linearVelocity.y);
         if (Mathf.Abs(transform.position.x - targetX) < 0.2f)
         {
@@ -299,6 +310,14 @@ public class CatEnemy : EnemyBase
     void MoveToward(float targetX, float speed)
     {
         float dir = targetX > transform.position.x ? 1f : -1f;
+
+        // validGroundLayers 설정 시: 앞 바닥이 유효하지 않으면 이동 중단
+        if (!IsValidGroundAhead(dir))
+        {
+            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+            return;
+        }
+
         FaceToward(targetX);
         _rb.linearVelocity = new Vector2(dir * speed, _rb.linearVelocity.y);
     }

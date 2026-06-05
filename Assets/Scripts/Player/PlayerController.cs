@@ -42,6 +42,12 @@ public partial class PlayerController : MonoBehaviour
     [Header("Double Jump")]
     [SerializeField] bool doubleJumpEnabled = false;
 
+    [Header("Hunger Debuff")]
+    [Tooltip("Hunger 0 시 속도·점프에 곱할 배율 (0~1). 기본 0.6 = 40% 감소")]
+    [SerializeField] float hungerDebuffMultiplier = 0.6f;
+    [Tooltip("이동 중 배고픔 감소 확률을 체크하는 간격")]
+    [SerializeField] float moveHungerCheckInterval = 0.2f;
+
     [Header("Attack HitBox")]
     [SerializeField] GameObject _attackHitBox;
     [SerializeField] float _attackActiveDuration = 0.2f;
@@ -58,6 +64,7 @@ public partial class PlayerController : MonoBehaviour
     Rigidbody2D _rb;
     PlayerAnimationController _anim;
     Collider2D _col;
+    HungerSystem _hungerSystem;
 
     // ── 레이어 마스크 ────────────────────────────────────────────────────────
     int _groundMask;
@@ -103,10 +110,17 @@ public partial class PlayerController : MonoBehaviour
     Coroutine _attackCoroutine;
     Coroutine _turnCoroutine;
 
+    // ── Hunger 디버프 기본값 저장 ────────────────────────────────────────────
+    float _baseMoveSpeed;
+    float _baseDashForce;
+    float _baseMaxJumpHeight;
+
     // ── 상태 (액션 쿨다운/토글) ──────────────────────────────────────────────
     bool _isHungry;
+    bool _isStarving;
     float _hurtAnimTimer;
     float _fightCooldown;
+    float _moveHungerTimer;
 
     // Rigidbody2D.GetContacts 재사용 배열 (GC 방지)
     static readonly ContactPoint2D[] _contacts = new ContactPoint2D[8];
@@ -118,6 +132,13 @@ public partial class PlayerController : MonoBehaviour
         _anim = GetComponent<PlayerAnimationController>();
         _col = GetComponent<Collider2D>();
         _defaultGravityScale = _rb.gravityScale;
+
+        // Hunger 디버프 + 업그레이드용 기본값 저장
+        _baseMoveSpeed      = moveSpeed;
+        _baseDashForce      = dashForce;
+        _baseMaxJumpHeight  = maxJumpHeight;
+        _baseActionResetTime = actionResetTime;
+        _baseTurnDuration   = turnDuration;
     }
 
     void Start()
@@ -128,6 +149,7 @@ public partial class PlayerController : MonoBehaviour
         _hp = maxHp;
         if (_attackHitBox == null) _attackHitBox = BuildAttackHitBox();
         _attackHitBox.SetActive(false);
+        _hungerSystem = FindFirstObjectByType<HungerSystem>();
         HungerSystem.OnHungerChanged += OnHungerChanged;
     }
 
@@ -142,6 +164,12 @@ public partial class PlayerController : MonoBehaviour
         if (_isHungry == hungry) return;
         _isHungry = hungry;
         _anim?.SetHungry(_isHungry);
+
+        // Hunger 0 → 속도·대시·점프 감소 / 회복 → 원래 값 복원
+        float mult = hungry ? hungerDebuffMultiplier : 1f;
+        moveSpeed     = _baseMoveSpeed     * mult;
+        dashForce     = _baseDashForce     * mult;
+        maxJumpHeight = _baseMaxJumpHeight * mult;
     }
 
     // ── 업데이트 ─────────────────────────────────────────────────────────────
@@ -298,6 +326,7 @@ public partial class PlayerController : MonoBehaviour
             else if (_wallJumpDirX < 0f && moveX > 0f) moveX = 0f;
         }
         _rb.linearVelocity = new Vector2(moveX * moveSpeed * speedScale, _rb.linearVelocity.y);
+        ConsumeMoveHunger(moveX);
     }
 
     // ── 물리 감지 ────────────────────────────────────────────────────────────
@@ -373,6 +402,29 @@ public partial class PlayerController : MonoBehaviour
     public int MaxHp => maxHp;
     public bool IsFacingLeft => !_facingRight;
 
+    /// <summary>UpgradeManager가 업그레이드 보너스를 적용한다.</summary>
+    public void SetUpgradeBonuses(float speedBonus, float dashBonus, float jumpBonus,
+                                   int hpBonus, float dashCoolReduction, float turnCoolReduction)
+    {
+        moveSpeed     = (_baseMoveSpeed     + speedBonus) * (_isStarving ? hungerDebuffMultiplier : 1f);
+        dashForce     = (_baseDashForce     + dashBonus)  * (_isStarving ? hungerDebuffMultiplier : 1f);
+        maxJumpHeight = (_baseMaxJumpHeight + jumpBonus)  * (_isStarving ? hungerDebuffMultiplier : 1f);
+
+        // HP 보너스: 기본 maxHp + 업그레이드 보너스
+        int newMaxHp = Mathf.Max(1, maxHp + hpBonus - _upgradeHpBonus);
+        _upgradeHpBonus = hpBonus;
+        if (newMaxHp != maxHp) SetHp(_hp, newMaxHp);
+
+        // 쿨타임 단축 (최소 0.1초)
+        actionResetTime = Mathf.Max(0.1f, _baseActionResetTime - dashCoolReduction);
+        turnDuration    = Mathf.Max(0.1f, _baseTurnDuration    - turnCoolReduction);
+    }
+
+    // 업그레이드용 기본값 (Awake에서 캡처, SetUpgradeBonuses 이전에 세팅됨)
+    float _baseActionResetTime;
+    float _baseTurnDuration;
+    int   _upgradeHpBonus;
+
     /// <summary>스폰 연출 중 입력·물리를 차단한다. PlayerSpawner에서 호출.</summary>
     public void SetSpawning(bool spawning)
     {
@@ -397,4 +449,26 @@ public partial class PlayerController : MonoBehaviour
 
     public int AttackPower => attackPower;
     public void SetAttackPower(int value) => attackPower = value;
+
+    void ConsumeHunger(HungerAction action)
+    {
+        if (_hungerSystem == null)
+            _hungerSystem = FindFirstObjectByType<HungerSystem>();
+        _hungerSystem?.TryDepleteForAction(action);
+    }
+
+    void ConsumeMoveHunger(float moveX)
+    {
+        if (Mathf.Abs(moveX) <= 0.01f)
+        {
+            _moveHungerTimer = 0f;
+            return;
+        }
+
+        _moveHungerTimer += Time.fixedDeltaTime;
+        if (_moveHungerTimer < moveHungerCheckInterval) return;
+
+        _moveHungerTimer = 0f;
+        ConsumeHunger(HungerAction.Move);
+    }
 }

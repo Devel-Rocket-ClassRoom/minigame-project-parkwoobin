@@ -8,10 +8,12 @@ public class DeadZone : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"[DeadZone] 충돌: {other.gameObject.name}");
+        // 적이 DeadZone에 떨어지면 스폰 위치로 복귀
+        var enemy = other.GetComponentInParent<EnemyBase>();
+        if (enemy != null) { enemy.ResetToSpawn(); return; }
 
         var player = other.GetComponentInParent<PlayerController>();
-        if (player == null) { Debug.Log("[DeadZone] PlayerController 없음 — 무시"); return; }
+        if (player == null) return;
 
         Debug.Log("[DeadZone] 플레이어 감지 → Die() 호출");
 

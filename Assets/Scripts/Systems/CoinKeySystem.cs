@@ -40,6 +40,15 @@ public class CoinKeySystem : MonoBehaviour
         return true;
     }
 
+    /// <summary>코인을 소비한다. 코인이 부족하면 false 반환.</summary>
+    public bool SpendCoins(int amount)
+    {
+        if (_coins < amount) return false;
+        _coins -= amount;
+        OnCoinChanged?.Invoke(_coins);
+        return true;
+    }
+
     public void SetCoinsAndKeys(int coins, int keys)
     {
         _coins = coins;

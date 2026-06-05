@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +19,9 @@ public class PrologueManager : MonoBehaviour
     [Header("UI 연결")]
     [SerializeField] Button clickArea;
     [SerializeField] Button skipButton;
+    [SerializeField] TMP_Text skipButtonText;
     [SerializeField] GameObject startText;
+    [SerializeField] TMP_Text startTextLabel;
     [SerializeField] Button startTextButton;
 
     [Header("BGM")]
@@ -41,11 +44,23 @@ public class PrologueManager : MonoBehaviour
     bool _ended;
     Coroutine _autoCoroutine;
 
+    void Awake()
+    {
+        ResolveLocalizedTexts();
+        RefreshLocalizedTexts();
+    }
+
+    void OnEnable() => LanguageManager.OnLanguageChanged += OnLanguageChanged;
+    void OnDisable() => LanguageManager.OnLanguageChanged -= OnLanguageChanged;
+
+    void OnLanguageChanged(LanguageManager.Language _) => RefreshLocalizedTexts();
+
     void Start()
     {
         clickArea?.onClick.AddListener(OnManualClick);
         skipButton?.onClick.AddListener(EndPrologue);
         startTextButton?.onClick.AddListener(EndPrologue);
+        RefreshLocalizedTexts();
 
         if (startText != null) startText.SetActive(false);
         if (bgmMuteToggle != null)
@@ -227,5 +242,26 @@ public class PrologueManager : MonoBehaviour
         if (clickArea != null) clickArea.interactable = false;
         if (skipButton != null) skipButton.interactable = false;
         SceneTransitionManager.Instance.TransitionTo(nextScene);
+    }
+
+    void ResolveLocalizedTexts()
+    {
+        if (skipButtonText == null && skipButton != null)
+            skipButtonText = skipButton.GetComponentInChildren<TMP_Text>(true);
+        if (startTextLabel == null && startText != null)
+            startTextLabel = startText.GetComponentInChildren<TMP_Text>(true);
+    }
+
+    void RefreshLocalizedTexts()
+    {
+        ResolveLocalizedTexts();
+
+        string skipText = LocalizationManager.Get("common_skip");
+        if (skipButtonText != null && !string.IsNullOrEmpty(skipText))
+            skipButtonText.text = skipText;
+
+        string startTextValue = LocalizationManager.Get("prologue_start");
+        if (startTextLabel != null && !string.IsNullOrEmpty(startTextValue))
+            startTextLabel.text = startTextValue;
     }
 }

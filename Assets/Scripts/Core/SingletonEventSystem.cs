@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -21,6 +22,21 @@ public class SingletonEventSystem : EventSystem
         s_instance = this;
         DontDestroyOnLoad(gameObject);
         base.OnEnable();
+
+        // InputSystem UI Module 첫 클릭 소실 워크어라운드:
+        // 다음 프레임에 InputModule을 재토글해 입력 상태를 초기화
+        StartCoroutine(KickInputModule());
+    }
+
+    IEnumerator KickInputModule()
+    {
+        yield return null;
+        var module = GetComponent<BaseInputModule>();
+        if (module != null)
+        {
+            module.enabled = false;
+            module.enabled = true;
+        }
     }
 
     protected override void OnDisable()

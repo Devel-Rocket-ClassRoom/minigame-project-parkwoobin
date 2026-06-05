@@ -80,6 +80,7 @@ public partial class PlayerController
         _anim?.TriggerFight();
         _fightCooldown = actionResetTime;
         PlaySfxAttack();
+        ConsumeHunger(HungerAction.Attack);
         // HitBox는 Animation Event(OnAttackHitFrame)에서 활성화
     }
 
@@ -191,6 +192,7 @@ public partial class PlayerController
         _anim?.TriggerTurn();
         _invincibleTimer = Mathf.Max(_invincibleTimer, turnDuration);
         PlaySfxTurn();
+        ConsumeHunger(HungerAction.Skill);
         if (_turnCoroutine != null) StopCoroutine(_turnCoroutine);
         _turnCoroutine = StartCoroutine(TurnPassthroughRoutine());
         return true;
