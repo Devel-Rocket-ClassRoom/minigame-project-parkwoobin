@@ -46,6 +46,10 @@ public class PlayerSpawner : MonoBehaviour
         // 같은 프레임의 모든 Awake/Start가 끝난 뒤 실행 (SpawnPoint 등록 순서 보장)
         yield return null;
 
+        // ── 인트로 컷씬 대기 ─────────────────────────────────────────────────
+        if (MapCutsceneManager.Instance != null && !MapCutsceneManager.Instance.IntroComplete)
+            yield return new WaitUntil(() => MapCutsceneManager.Instance.IntroComplete);
+
         // ── 스폰 포인트 결정 ────────────────────────────────────────────────
         string entryID = GameState.Instance != null
             ? GameState.Instance.GetTransitionEntry()
@@ -67,8 +71,8 @@ public class PlayerSpawner : MonoBehaviour
             if (GameState.Instance.savedMaxHunger > 0f)
                 hunger?.SetHunger(GameState.Instance.savedHunger);
 
-            CoinKeySystem.Instance?.SetCoinsAndKeys(GameState.Instance.savedCoins,
-                                                   GameState.Instance.savedKeys);
+            GetCoinKeySystem()?.SetCoinsAndKeys(GameState.Instance.savedCoins,
+                                                GameState.Instance.savedKeys);
 
             // 세이브 파일 불러오기: 저장된 공격력 복원
             if (restoringFromSave)
@@ -78,6 +82,7 @@ public class PlayerSpawner : MonoBehaviour
         {
             // 새 게임: HungerSystem이 DDOL이라 Start()가 재실행되지 않으므로 직접 초기화
             if (hunger != null) hunger.SetHunger(hunger.MaxHunger);
+            GetCoinKeySystem()?.SetCoinsAndKeys(10, 0);
         }
 
         // ── entryID 정리 ─────────────────────────────────────────────────────
@@ -158,5 +163,12 @@ public class PlayerSpawner : MonoBehaviour
         // zone transition으로 도착한 경우 현재 씬·위치로 저장
         if (restoringFromTransition)
             SaveManager.Instance?.AutoSave();
+    }
+
+    CoinKeySystem GetCoinKeySystem()
+    {
+        return CoinKeySystem.Instance != null
+            ? CoinKeySystem.Instance
+            : FindFirstObjectByType<CoinKeySystem>();
     }
 }

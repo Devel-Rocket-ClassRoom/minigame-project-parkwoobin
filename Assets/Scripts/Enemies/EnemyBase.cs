@@ -16,6 +16,14 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] GameObject _attackHitBox;
     [SerializeField] float _hitBoxDuration = 0.2f;
 
+    [Header("Movement Constraints")]
+    [Tooltip("적이 올라설 수 있는 레이어. 비어있으면 제한 없음.\n여기에 없는 레이어 바닥으로는 이동하지 않음.")]
+    [SerializeField] LayerMask validGroundLayers;
+
+    // 스포너에서 SetCanJump()로 설정
+    protected bool canJump = true;
+    public void SetCanJump(bool value) => canJump = value;
+
     [Header("Hurt Knockback")]
     [Tooltip("피격 시 뒤로 밀려나는 거리(unit)")]
     [SerializeField] float knockbackDistance = 0.1f;
@@ -47,6 +55,8 @@ public abstract class EnemyBase : MonoBehaviour
     int _hp;
     protected int _groundMask;
 
+    Vector3 _spawnPoint;
+
     AudioSource _sfxSource;
 
     public System.Action<int, int> OnHealthChanged;
@@ -56,12 +66,62 @@ public abstract class EnemyBase : MonoBehaviour
     public float MoveSpeed => moveSpeed;
     public int AttackPower => attackPower;
 
+    /// <summary>
+    /// 진행 방향 앞 발 아래에 validGroundLayers에 속하는 바닥이 있는지 확인한다.
+    /// validGroundLayers가 0(Nothing)이면 항상 true(제한 없음).
+    /// </summary>
+    protected bool IsValidGroundAhead(float dirX)
+    {
+        if (validGroundLayers == 0) return true;
+
+        // 발 위치에서 한 발짝 앞 지점 아래로 레이캐스트
+        float feetY = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
+        float checkX = transform.position.x + Mathf.Sign(dirX) * 0.4f;
+        var hit = Physics2D.Raycast(new Vector2(checkX, feetY), Vector2.down, 1.2f, _groundMask);
+
+        if (hit.collider == null) return false; // 앞에 바닥 자체가 없음 → 낭떠러지
+        return (validGroundLayers & (1 << hit.collider.gameObject.layer)) != 0;
+    }
+
+    /// <summary>스포너가 인스턴스 생성 후 스폰 위치를 알려준다.</summary>
+    public void SetSpawnPoint(Vector3 pos) => _spawnPoint = pos;
+
+    /// <summary>DeadZone 진입 시 스폰 위치로 복귀 + 상태 초기화.</summary>
+    public void ResetToSpawn()
+    {
+        StopAllCoroutines();
+
+        // 위치 복귀
+        transform.position = _spawnPoint;
+
+        // 물리 복원
+        _rb.bodyType = RigidbodyType2D.Dynamic;
+        _rb.linearVelocity = Vector2.zero;
+
+        // 스탯 초기화
+        _hp = maxHp;
+        _isDead = false;
+        _flipCooldown = 0f;
+        OnHealthChanged?.Invoke(_hp, maxHp);
+
+        // 히트박스 끄기
+        _attackHitBox?.SetActive(false);
+        _hitBoxCoroutine = null;
+
+        // 서브클래스 초기화
+        OnRespawn();
+    }
+
+    /// <summary>서브클래스에서 재정의해 상태머신 등 추가 초기화.</summary>
+    protected virtual void OnRespawn() { }
+
     protected virtual void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _anim = GetComponent<EnemyAnimationController>();
         _col = GetComponent<Collider2D>();
         _hp = maxHp;
+        _spawnPoint = transform.position; // 씬 직접 배치 시 기본값
 
         // Ground 레이어가 정의되지 않은 프로젝트 대비: 자기 레이어 제외 전체로 fallback
         _groundMask = LayerMask.GetMask("Ground");

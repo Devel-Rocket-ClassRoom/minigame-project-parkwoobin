@@ -1,11 +1,10 @@
-using Unity.VisualScripting;
+using TMPro;
 using UnityEngine;
-
 using UnityEngine.UI;
 
 /// <summary>
 /// 설정 패널 UI 동작 담당.
-/// BGM / SFX 슬라이더, 메인 버튼, 게임오버 버튼 처리.
+/// BGM / SFX 슬라이더, 언어 드롭다운, 메인 버튼, 게임오버 버튼 처리.
 /// </summary>
 public class SettingPanelController : MonoBehaviour
 {
@@ -13,9 +12,32 @@ public class SettingPanelController : MonoBehaviour
     [SerializeField] Slider bgmSlider;
     [SerializeField] Slider sfxSlider;
 
+    [Header("언어")]
+    [SerializeField] TMP_Dropdown languageDropdown;
+
     [Header("Buttons")]
     [SerializeField] Button mainButton;
     [SerializeField] Button gameOverButton;
+    [SerializeField] Button helpButton;
+
+    [Header("도움말 패널")]
+    [SerializeField] TipsPanelController tipsPanel;
+
+    bool _tipsOpen;
+
+    void OnEnable()
+    {
+        if (tipsPanel == null) return;
+        tipsPanel.OnShown += OnTipsShown;
+        tipsPanel.OnHidden += OnTipsHidden;
+    }
+
+    void OnDisable()
+    {
+        if (tipsPanel == null) return;
+        tipsPanel.OnShown -= OnTipsShown;
+        tipsPanel.OnHidden -= OnTipsHidden;
+    }
 
     void Start()
     {
@@ -30,8 +52,44 @@ public class SettingPanelController : MonoBehaviour
             sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
             sfxSlider.onValueChanged.AddListener(OnSfxChanged);
         }
+
+        // 언어 드롭다운 초기화
+        if (languageDropdown != null)
+        {
+            languageDropdown.ClearOptions();
+            languageDropdown.AddOptions(new System.Collections.Generic.List<string> { "한국어", "English" });
+            int idx = LanguageManager.CurrentLanguage == LanguageManager.Language.English ? 1 : 0;
+            languageDropdown.SetValueWithoutNotify(idx);
+            languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
+        }
+
         mainButton?.onClick.AddListener(OnMainClicked);
         gameOverButton?.onClick.AddListener(OnGameOverClicked);
+        helpButton?.onClick.AddListener(OnHelpClicked);
+    }
+
+    void OnHelpClicked()
+    {
+        if (gameObject.activeInHierarchy) return;
+        if (_tipsOpen) return;
+        if (tipsPanel == null) return;
+        tipsPanel.Show();
+    }
+
+    void OnTipsShown()
+    {
+        _tipsOpen = true;
+    }
+
+    void OnTipsHidden()
+    {
+        _tipsOpen = false;
+    }
+
+    void OnLanguageChanged(int index)
+    {
+        var lang = index == 1 ? LanguageManager.Language.English : LanguageManager.Language.Korean;
+        LanguageManager.SetLanguageStatic(lang);
     }
 
     void OnBgmChanged(float value)

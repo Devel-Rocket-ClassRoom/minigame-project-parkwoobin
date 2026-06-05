@@ -174,8 +174,13 @@ public class DogEnemy : EnemyBase
                     break;
                 }
 
-                // 추격 이동
+                // 추격 이동 — 앞 바닥이 유효하지 않으면 멈춤
                 float dir = dx > 0f ? 1f : -1f;
+                if (!IsValidGroundAhead(dir))
+                {
+                    _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+                    break;
+                }
                 _rb.linearVelocity = new Vector2(dir * MoveSpeed, _rb.linearVelocity.y);
 
                 // 너무 멀어지면 포기
@@ -202,6 +207,15 @@ public class DogEnemy : EnemyBase
     // ── 순찰 이동 ────────────────────────────────────────────────────────────
     void MovePatrol()
     {
+        // 앞 바닥이 유효하지 않으면 방향 전환
+        if (!IsValidGroundAhead(_patrolDir))
+        {
+            _patrolDir *= -1;
+            _state = State.Idle;
+            _idleTimer = Random.Range(idleMin, idleMax);
+            return;
+        }
+
         float targetX = _patrolOriginX + _patrolDir * patrolRange;
         FaceToward(targetX);
         _rb.linearVelocity = new Vector2(_patrolDir * patrolSpeed, _rb.linearVelocity.y);
