@@ -23,6 +23,22 @@ public class SettingPanelController : MonoBehaviour
     [Header("도움말 패널")]
     [SerializeField] TipsPanelController tipsPanel;
 
+    bool _tipsOpen;
+
+    void OnEnable()
+    {
+        if (tipsPanel == null) return;
+        tipsPanel.OnShown += OnTipsShown;
+        tipsPanel.OnHidden += OnTipsHidden;
+    }
+
+    void OnDisable()
+    {
+        if (tipsPanel == null) return;
+        tipsPanel.OnShown -= OnTipsShown;
+        tipsPanel.OnHidden -= OnTipsHidden;
+    }
+
     void Start()
     {
         // 저장된 볼륨 값으로 슬라이더 초기화
@@ -49,7 +65,25 @@ public class SettingPanelController : MonoBehaviour
 
         mainButton?.onClick.AddListener(OnMainClicked);
         gameOverButton?.onClick.AddListener(OnGameOverClicked);
-        helpButton?.onClick.AddListener(() => tipsPanel?.Show());
+        helpButton?.onClick.AddListener(OnHelpClicked);
+    }
+
+    void OnHelpClicked()
+    {
+        if (gameObject.activeInHierarchy) return;
+        if (_tipsOpen) return;
+        if (tipsPanel == null) return;
+        tipsPanel.Show();
+    }
+
+    void OnTipsShown()
+    {
+        _tipsOpen = true;
+    }
+
+    void OnTipsHidden()
+    {
+        _tipsOpen = false;
     }
 
     void OnLanguageChanged(int index)

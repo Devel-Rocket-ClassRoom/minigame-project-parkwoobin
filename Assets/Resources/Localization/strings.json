@@ -16,6 +16,8 @@
   "menu_language":       { "ko": "언어",          "en": "Language"    },
   "menu_help":           { "ko": "도움말",        "en": "Help"        },
   "menu_close":          { "ko": "닫기",          "en": "Close"       },
+  "common_skip":         { "ko": "- 건너 뛰기 -", "en": "- Skip -"    },
+  "prologue_start":      { "ko": "시작하기",      "en": "Start"       },
   "menu_main":           { "ko": "메인으로",      "en": "Main Menu"   },
   "menu_resume":         { "ko": "계속하기",      "en": "Resume"      },
   "menu_slot_select":    { "ko": "슬롯 선택",          "en": "Select Slot"        },
@@ -51,11 +53,11 @@
   "upgrade_jumpheight_name":   { "ko": "점프",            "en": "Jump Height"     },
   "upgrade_jumpheight_desc":   { "ko": "점프 높이가 높아집니다.", "en": "Increases jump height." },
 
-  "upgrade_maxhp_name":        { "ko": "체력 증가",       "en": "Max HP"          },
-  "upgrade_maxhp_desc":        { "ko": "최대 HP가 증가합니다.", "en": "Increases maximum HP." },
+  "upgrade_hpup_name":        { "ko": "체력 회복",       "en": "HP Recovery"     },
+  "upgrade_hpup_desc":        { "ko": "현재 HP가 3 회복됩니다.", "en": "Restores 3 current HP." },
 
-  "upgrade_maxhunger_name":    { "ko": "배고픔 증가",     "en": "Max Hunger"      },
-  "upgrade_maxhunger_desc":    { "ko": "최대 배고픔이 증가합니다.", "en": "Increases maximum hunger." },
+  "upgrade_eating_name":    { "ko": "배고픔 해결",     "en": "Hunger Relief"   },
+  "upgrade_eating_desc":    { "ko": "현재 배고픔이 10 회복됩니다.", "en": "Restores 10 current hunger." },
 
   "upgrade_dashcooldown_name": { "ko": "대시 쿨타임",     "en": "Dash Cooldown"   },
   "upgrade_dashcooldown_desc": { "ko": "대시 재사용 대기시간이 줄어듭니다.", "en": "Reduces dash cooldown time." },

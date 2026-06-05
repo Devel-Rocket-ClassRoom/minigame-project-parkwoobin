@@ -78,10 +78,12 @@ public class MainMenuTipsPanel : MonoBehaviour
 
     public void Show()
     {
+        if (IsBlockedByHudPanel()) return;
         if (tips == null || tips.Length == 0) return;
         _index = 0;
         if (dimOverlay != null) dimOverlay.SetActive(true);
         SetVisible(true);
+        NotifyHudControllers(true);
         RefreshText();
         StartCoroutine(PlayAnimNextFrame());
     }
@@ -96,6 +98,7 @@ public class MainMenuTipsPanel : MonoBehaviour
     {
         SetVisible(false);
         if (dimOverlay != null) dimOverlay.SetActive(false);
+        NotifyHudControllers(false);
     }
 
     void Prev()
@@ -138,4 +141,17 @@ public class MainMenuTipsPanel : MonoBehaviour
         if (!string.IsNullOrEmpty(state))
             tipAnimator.Play(state, 0, 0f);
     }
+
+    bool IsBlockedByHudPanel()
+    {
+        foreach (var shop in FindObjectsByType<ShopPanel>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (shop != null && shop.IsVisible) return true;
+
+        foreach (var hud in FindObjectsByType<HUDController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (hud != null && hud.IsAnyPanelOpen()) return true;
+
+        return false;
+    }
+
+    void NotifyHudControllers(bool visible) { /* 도움말은 HUDController를 거치지 않음 */ }
 }

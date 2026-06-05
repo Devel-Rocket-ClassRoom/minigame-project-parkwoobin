@@ -34,6 +34,7 @@ public class MapCutsceneManager : MonoBehaviour
     [Header("공통 UI")]
     [SerializeField] Button clickArea;
     [SerializeField] Button skipButton;
+    [SerializeField] TMP_Text skipButtonText;
     [Tooltip("컷씬 종료 시 숨길 뮤트 버튼 (introRoot/outroRoot 밖에 있는 경우)")]
     [SerializeField] GameObject bgmMuteButton;
 
@@ -72,6 +73,9 @@ public class MapCutsceneManager : MonoBehaviour
         if (!HasIntro) IntroComplete = true;
         if (introRoot != null) introRoot.SetActive(false);
         if (outroRoot != null) outroRoot.SetActive(false);
+        ResolveSkipButtonText();
+        RefreshSkipButtonText();
+        DisableSubtitleRaycasts();
         ClearSubtitle();
     }
 
@@ -82,6 +86,8 @@ public class MapCutsceneManager : MonoBehaviour
     // 단, 자막 패널이 이미 표시 중일 때만 — 컷씬 종료 후 언어 변경 시 자막이 다시 뜨는 버그 방지.
     void OnLanguageChanged(LanguageManager.Language _)
     {
+        RefreshSkipButtonText();
+
         var panel = SubtitlePanelResolved;
         if (panel == null || !panel.activeSelf) return;
         RefreshSubtitle();
@@ -121,6 +127,7 @@ public class MapCutsceneManager : MonoBehaviour
         if (subtitleText != null) subtitleText.text = hasText ? text : "";
         var panel = SubtitlePanelResolved;
         if (panel != null) panel.SetActive(hasText);
+        DisableSubtitleRaycasts();
     }
 
     // subtitlePanel이 없으면 subtitleText의 부모 오브젝트를 대신 사용
@@ -129,11 +136,45 @@ public class MapCutsceneManager : MonoBehaviour
         : subtitleText != null ? subtitleText.transform.parent?.gameObject
         : null;
 
+    void ResolveSkipButtonText()
+    {
+        if (skipButtonText == null && skipButton != null)
+            skipButtonText = skipButton.GetComponentInChildren<TMP_Text>(true);
+    }
+
+    void RefreshSkipButtonText()
+    {
+        ResolveSkipButtonText();
+        string text = LocalizationManager.Get("common_skip");
+        if (skipButtonText != null && !string.IsNullOrEmpty(text))
+            skipButtonText.text = text;
+    }
+
+    void DisableSubtitleRaycasts()
+    {
+        if (subtitlePanel != null)
+        {
+            var graphics = subtitlePanel.GetComponentsInChildren<Graphic>(true);
+            foreach (var graphic in graphics)
+                graphic.raycastTarget = false;
+        }
+        else if (subtitleText != null && subtitleText.transform.parent != null)
+        {
+            var parentGraphic = subtitleText.transform.parent.GetComponent<Graphic>();
+            if (parentGraphic != null)
+                parentGraphic.raycastTarget = false;
+        }
+
+        if (subtitleText != null)
+            subtitleText.raycastTarget = false;
+    }
+
     void ClearSubtitle()
     {
         if (subtitleText != null) subtitleText.text = "";
         var panel = SubtitlePanelResolved;
         if (panel != null) panel.SetActive(false);
+        DisableSubtitleRaycasts();
     }
 
     // ── HUD / 컷씬UI 표시 ───────────────────────────────────────────────────
@@ -209,6 +250,7 @@ public class MapCutsceneManager : MonoBehaviour
         skipButton?.onClick.AddListener(EndCutscene);
 
         if (skipButton != null) skipButton.gameObject.SetActive(true);
+        RefreshSkipButtonText();
         if (clickArea != null) clickArea.gameObject.SetActive(true);
 
         StartPage(0);

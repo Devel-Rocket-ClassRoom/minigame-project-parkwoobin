@@ -2,10 +2,27 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum HungerAction
+{
+    Move,
+    Jump,
+    Skill,
+    Attack
+}
+
 public class HungerSystem : MonoBehaviour
 {
     [SerializeField] float maxHunger = 100f;
-    [SerializeField] float depletionRate = 2f;   // per second
+
+    [Header("Action Depletion")]
+    [SerializeField, Range(0f, 1f)] float moveDepletionChance = 0.8f;
+    [SerializeField] Vector2 moveDepletionRange = new Vector2(0.2f, 0.45f);
+    [SerializeField, Range(0f, 1f)] float jumpDepletionChance = 1f;
+    [SerializeField] Vector2 jumpDepletionRange = new Vector2(0.8f, 1.5f);
+    [SerializeField, Range(0f, 1f)] float skillDepletionChance = 1f;
+    [SerializeField] Vector2 skillDepletionRange = new Vector2(1.2f, 2.2f);
+    [SerializeField, Range(0f, 1f)] float attackDepletionChance = 1f;
+    [SerializeField] Vector2 attackDepletionRange = new Vector2(0.9f, 1.7f);
 
     public static UnityAction<float, float> OnHungerChanged;  // current, max
 
@@ -21,12 +38,38 @@ public class HungerSystem : MonoBehaviour
         OnHungerChanged?.Invoke(_hunger, maxHunger);
     }
 
-    void Update()
+    public void TryDepleteForAction(HungerAction action)
     {
-        if (!GameManager.Instance.IsPlaying) return;
+        if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+        if (_hunger <= 0f) return;
+
+        float chance;
+        Vector2 range;
+        switch (action)
+        {
+            case HungerAction.Move:
+                chance = moveDepletionChance;
+                range = moveDepletionRange;
+                break;
+            case HungerAction.Jump:
+                chance = jumpDepletionChance;
+                range = jumpDepletionRange;
+                break;
+            case HungerAction.Skill:
+                chance = skillDepletionChance;
+                range = skillDepletionRange;
+                break;
+            default:
+                chance = attackDepletionChance;
+                range = attackDepletionRange;
+                break;
+        }
+
+        if (Random.value > chance) return;
 
         float prev = _hunger;
-        _hunger = Mathf.Max(0f, _hunger - depletionRate * Time.deltaTime);
+        float amount = Random.Range(Mathf.Min(range.x, range.y), Mathf.Max(range.x, range.y));
+        _hunger = Mathf.Max(0f, _hunger - amount);
         if (!Mathf.Approximately(prev, _hunger))
             OnHungerChanged?.Invoke(_hunger, maxHunger);
     }
