@@ -42,6 +42,10 @@ public partial class PlayerController : MonoBehaviour
     [Header("Double Jump")]
     [SerializeField] bool doubleJumpEnabled = false;
 
+    [Header("Hunger Debuff")]
+    [Tooltip("Hunger 0 시 속도·점프에 곱할 배율 (0~1). 기본 0.6 = 40% 감소")]
+    [SerializeField] float hungerDebuffMultiplier = 0.6f;
+
     [Header("Attack HitBox")]
     [SerializeField] GameObject _attackHitBox;
     [SerializeField] float _attackActiveDuration = 0.2f;
@@ -103,8 +107,14 @@ public partial class PlayerController : MonoBehaviour
     Coroutine _attackCoroutine;
     Coroutine _turnCoroutine;
 
+    // ── Hunger 디버프 기본값 저장 ────────────────────────────────────────────
+    float _baseMoveSpeed;
+    float _baseDashForce;
+    float _baseMaxJumpHeight;
+
     // ── 상태 (액션 쿨다운/토글) ──────────────────────────────────────────────
     bool _isHungry;
+    bool _isStarving;
     float _hurtAnimTimer;
     float _fightCooldown;
 
@@ -118,6 +128,13 @@ public partial class PlayerController : MonoBehaviour
         _anim = GetComponent<PlayerAnimationController>();
         _col = GetComponent<Collider2D>();
         _defaultGravityScale = _rb.gravityScale;
+
+        // Hunger 디버프 + 업그레이드용 기본값 저장
+        _baseMoveSpeed      = moveSpeed;
+        _baseDashForce      = dashForce;
+        _baseMaxJumpHeight  = maxJumpHeight;
+        _baseActionResetTime = actionResetTime;
+        _baseTurnDuration   = turnDuration;
     }
 
     void Start()
@@ -142,6 +159,12 @@ public partial class PlayerController : MonoBehaviour
         if (_isHungry == hungry) return;
         _isHungry = hungry;
         _anim?.SetHungry(_isHungry);
+
+        // Hunger 0 → 속도·대시·점프 감소 / 회복 → 원래 값 복원
+        float mult = hungry ? hungerDebuffMultiplier : 1f;
+        moveSpeed     = _baseMoveSpeed     * mult;
+        dashForce     = _baseDashForce     * mult;
+        maxJumpHeight = _baseMaxJumpHeight * mult;
     }
 
     // ── 업데이트 ─────────────────────────────────────────────────────────────
@@ -372,6 +395,29 @@ public partial class PlayerController : MonoBehaviour
     public int Hp => _hp;
     public int MaxHp => maxHp;
     public bool IsFacingLeft => !_facingRight;
+
+    /// <summary>UpgradeManager가 업그레이드 보너스를 적용한다.</summary>
+    public void SetUpgradeBonuses(float speedBonus, float dashBonus, float jumpBonus,
+                                   int hpBonus, float dashCoolReduction, float turnCoolReduction)
+    {
+        moveSpeed     = (_baseMoveSpeed     + speedBonus) * (_isStarving ? hungerDebuffMultiplier : 1f);
+        dashForce     = (_baseDashForce     + dashBonus)  * (_isStarving ? hungerDebuffMultiplier : 1f);
+        maxJumpHeight = (_baseMaxJumpHeight + jumpBonus)  * (_isStarving ? hungerDebuffMultiplier : 1f);
+
+        // HP 보너스: 기본 maxHp + 업그레이드 보너스
+        int newMaxHp = Mathf.Max(1, maxHp + hpBonus - _upgradeHpBonus);
+        _upgradeHpBonus = hpBonus;
+        if (newMaxHp != maxHp) SetHp(_hp, newMaxHp);
+
+        // 쿨타임 단축 (최소 0.1초)
+        actionResetTime = Mathf.Max(0.1f, _baseActionResetTime - dashCoolReduction);
+        turnDuration    = Mathf.Max(0.1f, _baseTurnDuration    - turnCoolReduction);
+    }
+
+    // 업그레이드용 기본값 (Awake에서 캡처, SetUpgradeBonuses 이전에 세팅됨)
+    float _baseActionResetTime;
+    float _baseTurnDuration;
+    int   _upgradeHpBonus;
 
     /// <summary>스폰 연출 중 입력·물리를 차단한다. PlayerSpawner에서 호출.</summary>
     public void SetSpawning(bool spawning)

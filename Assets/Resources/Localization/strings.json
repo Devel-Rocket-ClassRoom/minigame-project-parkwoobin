@@ -1,0 +1,138 @@
+{
+  "_comment": "키: 자유롭게 작명. 언어 추가 시 각 항목에 해당 언어 코드를 추가하세요.",
+
+  "menu_new_game":       { "ko": "새 게임",       "en": "New Game"    },
+  "menu_load_game":      { "ko": "게임 불러오기", "en": "Load Game"   },
+  "menu_quit":           { "ko": "게임 종료",     "en": "Quit"        },
+  "menu_no_save_data":   { "ko": "저장된 데이터가 없습니다.", "en": "No save data found." },
+  "menu_notice":         { "ko": "알림",          "en": "Notice"      },
+  "menu_no_save_msg":    { "ko": "저장된 게임 데이터가 없습니다.", "en": "No saved game data found." },
+  "menu_confirm":        { "ko": "확인",          "en": "Confirm"     },
+  "hud_no_key":          { "ko": "키 없음",       "en": "No Key"      },
+  "hud_key_count":       { "ko": "{0}개",         "en": "{0} keys"    },
+  "menu_settings_title": { "ko": "설정",          "en": "Settings"    },
+  "menu_bgm":            { "ko": "BGM",           "en": "BGM"         },
+  "menu_sfx":            { "ko": "효과음",        "en": "SFX"         },
+  "menu_language":       { "ko": "언어",          "en": "Language"    },
+  "menu_help":           { "ko": "도움말",        "en": "Help"        },
+  "menu_close":          { "ko": "닫기",          "en": "Close"       },
+  "menu_main":           { "ko": "메인으로",      "en": "Main Menu"   },
+  "menu_resume":         { "ko": "계속하기",      "en": "Resume"      },
+  "menu_slot_select":    { "ko": "슬롯 선택",          "en": "Select Slot"        },
+  "menu_slot":           { "ko": "슬롯",               "en": "Slot"               },
+  "menu_slot_empty":     { "ko": "— 빈 슬롯 —",        "en": "— Empty —"          },
+  "menu_slot_delete":    { "ko": "삭제",               "en": "Delete"             },
+  "menu_slot_delete_all":{ "ko": "세이브 파일 지우기",  "en": "Delete Save Files"  },
+  "menu_new_game_title": { "ko": "새 게임 선택",        "en": "New Game"           },
+  "menu_load_game_title":{ "ko": "게임 불러오기",       "en": "Load Game"          },
+  "menu_help_title":     { "ko": "도움말",              "en": "Help"               },
+  "menu_tips_title":     { "ko": "도움말",        "en": "Tips"        },
+  "menu_shop":           { "ko": "상점",          "en": "Shop"        },
+
+  "tutorial_none_desc":        { "ko": "조이스틱(또는 방향키)으로 이동할 수 있어요.", "en": "Use the joystick (or arrow keys) to move." },
+  "tutorial_move_desc":        { "ko": "조이스틱(또는 방향키)으로 이동할 수 있어요.", "en": "Use the joystick (or arrow keys) to move." },
+  "tutorial_jump_desc":        { "ko": "점프 버튼을 눌러 점프합니다.\n꾹 누르면 더 높이 점프해요!", "en": "Press the jump button to jump.\nHold it to jump higher!" },
+  "tutorial_doublejump_desc":  { "ko": "공중에서 다시 점프 버튼을 누르면\n한 번 더 점프할 수 있어요!", "en": "Press jump again in the air\nto perform a double jump!" },
+  "tutorial_dash_desc":        { "ko": "대시 버튼을 누르면 빠르게 돌진해요.\n적의 공격을 피할 때도 유용해요!", "en": "Press dash to lunge forward quickly.\nGreat for dodging enemy attacks!" },
+  "tutorial_walljump_desc":    { "ko": "벽에 붙은 상태에서 점프 버튼을 누르면\n벽을 박차고 점프할 수 있어요!", "en": "Press jump while clinging to a wall\nto perform a wall jump!" },
+  "tutorial_turn_desc":        { "ko": "턴 버튼으로 순간적으로 뒤를 돌아\n공격을 피하거나 반격할 수 있어요!", "en": "Use turn to quickly spin around\nto dodge or counter-attack!" },
+  "tutorial_attack_desc":      { "ko": "공격 버튼으로 적을 공격해요.\n연속으로 누르면 콤보 공격이 가능해요!", "en": "Press attack to strike enemies.\nKeep pressing for combo attacks!" },
+  "tutorial_tip_desc":         { "ko": "화면 우측 상단의 도움말 버튼에서\n언제든지 팁을 다시 확인할 수 있어요!", "en": "You can review tips anytime\nfrom the help button in the top-right!" },
+
+  "upgrade_buy":   { "ko": "구매", "en": "Buy"   },
+  "upgrade_maxed": { "ko": "최대", "en": "MAX"   },
+
+  "upgrade_speed_name":        { "ko": "스피드",          "en": "Speed"           },
+  "upgrade_speed_desc":        { "ko": "이동 속도가 빨라집니다.", "en": "Increases movement speed." },
+
+  "upgrade_dashspeed_name":    { "ko": "대시",            "en": "Dash Speed"      },
+  "upgrade_dashspeed_desc":    { "ko": "대시 속도가 빨라집니다.", "en": "Increases dash speed." },
+
+  "upgrade_jumpheight_name":   { "ko": "점프",            "en": "Jump Height"     },
+  "upgrade_jumpheight_desc":   { "ko": "점프 높이가 높아집니다.", "en": "Increases jump height." },
+
+  "upgrade_maxhp_name":        { "ko": "체력 증가",       "en": "Max HP"          },
+  "upgrade_maxhp_desc":        { "ko": "최대 HP가 증가합니다.", "en": "Increases maximum HP." },
+
+  "upgrade_maxhunger_name":    { "ko": "배고픔 증가",     "en": "Max Hunger"      },
+  "upgrade_maxhunger_desc":    { "ko": "최대 배고픔이 증가합니다.", "en": "Increases maximum hunger." },
+
+  "upgrade_dashcooldown_name": { "ko": "대시 쿨타임",     "en": "Dash Cooldown"   },
+  "upgrade_dashcooldown_desc": { "ko": "대시 재사용 대기시간이 줄어듭니다.", "en": "Reduces dash cooldown time." },
+
+  "upgrade_turncooldown_name": { "ko": "턴 쿨타임",       "en": "Turn Cooldown"   },
+  "upgrade_turncooldown_desc": { "ko": "턴 재사용 대기시간이 줄어듭니다.", "en": "Reduces turn cooldown time." },
+
+
+  "tutorial_intro_0": { "ko": "   여기가 어디지? ...", "en": "   Where am I? ..." },
+  "tutorial_intro_1": { "ko": "   내가 고양이라고?!!",             "en": "   I'm a cat?!!"          },
+  
+  "Map1_intro_0": { "ko": "   저 빛은 뭐지?", "en": "   What is that light?" },
+  "Map1_intro_1": { "ko": "   저 빛을 따라가자.", "en": "   Let's follow that light."          },
+  "Map1_intro_2": { "ko": "   무슨 단서가 나올지도 몰라", "en": "   Maybe a clue will appear."          },
+
+  "Map1_outro_0": { "ko": "   드디어 도착했다\n 이건 뭘까?",     "en": "   Finally, I arrived.\n What is this?"     },
+  "Map1_outro_1": { "ko": "   내가 이 고양이를 지키려고 차에 치었구나",     "en": "   I hit a cat to protect this cat!"     },
+  "Map1_outro_2": { "ko": "   어어어어!!",     "en": "   What is this?!"     },
+
+  "Map2_intro_0": { "ko": "   돌아다니다보니 밤이 됐네...", "en": "   I've been walking around and it's getting late..." },
+  "Map2_intro_1": { "ko": "   먹을게 없나?", "en": "   Do I have anything to eat?"          },
+  "Map2_intro_2": { "ko": "   왜 이렇게 까칠어!", "en": "   Why are you so grumpy!"          },
+  "Map2_intro_3": { "ko": "   새로운 빛이다!", "en": "   A new light!"          },
+
+  "Map2_outro_0": { "ko": "   이걸 만지면 ?",     "en": "   Finally, I arrived.\n What is this?"     },
+  "Map2_outro_1": { "ko": "   내 영혼이 고양이 한테 들어갔다니..!\n   너무 영화적인데",     "en": "   My soul entered the cat's body...!\n   That's too much like a movie."     },
+  "Map2_outro_2": { "ko": "   ",     "en": "   "     },
+  "Map2_outro_3": { "ko": "   도시가 보인다!\n   남자를 찾으로 가자!!",     "en": "   The city is visible!\n   Let's go find that man!!"     },
+
+
+  "Map3_intro_0": { "ko": "   ...", "en": "   ..." },
+  "Map3_intro_1": { "ko": "   살려주세요!!", "en": "   Please save me!!"          },
+  "Map3_intro_2": { "ko": "   휴... 겨우 달아났다", "en": "   Phew... I barely escaped."          },
+  "Map3_intro_3": { "ko": "   또 빛이 보이네 저기로 가야겠어", "en": "   There's another light over there."          },
+
+  "Map3_outro_0": { "ko": "   병원 앞에서 빛이 나고 있어!",     "en": "   The light is coming from in front of the hospital!"     },
+  "Map3_outro_1": { "ko": "   내가 이 병원에 입원중인거군!",     "en": "   I'm hospitalized at this hospital!"     },
+  "Map3_outro_2": { "ko": "   나를 만난다면 돌아올지도 몰라",     "en": "   If I meet them, I might be able to return."     },
+
+  "tip_0": {
+    "ko": "배고픔이 0이 되면 HP가 줄어들기 시작해요!\n항상 음식을 챙겨두세요.",
+    "en": "When hunger reaches 0, your HP starts decreasing!\nAlways keep food on hand."
+  },
+  "tip_1": {
+    "ko": "체크포인트 깃발에 닿으면 현재 위치가 저장돼요.",
+    "en": "Touch checkpoint flags to save your current progress."
+  },
+  "tip_2": {
+    "ko": "열쇠를 모아서 잠긴 상자를 열어보세요!\n좋은 아이템이 들어있을지도 몰라요.",
+    "en": "Collect keys to open locked chests!\nYou might find useful items inside."
+  },
+  "tip_3": {
+    "ko": "벽에 붙어서 점프하면 벽 점프가 가능해요.\n높은 곳도 올라갈 수 있어요!",
+    "en": "Jump while clinging to a wall to perform a wall jump.\nYou can reach high places this way!"
+  },
+  "tip_4": {
+    "ko": "대쉬를 사용하면 빠르게 이동하거나 공격을 피할 수 있어요.",
+    "en": "Use dash to move quickly or dodge enemy attacks."
+  },
+  "tip_5": {
+    "ko": "구역 끝의 빛을 따라가면 다음 맵으로 이동해요.",
+    "en": "Follow the light at the end of the area to move to the next map."
+  },
+  "tip_6": {
+    "ko": "적을 처치하면 아이템을 드롭해요.\n놓치지 말고 챙겨가세요!",
+    "en": "Defeated enemies drop items.\nDon't miss them!"
+  },
+  "tip_7": {
+    "ko": "더블 점프로 더 높이, 더 멀리 이동할 수 있어요.",
+    "en": "Use double jump to jump higher and farther."
+  },
+  "tip_8": {
+    "ko": "적에게 피격되면 잠깐 무적 시간이 생겨요.\n그 사이에 안전한 곳으로 피하세요.",
+    "en": "You have a brief invincibility period after taking damage.\nUse it to move to safety."
+  },
+  "tip_9": {
+    "ko": "코인을 모으면 좋은 일이 생길지도 몰라요!",
+    "en": "Collect coins — something good might happen!"
+  }
+}

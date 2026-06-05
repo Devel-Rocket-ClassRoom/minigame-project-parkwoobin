@@ -22,6 +22,10 @@ public class ZoneTransition : MonoBehaviour
     [SerializeField] private string targetScene;
     [SerializeField] private string targetEntryID;
 
+    [Header("아웃트로 컷씬")]
+    [Tooltip("맵의 마지막 존에서 체크. MapCutsceneManager의 아웃트로 컷씬을 재생한 뒤 씬 전환한다.")]
+    [SerializeField] private bool triggerOutro;
+
     [Header("SFX")]
     [SerializeField] private AudioClip sfxTransition;
 
@@ -73,7 +77,10 @@ public class ZoneTransition : MonoBehaviour
             }
         }
 
-        SceneTransitionManager.Instance.TransitionTo(targetScene, targetEntryID);
+        if (triggerOutro && MapCutsceneManager.Instance != null && MapCutsceneManager.Instance.HasOutro)
+            MapCutsceneManager.Instance.TriggerOutro(targetScene, targetEntryID);
+        else
+            SceneTransitionManager.Instance.TransitionTo(targetScene, targetEntryID);
     }
 
 #if UNITY_EDITOR

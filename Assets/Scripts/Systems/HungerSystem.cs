@@ -42,4 +42,14 @@ public class HungerSystem : MonoBehaviour
         _hunger = Mathf.Clamp(hunger, 0f, maxHunger);
         OnHungerChanged?.Invoke(_hunger, maxHunger);
     }
+
+    float _hungerBonus;
+    /// <summary>UpgradeManager가 최대 배고픔 보너스를 적용한다.</summary>
+    public void AddMaxHungerBonus(float bonus)
+    {
+        maxHunger = maxHunger - _hungerBonus + bonus;
+        _hungerBonus = bonus;
+        _hunger = Mathf.Min(_hunger, maxHunger);
+        OnHungerChanged?.Invoke(_hunger, maxHunger);
+    }
 }

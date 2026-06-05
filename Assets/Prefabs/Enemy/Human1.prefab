@@ -710,6 +710,10 @@ MonoBehaviour:
   attackPower: 1
   _attackHitBox: {fileID: 7000100010001001}
   _hitBoxDuration: 0.2
+  canJump: 1
+  validGroundLayers:
+    serializedVersion: 2
+    m_Bits: 8
   knockbackDistance: 0.1
   dropItemPrefabs:
   - {fileID: 4246600087596067611, guid: 180f5ff90f2c5294e9107ef787f1c514, type: 3}
