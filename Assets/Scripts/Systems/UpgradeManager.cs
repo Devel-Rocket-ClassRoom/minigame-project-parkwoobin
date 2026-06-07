@@ -23,7 +23,7 @@ public class UpgradeManager : MonoBehaviour
     public const int UpgradeCount = 7;
 
     // ── 업그레이드별 기본 비용 (레벨당 baseCost * (level+1)) ─────────────────
-    static readonly int[] BaseCosts = { 5, 5, 5, 5, 5, 10, 10 };
+    static readonly int[] BaseCosts = { 10, 10, 10, 10, 10, 15, 15 };
 
     // ── 레벨당 증가량 ────────────────────────────────────────────────────────
     public static readonly float[] SpeedPerLevel = { 0f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f };
@@ -125,6 +125,22 @@ public class UpgradeManager : MonoBehaviour
     {
         for (int i = 0; i < UpgradeCount; i++) _levels[i] = 0;
         _lastOfferedStage = -1;
+    }
+
+    public int[] GetLevels()
+    {
+        var copy = new int[UpgradeCount];
+        _levels.CopyTo(copy, 0);
+        return copy;
+    }
+
+    public void SetLevels(int[] levels)
+    {
+        if (levels == null) return;
+        for (int i = 0; i < UpgradeCount && i < levels.Length; i++)
+            _levels[i] = Mathf.Clamp(levels[i], 0, MaxLevel);
+        _lastOfferedStage = -1;
+        ApplyToPlayer();
     }
 
     // ── 내부 ─────────────────────────────────────────────────────────────────

@@ -21,12 +21,13 @@ public class GameOverPanelController : MonoBehaviour
     [SerializeField] GameObject dimOverlay;
     [SerializeField] string mainSceneName = "Main";
     [SerializeField] float extraDelay = 2f;   // 사망 애니메이션 완료 후 추가 대기 시간
+    [SerializeField] AudioClip sfxGameOver;
 
     void Awake()
     {
         // 시작 시 패널·오버레이 숨김
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (dimOverlay    != null) dimOverlay.SetActive(false);
+        if (dimOverlay != null) dimOverlay.SetActive(false);
     }
 
     void OnEnable()
@@ -101,8 +102,9 @@ public class GameOverPanelController : MonoBehaviour
     {
         _showing = true;
         Debug.Log("[GameOverPanel] Show() 호출");
-        if (dimOverlay    != null) dimOverlay.SetActive(true);
+        if (dimOverlay != null) dimOverlay.SetActive(true);
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
+        AudioManager.Instance?.PlaySfx(sfxGameOver);
         Time.timeScale = 0f;
     }
 
@@ -110,7 +112,7 @@ public class GameOverPanelController : MonoBehaviour
     {
         _showing = false;
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (dimOverlay    != null) dimOverlay.SetActive(false);
+        if (dimOverlay != null) dimOverlay.SetActive(false);
         Time.timeScale = 1f;
     }
 
@@ -132,13 +134,46 @@ public class GameOverPanelController : MonoBehaviour
             SceneManager.LoadScene(mainSceneName);
     }
 
-    /// 종료 버튼 — 앱 종료
-    public void OnClickQuit()
+    /// 다시 하기 버튼 — 마지막 체크포인트에서 재시작
+    public void OnClickRestart()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
+        Hide();
+        GameManager.Instance?.StartGame();   // GameOver 상태 → Playing으로 리셋
+
+        // 세이브 데이터를 GameState에 복원 → PlayerSpawner가 체크포인트 위치를 사용
+        var saveManager = SaveManager.Instance;
+        if (saveManager != null)
+        {
+            var data = saveManager.LoadGame(saveManager.ActiveSlot);
+            if (data != null)
+            {
+                var gs = GameState.Instance;
+                if (gs != null)
+                {
+                    gs.savedPositionX   = data.posX;
+                    gs.savedPositionY   = data.posY;
+                    gs.hasSavedPosition = true;
+                    gs.savedHP          = Mathf.RoundToInt(data.hp);
+                    gs.savedMaxHP       = data.maxHp > 0 ? data.maxHp : Mathf.RoundToInt(data.hp);
+                    gs.savedHunger      = data.hunger;
+                    gs.savedMaxHunger   = 100f;
+                    gs.savedCoins       = data.coins;
+                    gs.savedKeys        = data.key;
+                    gs.savedAttack      = data.attack;
+                    gs.savedSkillAttack     = data.skillAttack;
+                    gs.savedSkillJump       = data.skillJump;
+                    gs.savedSkillDash       = data.skillDash;
+                    gs.savedSkillTurn       = data.skillTurn;
+                    gs.savedSkillDoubleJump = data.skillDoubleJump;
+                    gs.savedSkillWallJump   = data.skillWallJump;
+                }
+            }
+        }
+
+        string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (SceneTransitionManager.Instance != null)
+            SceneTransitionManager.Instance.TransitionTo(currentScene);
+        else
+            UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene);
     }
 }

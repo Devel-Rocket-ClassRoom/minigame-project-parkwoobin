@@ -38,9 +38,15 @@ public class MainMenuTipsPanel : MonoBehaviour
         new TipEntry { animState = "Jump",        descKey = "tutorial_jump_desc"       },
         new TipEntry { animState = "DoubleJump",  descKey = "tutorial_doublejump_desc" },
         new TipEntry { animState = "Dash",        descKey = "tutorial_dash_desc"       },
+        new TipEntry { animState = "",            descKey = "tutorial_key_desc"        },
         new TipEntry { animState = "WallJump",    descKey = "tutorial_walljump_desc"   },
         new TipEntry { animState = "Turn",        descKey = "tutorial_turn_desc"       },
         new TipEntry { animState = "Attack",      descKey = "tutorial_attack_desc"     },
+        new TipEntry { animState = "",            descKey = "tip_0"                    },
+        new TipEntry { animState = "",            descKey = "tip_1"                    },
+        new TipEntry { animState = "",            descKey = "tip_2"                    },
+        new TipEntry { animState = "",            descKey = "tip_3"                    },
+        new TipEntry { animState = "",            descKey = "tip_4"                    },
     };
 
     int _index;
@@ -138,7 +144,9 @@ public class MainMenuTipsPanel : MonoBehaviour
     {
         if (tipAnimator == null || tips == null || tips.Length == 0) return;
         string state = tips[_index].animState;
-        if (!string.IsNullOrEmpty(state))
+        bool hasAnim = !string.IsNullOrEmpty(state);
+        tipAnimator.gameObject.SetActive(hasAnim);
+        if (hasAnim)
             tipAnimator.Play(state, 0, 0f);
     }
 

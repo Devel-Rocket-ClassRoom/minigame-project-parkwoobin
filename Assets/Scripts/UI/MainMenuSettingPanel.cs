@@ -58,6 +58,15 @@ public class MainMenuSettingPanel : MonoBehaviour
     {
         if (dimOverlay != null) dimOverlay.SetActive(true);
         if (panelRoot != null) panelRoot.SetActive(true);
+        RefreshLanguageDropdown();
+    }
+
+    void RefreshLanguageDropdown()
+    {
+        if (languageDropdown == null) return;
+        int idx = LanguageManager.CurrentLanguage == LanguageManager.Language.English ? 1 : 0;
+        languageDropdown.SetValueWithoutNotify(idx);
+        languageDropdown.RefreshShownValue();
     }
 
     public void Close()

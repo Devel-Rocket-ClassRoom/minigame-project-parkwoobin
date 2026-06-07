@@ -127,7 +127,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!70 &6074361588469453978
 CapsuleCollider2D:
@@ -224,6 +224,8 @@ MonoBehaviour:
   maxHp: 20
   wallJumpEnabled: 0
   doubleJumpEnabled: 0
+  hungerDebuffMultiplier: 0.6
+  moveHungerCheckInterval: 0.35
   _attackHitBox: {fileID: 6479127723245625833}
   _attackActiveDuration: 0.2
   attackPower: 1

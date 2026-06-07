@@ -20,8 +20,6 @@ public class PrologueManager : MonoBehaviour
     [SerializeField] Button clickArea;
     [SerializeField] Button skipButton;
     [SerializeField] TMP_Text skipButtonText;
-    [SerializeField] GameObject startText;
-    [SerializeField] TMP_Text startTextLabel;
     [SerializeField] Button startTextButton;
 
     [Header("BGM")]
@@ -58,15 +56,18 @@ public class PrologueManager : MonoBehaviour
     void Start()
     {
         clickArea?.onClick.AddListener(OnManualClick);
-        skipButton?.onClick.AddListener(EndPrologue);
-        startTextButton?.onClick.AddListener(EndPrologue);
+        skipButton?.onClick.AddListener(JumpToLastPage);   // 스킵 → 마지막 페이지로
+        startTextButton?.onClick.AddListener(EndPrologue); // StartText 클릭 → 씬 전환
+
+        // StartText는 마지막 페이지에서만 표시
+        if (startTextButton != null) startTextButton.gameObject.SetActive(false);
+
         RefreshLocalizedTexts();
 
-        if (startText != null) startText.SetActive(false);
         if (bgmMuteToggle != null)
         {
             bgmMuteToggle.gameObject.SetActive(false);
-            bgmMuteToggle.isOn = true;  // 기본: BGM 켜짐
+            bgmMuteToggle.isOn = true;
             bgmMuteToggle.onValueChanged.AddListener(OnBgmToggleChanged);
         }
 
@@ -74,8 +75,6 @@ public class PrologueManager : MonoBehaviour
             SetPageActive(i, false);
 
         StartPage(0);
-
-        // 첫 컷 자동 표시 후 자동 진행 시작
         StartCoroutine(ShowFirstCutThenAuto());
     }
 
@@ -155,15 +154,17 @@ public class PrologueManager : MonoBehaviour
     IEnumerator ShowCutAndCheck(Image slot, Sprite sprite, bool isLast)
     {
         yield return StartCoroutine(ShowCut(slot, sprite));
-        if (isLast)
-        {
-            if (skipButton != null) skipButton.gameObject.SetActive(false);
-            if (startText != null) startText.SetActive(true);
-            if (bgmMuteToggle != null) bgmMuteToggle.gameObject.SetActive(true);
-            PlayBgm();
-            _ended = true;
-            if (_autoCoroutine != null) StopCoroutine(_autoCoroutine);
-        }
+        if (isLast) ShowLastPage();
+    }
+
+    void ShowLastPage()
+    {
+        if (_autoCoroutine != null) StopCoroutine(_autoCoroutine);
+        _ended = true;
+        if (skipButton != null)      skipButton.gameObject.SetActive(false);
+        if (startTextButton != null) startTextButton.gameObject.SetActive(true);
+        if (bgmMuteToggle != null)   bgmMuteToggle.gameObject.SetActive(true);
+        PlayBgm();
     }
 
     IEnumerator ShowCut(Image slot, Sprite sprite)
@@ -235,11 +236,34 @@ public class PrologueManager : MonoBehaviour
         src.Play();
     }
 
+    // 스킵 버튼: 마지막 페이지로 점프
+    void JumpToLastPage()
+    {
+        if (_ended) return;
+        if (_autoCoroutine != null) StopCoroutine(_autoCoroutine);
+        StopAllCoroutines();
+
+        // 현재 페이지 숨기고 마지막 페이지 활성화
+        for (int i = 0; i < pages.Length; i++) SetPageActive(i, false);
+
+        int lastPageIdx = pages.Length - 1;
+        StartPage(lastPageIdx);
+
+        Page lastPage = pages[lastPageIdx];
+        int lastCutIdx = Mathf.Min(lastPage.slots.Length, lastPage.cuts.Length) - 1;
+        if (lastCutIdx >= 0)
+        {
+            lastPage.slots[lastCutIdx].sprite = lastPage.cuts[lastCutIdx];
+            lastPage.slots[lastCutIdx].color  = Color.white;
+        }
+
+        ShowLastPage();
+    }
+
+    // StartText 버튼: 씬 전환
     void EndPrologue()
     {
-        _ended = true;
-        if (_autoCoroutine != null) StopCoroutine(_autoCoroutine);
-        if (clickArea != null) clickArea.interactable = false;
+        if (clickArea != null)  clickArea.interactable  = false;
         if (skipButton != null) skipButton.interactable = false;
         SceneTransitionManager.Instance.TransitionTo(nextScene);
     }
@@ -248,8 +272,6 @@ public class PrologueManager : MonoBehaviour
     {
         if (skipButtonText == null && skipButton != null)
             skipButtonText = skipButton.GetComponentInChildren<TMP_Text>(true);
-        if (startTextLabel == null && startText != null)
-            startTextLabel = startText.GetComponentInChildren<TMP_Text>(true);
     }
 
     void RefreshLocalizedTexts()
@@ -261,7 +283,5 @@ public class PrologueManager : MonoBehaviour
             skipButtonText.text = skipText;
 
         string startTextValue = LocalizationManager.Get("prologue_start");
-        if (startTextLabel != null && !string.IsNullOrEmpty(startTextValue))
-            startTextLabel.text = startTextValue;
     }
 }

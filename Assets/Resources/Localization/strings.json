@@ -31,14 +31,14 @@
   "menu_tips_title":     { "ko": "도움말",        "en": "Tips"        },
   "menu_shop":           { "ko": "상점",          "en": "Shop"        },
 
-  "tutorial_none_desc":        { "ko": "조이스틱(또는 방향키)으로 이동할 수 있어요.", "en": "Use the joystick (or arrow keys) to move." },
   "tutorial_move_desc":        { "ko": "조이스틱(또는 방향키)으로 이동할 수 있어요.", "en": "Use the joystick (or arrow keys) to move." },
   "tutorial_jump_desc":        { "ko": "점프 버튼을 눌러 점프합니다.\n꾹 누르면 더 높이 점프해요!", "en": "Press the jump button to jump.\nHold it to jump higher!" },
   "tutorial_doublejump_desc":  { "ko": "공중에서 다시 점프 버튼을 누르면\n한 번 더 점프할 수 있어요!", "en": "Press jump again in the air\nto perform a double jump!" },
   "tutorial_dash_desc":        { "ko": "대시 버튼을 누르면 빠르게 돌진해요.\n적의 공격을 피할 때도 유용해요!", "en": "Press dash to lunge forward quickly.\nGreat for dodging enemy attacks!" },
+  "tutorial_key_desc":         { "ko": "키를 얻고 박스 주위에서 버튼을 눌러 열어보세요.", "en": "Get keys and press buttons around boxes to open them." },
   "tutorial_walljump_desc":    { "ko": "벽에 붙은 상태에서 점프 버튼을 누르면\n벽을 박차고 점프할 수 있어요!", "en": "Press jump while clinging to a wall\nto perform a wall jump!" },
   "tutorial_turn_desc":        { "ko": "턴 버튼으로 순간적으로 뒤를 돌아\n공격을 피하거나 반격할 수 있어요!", "en": "Use turn to quickly spin around\nto dodge or counter-attack!" },
-  "tutorial_attack_desc":      { "ko": "공격 버튼으로 적을 공격해요.\n연속으로 누르면 콤보 공격이 가능해요!", "en": "Press attack to strike enemies.\nKeep pressing for combo attacks!" },
+  "tutorial_attack_desc":      { "ko": "공격 버튼으로 적을 공격해요!", "en": "Press attack to strike enemies!" },
   "tutorial_tip_desc":         { "ko": "화면 우측 상단의 도움말 버튼에서\n언제든지 팁을 다시 확인할 수 있어요!", "en": "You can review tips anytime\nfrom the help button in the top-right!" },
 
   "upgrade_buy":   { "ko": "구매", "en": "Buy"   },
@@ -56,7 +56,7 @@
   "upgrade_hpup_name":        { "ko": "체력 회복",       "en": "HP Recovery"     },
   "upgrade_hpup_desc":        { "ko": "현재 HP가 3 회복됩니다.", "en": "Restores 3 current HP." },
 
-  "upgrade_eating_name":    { "ko": "배고픔 해결",     "en": "Hunger Relief"   },
+  "upgrade_eating_name":    { "ko": "배고픔 회복",       "en": "Hunger Relief"   },
   "upgrade_eating_desc":    { "ko": "현재 배고픔이 10 회복됩니다.", "en": "Restores 10 current hunger." },
 
   "upgrade_dashcooldown_name": { "ko": "대시 쿨타임",     "en": "Dash Cooldown"   },
@@ -73,7 +73,7 @@
   "Map1_intro_1": { "ko": "   저 빛을 따라가자.", "en": "   Let's follow that light."          },
   "Map1_intro_2": { "ko": "   무슨 단서가 나올지도 몰라", "en": "   Maybe a clue will appear."          },
 
-  "Map1_outro_0": { "ko": "   드디어 도착했다\n 이건 뭘까?",     "en": "   Finally, I arrived.\n What is this?"     },
+  "Map1_outro_0": { "ko": "   드디어 도착했다\n   이건 뭘까?",     "en": "   Finally, I arrived.\n What is this?"     },
   "Map1_outro_1": { "ko": "   내가 이 고양이를 지키려고 차에 치었구나",     "en": "   I hit a cat to protect this cat!"     },
   "Map1_outro_2": { "ko": "   어어어어!!",     "en": "   What is this?!"     },
 
@@ -82,20 +82,34 @@
   "Map2_intro_2": { "ko": "   왜 이렇게 까칠어!", "en": "   Why are you so grumpy!"          },
   "Map2_intro_3": { "ko": "   새로운 빛이다!", "en": "   A new light!"          },
 
-  "Map2_outro_0": { "ko": "   이걸 만지면 ?",     "en": "   Finally, I arrived.\n What is this?"     },
-  "Map2_outro_1": { "ko": "   내 영혼이 고양이 한테 들어갔다니..!\n   너무 영화적인데",     "en": "   My soul entered the cat's body...!\n   That's too much like a movie."     },
-  "Map2_outro_2": { "ko": "   ",     "en": "   "     },
-  "Map2_outro_3": { "ko": "   도시가 보인다!\n   남자를 찾으로 가자!!",     "en": "   The city is visible!\n   Let's go find that man!!"     },
+  "Map2_outro_0": { "ko": "   이걸 만지면?",     "en": "   What happens if I touch it?"     },
+  "Map2_outro_1": { "ko": "   내 영혼이 고양이 한테 들어갔다니..!\n   너무 비현실적인데",     "en": "   My soul entered the cat's body...!\n   That's too unrealistic."     },
+  "Map2_outro_2": { "ko": "   우우우웅!",     "en": "   Whoo! Whoo!"     },
+  "Map2_outro_3": { "ko": "   도시가 보인다!\n   내 몸을 찾으러 가자!!",     "en": "   The city is visible!\n   Let's go find my body!!"     },
 
 
   "Map3_intro_0": { "ko": "   ...", "en": "   ..." },
-  "Map3_intro_1": { "ko": "   살려주세요!!", "en": "   Please save me!!"          },
-  "Map3_intro_2": { "ko": "   휴... 겨우 달아났다", "en": "   Phew... I barely escaped."          },
-  "Map3_intro_3": { "ko": "   또 빛이 보이네 저기로 가야겠어", "en": "   There's another light over there."          },
+  "Map3_intro_1": { "ko": "   살려주세요!!", "en": "   Please Help me!!"          },
+  "Map3_intro_2": { "ko": "   헉헉! 어디에 숨어있어야겠어!", "en": "   Gasp! Where should I hide?"          },
 
-  "Map3_outro_0": { "ko": "   병원 앞에서 빛이 나고 있어!",     "en": "   The light is coming from in front of the hospital!"     },
-  "Map3_outro_1": { "ko": "   내가 이 병원에 입원중인거군!",     "en": "   I'm hospitalized at this hospital!"     },
-  "Map3_outro_2": { "ko": "   나를 만난다면 돌아올지도 몰라",     "en": "   If I meet them, I might be able to return."     },
+  "Map3_outro_0": { "ko": "   여기 밖에 없는 건가?!",     "en": "   Is there nothing outside?"     },
+
+
+  "Map4_intro_0": { "ko": "   더럽지만 일단 하수구를 통해 통과해야겠어", "en": "   It's dirty, but I have to get through the sewer" },
+
+  "Map4_outro_0": { "ko": "   드디어 하수구를 탈출했다!",     "en": "   Finally, I escaped the sewer!"     },
+  "Map4_outro_1": { "ko": "   거리 끝이 빛나고 있어!",     "en": "   The end of the street is glowing!"     },
+  "Map4_outro_2": { "ko": "   병원 앞이네?! 틀림없이 내가 여기 있을거야",     "en": "   It's the hospital?! I'm sure I'm here!"     },
+
+
+  "Map5_intro_0": { "ko": "   일단 들어가야겠어!", "en": "   I have to go in there!" },
+
+  "Map5_outro_0": { "ko": "   김...경일 여기다!",     "en": "   Kim... Kyung-il, here!"     },
+  "Map5_outro_1": { "ko": "   폴짝!",     "en": "   Jump Up!"     },
+  "Map5_outro_2": { "ko": "   (슈우웅) 고양이에서 영혼이 빠져나와 사람에게 들어갔다",     "en": "   (Whoosh) My soul exited the cat and entered a human!"     },
+  "Map5_outro_3": { "ko": "   그렇게 김경일은 고양이의 몸을 떠나 사람의 몸으로 돌아왔다",     "en": "   Thus, Kyung-il left the cat's body and returned to a human's body"     },
+
+
 
   "tip_0": {
     "ko": "배고픔이 0이 되면 HP가 줄어들기 시작해요!\n항상 음식을 챙겨두세요.",
@@ -106,35 +120,23 @@
     "en": "Touch checkpoint flags to save your current progress."
   },
   "tip_2": {
-    "ko": "열쇠를 모아서 잠긴 상자를 열어보세요!\n좋은 아이템이 들어있을지도 몰라요.",
-    "en": "Collect keys to open locked chests!\nYou might find useful items inside."
-  },
-  "tip_3": {
-    "ko": "벽에 붙어서 점프하면 벽 점프가 가능해요.\n높은 곳도 올라갈 수 있어요!",
-    "en": "Jump while clinging to a wall to perform a wall jump.\nYou can reach high places this way!"
-  },
-  "tip_4": {
-    "ko": "대쉬를 사용하면 빠르게 이동하거나 공격을 피할 수 있어요.",
-    "en": "Use dash to move quickly or dodge enemy attacks."
-  },
-  "tip_5": {
     "ko": "구역 끝의 빛을 따라가면 다음 맵으로 이동해요.",
     "en": "Follow the light at the end of the area to move to the next map."
   },
-  "tip_6": {
+  "tip_3": {
     "ko": "적을 처치하면 아이템을 드롭해요.\n놓치지 말고 챙겨가세요!",
     "en": "Defeated enemies drop items.\nDon't miss them!"
   },
-  "tip_7": {
-    "ko": "더블 점프로 더 높이, 더 멀리 이동할 수 있어요.",
-    "en": "Use double jump to jump higher and farther."
+  "tip_4": {
+    "ko": "코인을 모아, 상점에서 필요한 스킬을 업그레이드하세요!",
+    "en": "Collect coins and upgrade necessary skills at the shop!"
   },
-  "tip_8": {
-    "ko": "적에게 피격되면 잠깐 무적 시간이 생겨요.\n그 사이에 안전한 곳으로 피하세요.",
-    "en": "You have a brief invincibility period after taking damage.\nUse it to move to safety."
-  },
-  "tip_9": {
-    "ko": "코인을 모으면 좋은 일이 생길지도 몰라요!",
-    "en": "Collect coins — something good might happen!"
-  }
+
+  "gameover_title":     { "ko": "게임 오버",   "en": "Game Over"   },
+  "gameover_desc":      { "ko": "저런..",     "en": "Oh no.."     },
+  "gameover_restart":   { "ko": "다시하기",   "en": "Restart"     },
+
+  "ending_title":       { "ko": "게임 클리어!",                    "en": "Game Clear!"                        },
+  "ending_saved":       { "ko": "게임 클리어! 저장이 완료되었습니다.", "en": "Game Clear! Progress has been saved." },
+  "ending_to_main":     { "ko": "메인으로",                        "en": "Main Menu"                          }
 }

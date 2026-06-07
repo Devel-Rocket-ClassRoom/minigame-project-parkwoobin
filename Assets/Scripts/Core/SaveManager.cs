@@ -48,8 +48,8 @@ public class SaveManager : MonoBehaviour
     void OnApplicationQuit() => PlayerPrefs.Save();
     void OnApplicationPause(bool pause) { if (pause) PlayerPrefs.Save(); }
 
-    /// <summary>SaveSpot 통과 시 현재 슬롯에 저장.</summary>
-    public void AutoSave(PlayerController player = null)
+    /// <summary>SaveSpot 통과 시 현재 슬롯에 저장. 저장 위치는 SaveSpot 좌표로 고정.</summary>
+    public void AutoSaveAtPosition(PlayerController player, Vector2 savePos)
     {
         if (player == null) player = FindFirstObjectByType<PlayerController>();
         var hunger = FindFirstObjectByType<HungerSystem>();
@@ -60,8 +60,8 @@ public class SaveManager : MonoBehaviour
         var data = new SaveData
         {
             sceneName   = SceneManager.GetActiveScene().name,
-            posX        = player != null ? player.transform.position.x : 0f,
-            posY        = player != null ? player.transform.position.y : 0f,
+            posX        = savePos.x,
+            posY        = savePos.y,
             stage       = gs != null ? gs.savedStage : 1,
             coins       = coinKey != null ? coinKey.Coins : 0,
             hp          = player != null ? player.Hp : 0,
@@ -75,9 +75,18 @@ public class SaveManager : MonoBehaviour
             skillTurn       = skill != null && skill.turn,
             skillDoubleJump = skill != null && skill.doubleJump,
             skillWallJump   = skill != null && skill.wallJump,
+            upgradeLevels   = UpgradeManager.Instance?.GetLevels(),
         };
 
         SaveGame(ActiveSlot, data);
+    }
+
+    /// <summary>위치 지정 없이 저장 (플레이어 현재 위치 사용). 하위 호환용.</summary>
+    public void AutoSave(PlayerController player = null)
+    {
+        if (player == null) player = FindFirstObjectByType<PlayerController>();
+        Vector2 pos = player != null ? (Vector2)player.transform.position : Vector2.zero;
+        AutoSaveAtPosition(player, pos);
     }
 
     // ── 불러오기 → 씬 전환 ────────────────────────────────────────────────────
@@ -111,6 +120,8 @@ public class SaveManager : MonoBehaviour
         gs.savedSkillDoubleJump = data.skillDoubleJump;
         gs.savedSkillWallJump   = data.skillWallJump;
 
+        UpgradeManager.Instance?.SetLevels(data.upgradeLevels);
+
         // spawnAtDefault가 true면 저장된 좌표 대신 씬 기본 스폰 포인트 사용
         if (data.spawnAtDefault)
             gs.hasSavedPosition = false;
@@ -124,6 +135,43 @@ public class SaveManager : MonoBehaviour
         ActiveSlot = slot;
         DeleteSave(slot);
         if (GameState.Instance != null) GameState.Instance.hasSavedPosition = false;
+    }
+
+    /// <summary>
+    /// 엔딩 도달 시 클리어 상태로 저장.
+    /// Ending 씬에는 PlayerController가 없으므로 GameState에서 스탯을 읽는다.
+    /// 불러오기하면 Prologue 씬 기본 스폰 포인트에서 시작된다.
+    /// </summary>
+    public void SaveCleared()
+    {
+        var gs = GameState.Instance;
+        var coinKey = CoinKeySystem.Instance;
+        var skill = SkillUnlockManager.Instance;
+
+        var data = new SaveData
+        {
+            sceneName       = "Prologue",
+            spawnAtDefault  = true,
+            gameClear       = true,
+            posX            = 0f,
+            posY            = 0f,
+            stage           = gs != null ? gs.savedStage : 1,
+            coins           = coinKey != null ? coinKey.Coins : (gs != null ? gs.savedCoins : 0),
+            hp              = gs != null ? gs.savedHP : 0,
+            maxHp           = gs != null ? gs.savedMaxHP : 0,
+            key             = coinKey != null ? coinKey.Keys : (gs != null ? gs.savedKeys : 0),
+            hunger          = gs != null ? gs.savedMaxHunger : 100f,
+            attack          = gs != null ? gs.savedAttack : 1,
+            skillAttack     = skill != null && skill.attack,
+            skillJump       = skill != null && skill.jump,
+            skillDash       = skill != null && skill.dash,
+            skillTurn       = skill != null && skill.turn,
+            skillDoubleJump = skill != null && skill.doubleJump,
+            skillWallJump   = skill != null && skill.wallJump,
+            upgradeLevels   = UpgradeManager.Instance?.GetLevels(),
+        };
+
+        SaveGame(ActiveSlot, data);
     }
 
     // ── 내부 유틸 ─────────────────────────────────────────────────────────────
@@ -146,10 +194,12 @@ public class SaveData
     public int    attack;
     public string savedAt;
     public bool spawnAtDefault;
+    public bool gameClear;
     public bool skillAttack;
     public bool skillJump;
     public bool skillDash;
     public bool skillTurn;
     public bool skillDoubleJump;
     public bool skillWallJump;
+    public int[] upgradeLevels;
 }

@@ -1,8 +1,0 @@
-using UnityEngine;
-
-public class HungerSystem : MonoBehaviour
-{
-    PlayerStats _stats;
-    void Awake() { _stats = GetComponent<PlayerStats>(); }
-    public void Feed(float amount) { _stats.ModifyHunger(amount); }
-}
