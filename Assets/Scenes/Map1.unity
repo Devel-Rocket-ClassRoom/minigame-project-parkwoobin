@@ -27042,7 +27042,6 @@ GameObject:
   - component: {fileID: 170974030}
   - component: {fileID: 170974033}
   - component: {fileID: 170974032}
-  - component: {fileID: 170974031}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27069,20 +27068,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &170974031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 170974029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &170974032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27207,7 +27192,6 @@ GameObject:
   - component: {fileID: 186160251}
   - component: {fileID: 186160254}
   - component: {fileID: 186160253}
-  - component: {fileID: 186160252}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27234,20 +27218,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &186160252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186160250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &186160253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27297,7 +27267,6 @@ GameObject:
   - component: {fileID: 193729463}
   - component: {fileID: 193729466}
   - component: {fileID: 193729465}
-  - component: {fileID: 193729464}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27324,20 +27293,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &193729464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 193729462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &193729465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27497,7 +27452,6 @@ GameObject:
   - component: {fileID: 242326669}
   - component: {fileID: 242326672}
   - component: {fileID: 242326671}
-  - component: {fileID: 242326670}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27524,20 +27478,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &242326670
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 242326668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &242326671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29370,7 +29310,7 @@ GameObject:
   - component: {fileID: 445793700}
   - component: {fileID: 445793703}
   - component: {fileID: 445793702}
-  - component: {fileID: 445793701}
+  - component: {fileID: 445793704}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -29397,67 +29337,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &445793701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 445793699}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 12
-  frames:
-  - {fileID: 4412929025976260669, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1274058564, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -926971402, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1223806286, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -232209589, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 448178741, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1219833816, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -374615694, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -830124817, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 405769118, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 146734263, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -139032370, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1929534082, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1323006343, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1222314487, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1750230829, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -348548975, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1206833846, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1004851223, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 456966421, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -666486902, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1112099016, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 725058397, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -566930551, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1888951584, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 354562968, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1117898154, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1234914926, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1161116719, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1152018263, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1758785633, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1742380040, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -604588569, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -845966746, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 969341618, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 2100532736, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1384531718, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -2091307555, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 818840722, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 128169815, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1631996459, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 867174899, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 112428624, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 1652229132, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: 755676510, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -1936540575, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
-  - {fileID: -371937250, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
 --- !u!114 &445793702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29496,6 +29375,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 445793699}
   m_CullTransparentMesh: 1
+--- !u!95 &445793704
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445793699}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c8774c3f8b6c1304a81635c926141d9a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &447269727
 GameObject:
   m_ObjectHideFlags: 0
@@ -33911,7 +33812,6 @@ GameObject:
   - component: {fileID: 905490909}
   - component: {fileID: 905490912}
   - component: {fileID: 905490911}
-  - component: {fileID: 905490910}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -33938,20 +33838,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &905490910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 905490908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &905490911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34373,7 +34259,6 @@ GameObject:
   - component: {fileID: 966226583}
   - component: {fileID: 966226586}
   - component: {fileID: 966226585}
-  - component: {fileID: 966226584}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -34400,20 +34285,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &966226584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 966226582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &966226585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40997,6 +40868,10 @@ PrefabInstance:
       propertyPath: descriptionText
       value: 
       objectReference: {fileID: 476553070}
+    - target: {fileID: 2009645129310095059, guid: 039d40248fc482f449c140d420842ddd, type: 3}
+      propertyPath: tipAnimStateName
+      value: Turn
+      objectReference: {fileID: 0}
     - target: {fileID: 3665238127946531916, guid: 039d40248fc482f449c140d420842ddd, type: 3}
       propertyPath: m_IsActive
       value: 0

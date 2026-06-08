@@ -15,6 +15,10 @@ public class TutorialPopupTrigger : MonoBehaviour
     [Tooltip("비워두면 skill 이름으로 자동 생성 (예: tutorial_jump_desc)")]
     [SerializeField] string customDescKey;
 
+    [Header("Gif 애니메이션")]
+    [Tooltip("Gif 오브젝트 Animator의 상태(State) 이름. 비워두면 SpriteAnimator 방식 사용.")]
+    [SerializeField] string tipAnimStateName;
+
     static TutorialPopupTrigger _current;
 
     bool _triggered;
@@ -92,13 +96,29 @@ public class TutorialPopupTrigger : MonoBehaviour
     void PlayTipAnimation()
     {
         if (popupPanel == null) return;
-        // 팝업 패널의 Gif 오브젝트에 있는 SpriteAnimator를 재시작
+
+        // ── Animator 방식 (tipAnimStateName이 설정된 경우) ──────────────
+        if (!string.IsNullOrEmpty(tipAnimStateName))
+        {
+            var animator = popupPanel.GetComponentInChildren<Animator>(true);
+            if (animator != null)
+            {
+                animator.gameObject.SetActive(true);
+                // timeScale=0 에서도 재생되도록 UnscaledTime 모드 강제
+                animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+                animator.Rebind();
+                animator.Play(tipAnimStateName, 0, 0f);
+                animator.Update(0f); // 첫 프레임 즉시 반영
+                return;
+            }
+        }
+
+        // ── SpriteAnimator 방식 (기존 fallback) ─────────────────────────
         var sa = popupPanel.GetComponentInChildren<SpriteAnimator>(true);
         if (sa != null)
         {
             sa.gameObject.SetActive(true);
             sa.enabled = true;
-            // OnEnable이 이미 호출됐을 수 있으므로 강제 리셋
             sa.Restart();
         }
     }
