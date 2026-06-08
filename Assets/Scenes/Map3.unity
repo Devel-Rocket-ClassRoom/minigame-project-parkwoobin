@@ -27005,7 +27005,6 @@ GameObject:
   - component: {fileID: 170974030}
   - component: {fileID: 170974033}
   - component: {fileID: 170974032}
-  - component: {fileID: 170974031}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27032,20 +27031,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &170974031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 170974029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &170974032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27095,7 +27080,6 @@ GameObject:
   - component: {fileID: 186160251}
   - component: {fileID: 186160254}
   - component: {fileID: 186160253}
-  - component: {fileID: 186160252}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27122,20 +27106,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &186160252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186160250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &186160253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27190,7 +27160,6 @@ GameObject:
   - component: {fileID: 193729463}
   - component: {fileID: 193729466}
   - component: {fileID: 193729465}
-  - component: {fileID: 193729464}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27217,20 +27186,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &193729464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 193729462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &193729465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27429,7 +27384,6 @@ GameObject:
   - component: {fileID: 242326669}
   - component: {fileID: 242326672}
   - component: {fileID: 242326671}
-  - component: {fileID: 242326670}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -27456,20 +27410,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &242326670
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 242326668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &242326671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29337,7 +29277,6 @@ GameObject:
   - component: {fileID: 445793700}
   - component: {fileID: 445793703}
   - component: {fileID: 445793702}
-  - component: {fileID: 445793701}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -29364,20 +29303,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &445793701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 445793699}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &445793702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33356,7 +33281,6 @@ GameObject:
   - component: {fileID: 905490909}
   - component: {fileID: 905490912}
   - component: {fileID: 905490911}
-  - component: {fileID: 905490910}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -33383,20 +33307,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &905490910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 905490908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 8
-  frames: []
 --- !u!114 &905490911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33766,7 +33676,7 @@ GameObject:
   - component: {fileID: 966226583}
   - component: {fileID: 966226586}
   - component: {fileID: 966226585}
-  - component: {fileID: 966226584}
+  - component: {fileID: 966226587}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -33793,49 +33703,6 @@ RectTransform:
   m_AnchoredPosition: {x: 175, y: -117.1749}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &966226584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 966226582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
-  fps: 12
-  frames:
-  - {fileID: 3528185928632461864, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1563751784, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -425724856, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1334633294, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1197461314, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1199348525, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 369185204, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 981514834, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1070108641, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -418362601, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1331438589, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1811905505, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1494508349, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 185312221, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1881184717, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1255721180, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1959708699, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -554726492, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1917836761, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 655716231, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1599227346, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1171706672, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: -1150467723, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1233810976, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1118676857, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1037236659, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1238677422, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1284219487, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
-  - {fileID: 1864072029, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
 --- !u!114 &966226585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33856,7 +33723,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7008412969330441016, guid: 178c39707e0bf534a88e5a0dcac3d1f4, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -33874,6 +33741,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 966226582}
   m_CullTransparentMesh: 1
+--- !u!95 &966226587
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966226582}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c8774c3f8b6c1304a81635c926141d9a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &972065231
 GameObject:
   m_ObjectHideFlags: 0
@@ -36910,9 +36799,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1464599668}
     - target: {fileID: 5696163515624689270, guid: 039d40248fc482f449c140d420842ddd, type: 3}
+      propertyPath: customDescKey
+      value: tutorial_walljump_desc
+      objectReference: {fileID: 0}
+    - target: {fileID: 5696163515624689270, guid: 039d40248fc482f449c140d420842ddd, type: 3}
       propertyPath: descriptionText
       value: 
       objectReference: {fileID: 962438304}
+    - target: {fileID: 5696163515624689270, guid: 039d40248fc482f449c140d420842ddd, type: 3}
+      propertyPath: tipAnimStateName
+      value: WallJump
+      objectReference: {fileID: 0}
     - target: {fileID: 6082680851099878746, guid: 039d40248fc482f449c140d420842ddd, type: 3}
       propertyPath: m_IsActive
       value: 0
