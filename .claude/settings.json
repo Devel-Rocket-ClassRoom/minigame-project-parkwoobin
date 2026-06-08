@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -Command \"$file = ($env:CLAUDE_TOOL_INPUT | ConvertFrom-Json).file_path; if ($file -like '*.cs') { dotnet csharpier $file }\""
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "mcp__unity-mcp__Unity_GetConsoleLogs",
+      "mcp__unity-mcp__Unity_RunCommand",
+      "mcp__unity-mcp__Unity_SceneView_Capture2DScene",
+      "mcp__unity-mcp__Unity_Camera_Capture",
+      "mcp__unity-mcp__Unity_SceneView_CaptureMultiAngleSceneView"
+    ]
+  },
+  "mcpServers": {
+    "mcp-unity": {
+      "command": "node",
+      "args": [
+        "D:/Unity_Project/Cat_Project/Library/PackageCache/com.gamelovers.mcp-unity@d176a9d737cc/Server~/build/index.js"
+      ]
+    }
+  }
+}

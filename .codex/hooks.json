@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -Command \"$file = ($env:CLAUDE_TOOL_INPUT | ConvertFrom-Json).file_path; if ($file -like '*.cs') { dotnet csharpier $file }\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "cat_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "make_weekly_plan.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Devel-Rocket-ClassRoom/minigame-project-parkwoobin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Devel-Rocket-ClassRoom/minigame-project-parkwoobin/issues"
+  },
+  "homepage": "https://github.com/Devel-Rocket-ClassRoom/minigame-project-parkwoobin#readme",
+  "dependencies": {
+    "docx": "^9.6.1"
+  }
+}
