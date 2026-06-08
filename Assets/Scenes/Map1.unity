@@ -27081,6 +27081,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &170974032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27244,6 +27246,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &186160253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27332,6 +27336,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &193729465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27530,6 +27536,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &242326671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29401,6 +29409,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 12
+  frames:
+  - {fileID: 4412929025976260669, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1274058564, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -926971402, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1223806286, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -232209589, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 448178741, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1219833816, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -374615694, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -830124817, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 405769118, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 146734263, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -139032370, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1929534082, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1323006343, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1222314487, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1750230829, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -348548975, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1206833846, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1004851223, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 456966421, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -666486902, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1112099016, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 725058397, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -566930551, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1888951584, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 354562968, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1117898154, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1234914926, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1161116719, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1152018263, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1758785633, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1742380040, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -604588569, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -845966746, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 969341618, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 2100532736, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1384531718, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -2091307555, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 818840722, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 128169815, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1631996459, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 867174899, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 112428624, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 1652229132, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: 755676510, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -1936540575, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
+  - {fileID: -371937250, guid: c232760f3822c544e8dc4ee5c9fe3955, type: 3}
 --- !u!114 &445793702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33893,6 +33950,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &905490911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34353,6 +34412,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &966226585
 MonoBehaviour:
   m_ObjectHideFlags: 0

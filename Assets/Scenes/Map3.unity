@@ -27044,6 +27044,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &170974032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27132,6 +27134,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &186160253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27225,6 +27229,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &193729465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27462,6 +27468,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &242326671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29368,6 +29376,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &445793702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33385,6 +33395,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &905490911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33793,6 +33805,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 12
+  frames:
+  - {fileID: 3528185928632461864, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1563751784, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -425724856, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1334633294, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1197461314, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1199348525, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 369185204, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 981514834, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1070108641, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -418362601, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1331438589, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1811905505, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1494508349, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 185312221, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1881184717, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1255721180, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1959708699, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -554726492, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1917836761, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 655716231, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1599227346, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1171706672, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: -1150467723, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1233810976, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1118676857, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1037236659, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1238677422, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1284219487, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
+  - {fileID: 1864072029, guid: 017c86d3aebc0ff47b8b8bdf7f017eaf, type: 3}
 --- !u!114 &966226585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36866,10 +36909,6 @@ PrefabInstance:
       propertyPath: closeButton
       value: 
       objectReference: {fileID: 1464599668}
-    - target: {fileID: 5696163515624689270, guid: 039d40248fc482f449c140d420842ddd, type: 3}
-      propertyPath: customDescKey
-      value: tip_3
-      objectReference: {fileID: 0}
     - target: {fileID: 5696163515624689270, guid: 039d40248fc482f449c140d420842ddd, type: 3}
       propertyPath: descriptionText
       value: 

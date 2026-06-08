@@ -144769,6 +144769,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &170974032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144932,6 +144934,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &186160253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145020,6 +145024,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 12
+  frames:
+  - {fileID: -7848039375673857549, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 1110984541, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: -1572924387, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: -1397794894, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 157065357, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 1899503692, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 1731403926, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: -12260093, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 2096318274, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 1864882213, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: -1939979396, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 1531854431, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: -644238454, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 700357339, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: 1927779159, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
+  - {fileID: -953534315, guid: fff47b4da8fe7d94595f2bdf5fdf9614, type: 3}
 --- !u!114 &193729465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145376,6 +145398,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &242326671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147153,6 +147177,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &445793702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153081,6 +153107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &905490911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153848,6 +153876,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef4e549483f07f4785228249ab47c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  fps: 8
+  frames: []
 --- !u!114 &966226585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156585,10 +156615,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 995054458}
     - target: {fileID: 2000412256361773133, guid: 039d40248fc482f449c140d420842ddd, type: 3}
-      propertyPath: customDescKey
-      value: tip_4
-      objectReference: {fileID: 0}
-    - target: {fileID: 2000412256361773133, guid: 039d40248fc482f449c140d420842ddd, type: 3}
       propertyPath: descriptionText
       value: 
       objectReference: {fileID: 106340752}
@@ -156664,10 +156690,6 @@ PrefabInstance:
       propertyPath: closeButton
       value: 
       objectReference: {fileID: 1464599668}
-    - target: {fileID: 5696163515624689270, guid: 039d40248fc482f449c140d420842ddd, type: 3}
-      propertyPath: customDescKey
-      value: tip_3
-      objectReference: {fileID: 0}
     - target: {fileID: 5696163515624689270, guid: 039d40248fc482f449c140d420842ddd, type: 3}
       propertyPath: descriptionText
       value: 
