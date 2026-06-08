@@ -57,8 +57,8 @@ public class TutorialPopupTrigger : MonoBehaviour
         if (dimOverlay != null) dimOverlay.SetActive(true);
         if (closeButton != null) closeButton.onClick.AddListener(OnClose);
 
-        PlayTipAnimation();
         ShowDescription();
+        PlayTipAnimation();
 
         Time.timeScale = 0f;
         GameManager.Instance?.PauseGame();
@@ -92,16 +92,15 @@ public class TutorialPopupTrigger : MonoBehaviour
     void PlayTipAnimation()
     {
         if (popupPanel == null) return;
-        var animator = popupPanel.GetComponentInChildren<Animator>(true);
-        if (animator == null) return;
-
-        if (animator.runtimeAnimatorController == null) return;
-
-        // timeScale=0 중에도 재생되도록 UnscaledTime 모드 설정
-        animator.updateMode = AnimatorUpdateMode.UnscaledTime;
-
-        string stateName = skillToUnlock == SkillType.None ? "Move" : skillToUnlock.ToString();
-        animator.Play(stateName, 0, 0f);
+        // 팝업 패널의 Gif 오브젝트에 있는 SpriteAnimator를 재시작
+        var sa = popupPanel.GetComponentInChildren<SpriteAnimator>(true);
+        if (sa != null)
+        {
+            sa.gameObject.SetActive(true);
+            sa.enabled = true;
+            // OnEnable이 이미 호출됐을 수 있으므로 강제 리셋
+            sa.Restart();
+        }
     }
 
     void OnClose()
