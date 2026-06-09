@@ -10,7 +10,9 @@ public class CameraFollow : MonoBehaviour
 {
     [SerializeField] Transform target;
     [SerializeField] float smoothSpeed = 5f;
-    [SerializeField] Vector3 offset = new Vector3(0f, 1f, -10f);
+    [Tooltip("위로 올라갈 때(점프) Y 추적 속도. 낮을수록 점프 시 카메라가 덜 따라옴")]
+    [SerializeField] float upSmoothSpeed = 2f;
+    [SerializeField] Vector3 offset = new Vector3(0f, 0.2f, -10f);
     [SerializeField] float minX = float.MinValue;
     [SerializeField] float maxX = float.MaxValue;
     [SerializeField] float minY = float.MinValue;
@@ -24,7 +26,11 @@ public class CameraFollow : MonoBehaviour
         desired.x = Mathf.Clamp(desired.x, minX, maxX);
         desired.y = Mathf.Clamp(desired.y, minY, maxY);
 
-        transform.position = Vector3.Lerp(transform.position, desired, smoothSpeed * Time.deltaTime);
+        // Y: 위로 갈 때는 느리게, 아래로/수평은 기본 속도
+        float ySpeed = desired.y > transform.position.y ? upSmoothSpeed : smoothSpeed;
+        float newX = Mathf.Lerp(transform.position.x, desired.x, smoothSpeed * Time.deltaTime);
+        float newY = Mathf.Lerp(transform.position.y, desired.y, ySpeed * Time.deltaTime);
+        transform.position = new Vector3(newX, newY, desired.z);
     }
 
     public void SetBounds(float xMin, float xMax, float yMin, float yMax)

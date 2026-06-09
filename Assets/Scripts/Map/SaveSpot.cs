@@ -38,8 +38,15 @@ public class SaveSpot : MonoBehaviour
             _sfxSource.PlayOneShot(sfxSave, vol);
         }
 
+        if (SaveManager.Instance == null)
+        {
+            Debug.LogWarning($"[SaveSpot] {name} — SaveManager 없음, 저장 실패");
+            return;
+        }
+
         var player = other.GetComponent<PlayerController>();
-        SaveManager.Instance?.AutoSave(player);
-        Debug.Log($"[SaveSpot] {name} — 게임 저장 완료");
+        // 저장 위치는 플레이어가 아닌 SaveSpot의 위치로 고정 (일관된 리스폰 포인트)
+        SaveManager.Instance.AutoSaveAtPosition(player, transform.position);
+        Debug.Log($"[SaveSpot] {name} — 게임 저장 완료 (pos={transform.position})");
     }
 }

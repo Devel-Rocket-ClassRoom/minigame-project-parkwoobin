@@ -18,30 +18,22 @@ public class SettingPanelController : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] Button mainButton;
     [SerializeField] Button gameOverButton;
-    [SerializeField] Button helpButton;
 
-    [Header("도움말 패널")]
-    [SerializeField] TipsPanelController tipsPanel;
-
-    bool _tipsOpen;
+    bool _initialized;
 
     void OnEnable()
     {
-        if (tipsPanel == null) return;
-        tipsPanel.OnShown += OnTipsShown;
-        tipsPanel.OnHidden += OnTipsHidden;
+        // Start()가 먼저 실행된 뒤에만 갱신 (옵션이 없는 상태에서 호출하면 index 0으로 리셋됨)
+        if (_initialized) RefreshLanguageDropdown();
     }
 
-    void OnDisable()
-    {
-        if (tipsPanel == null) return;
-        tipsPanel.OnShown -= OnTipsShown;
-        tipsPanel.OnHidden -= OnTipsHidden;
-    }
+    void OnDisable() { }
 
     void Start()
     {
-        // 저장된 볼륨 값으로 슬라이더 초기화
+        if (_initialized) return;
+        _initialized = true;
+
         if (bgmSlider != null)
         {
             bgmSlider.value = PlayerPrefs.GetFloat("BGMVolume", 1f);
@@ -53,37 +45,25 @@ public class SettingPanelController : MonoBehaviour
             sfxSlider.onValueChanged.AddListener(OnSfxChanged);
         }
 
-        // 언어 드롭다운 초기화
         if (languageDropdown != null)
         {
             languageDropdown.ClearOptions();
             languageDropdown.AddOptions(new System.Collections.Generic.List<string> { "한국어", "English" });
-            int idx = LanguageManager.CurrentLanguage == LanguageManager.Language.English ? 1 : 0;
-            languageDropdown.SetValueWithoutNotify(idx);
             languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
         }
 
         mainButton?.onClick.AddListener(OnMainClicked);
         gameOverButton?.onClick.AddListener(OnGameOverClicked);
-        helpButton?.onClick.AddListener(OnHelpClicked);
+
+        RefreshLanguageDropdown();
     }
 
-    void OnHelpClicked()
+    void RefreshLanguageDropdown()
     {
-        if (gameObject.activeInHierarchy) return;
-        if (_tipsOpen) return;
-        if (tipsPanel == null) return;
-        tipsPanel.Show();
-    }
-
-    void OnTipsShown()
-    {
-        _tipsOpen = true;
-    }
-
-    void OnTipsHidden()
-    {
-        _tipsOpen = false;
+        if (languageDropdown == null) return;
+        int idx = LanguageManager.CurrentLanguage == LanguageManager.Language.English ? 1 : 0;
+        languageDropdown.SetValueWithoutNotify(idx);
+        languageDropdown.RefreshShownValue();
     }
 
     void OnLanguageChanged(int index)
@@ -127,6 +107,4 @@ public class SettingPanelController : MonoBehaviour
         Debug.Log("게임 종료");
         GameManager.Instance?.GameOver();
     }
-
-
 }
