@@ -82,6 +82,7 @@ public class TutorialFinishTrigger : MonoBehaviour
                 skillTurn       = skill != null && skill.turn,
                 skillDoubleJump = skill != null && skill.doubleJump,
                 skillWallJump   = skill != null && skill.wallJump,
+                upgradeLevels   = UpgradeManager.Instance?.GetLevels(),
             };
             sm.SaveGame(sm.ActiveSlot, data);
         }

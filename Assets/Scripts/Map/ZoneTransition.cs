@@ -75,6 +75,18 @@ public class ZoneTransition : MonoBehaviour
                 GameState.Instance.savedCoins = CoinKeySystem.Instance.Coins;
                 GameState.Instance.savedKeys = CoinKeySystem.Instance.Keys;
             }
+
+            // 스킬 잠금 해제 상태 보관
+            var skill = SkillUnlockManager.Instance;
+            if (skill != null)
+            {
+                GameState.Instance.savedSkillAttack     = skill.attack;
+                GameState.Instance.savedSkillJump       = skill.jump;
+                GameState.Instance.savedSkillDash       = skill.dash;
+                GameState.Instance.savedSkillTurn       = skill.turn;
+                GameState.Instance.savedSkillDoubleJump = skill.doubleJump;
+                GameState.Instance.savedSkillWallJump   = skill.wallJump;
+            }
         }
 
         if (triggerOutro && MapCutsceneManager.Instance != null && MapCutsceneManager.Instance.HasOutro)

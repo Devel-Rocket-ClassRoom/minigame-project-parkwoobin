@@ -13,6 +13,7 @@ public class TipsPanelController : MonoBehaviour
 {
     [Header("UI 연결")]
     [SerializeField] GameObject panelRoot;
+    [SerializeField] GameObject dimOverlay;
     [SerializeField] Button closeButton;
     [SerializeField] Transform contentParent;   // ScrollView > Viewport > Content
 
@@ -21,6 +22,7 @@ public class TipsPanelController : MonoBehaviour
     [SerializeField] GameObject tipItemPrefab;
 
     [Header("팁 키 목록 (strings.json 키)")]
+    [Tooltip("비워두면 tip_0, tip_1, ... 순서로 strings.json에 존재하는 키를 자동으로 읽음")]
     [SerializeField] string[] tipKeys;
 
     readonly List<GameObject> _items = new();
@@ -44,6 +46,7 @@ public class TipsPanelController : MonoBehaviour
         if (IsBlockedByHudPanel()) return;
 
         if (panelRoot != null) panelRoot.SetActive(true);
+        if (dimOverlay != null) dimOverlay.SetActive(true);
         RefreshItems();
         NotifyHudControllers(true);
         OnShown?.Invoke();
@@ -52,6 +55,7 @@ public class TipsPanelController : MonoBehaviour
     public void Hide()
     {
         if (panelRoot != null) panelRoot.SetActive(false);
+        if (dimOverlay != null) dimOverlay.SetActive(false);
         NotifyHudControllers(false);
         OnHidden?.Invoke();
     }
@@ -63,15 +67,32 @@ public class TipsPanelController : MonoBehaviour
             if (item != null) Destroy(item);
         _items.Clear();
 
-        if (tipKeys == null || contentParent == null) return;
+        if (contentParent == null) return;
 
-        for (int i = 0; i < tipKeys.Length; i++)
+        // tipKeys가 비어있으면 tip_0, tip_1, ... 자동 탐색
+        IEnumerable<string> keys = (tipKeys != null && tipKeys.Length > 0)
+            ? (IEnumerable<string>)tipKeys
+            : AutoTipKeys();
+
+        foreach (string key in keys)
         {
-            string text = LocalizationManager.Get(tipKeys[i]);
+            string text = LocalizationManager.Get(key);
             if (string.IsNullOrWhiteSpace(text)) continue;
 
             var item = CreateItem($"• {text}");
             _items.Add(item);
+        }
+    }
+
+    // tip_0, tip_1, ... 키를 strings.json에 존재하는 만큼 반환
+    static IEnumerable<string> AutoTipKeys()
+    {
+        for (int i = 0; ; i++)
+        {
+            string key = $"tip_{i}";
+            string text = LocalizationManager.Get(key);
+            if (string.IsNullOrWhiteSpace(text)) yield break;
+            yield return key;
         }
     }
 

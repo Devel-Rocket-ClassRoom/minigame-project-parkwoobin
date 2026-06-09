@@ -26,6 +26,9 @@ public class UpgradeCardUI : MonoBehaviour
     [SerializeField] Sprite dashCooldownIcon;
     [SerializeField] Sprite turnCooldownIcon;
 
+    [Header("SFX")]
+    [SerializeField] AudioClip sfxPurchase;
+
     [Header("색상")]
     [SerializeField] Color colorAvailable = new Color(0.2f, 0.8f, 0.3f);
     [SerializeField] Color colorMaxLevel = new Color(0.5f, 0.5f, 0.5f);
@@ -86,7 +89,18 @@ public class UpgradeCardUI : MonoBehaviour
         bool canBuy = UpgradeManager.Instance.CanBuy(_type);
 
         RefreshIcon();
-        RefreshLevel(level);
+
+        // 소모품(HPup, Eating)은 레벨 표시 불필요
+        bool isConsumable = _type == UpgradeType.HPup || _type == UpgradeType.Eating;
+        if (isConsumable)
+        {
+            if (levelText != null) levelText.gameObject.SetActive(false);
+        }
+        else
+        {
+            if (levelText != null) levelText.gameObject.SetActive(true);
+            RefreshLevel(level);
+        }
 
         // 이름·설명
         if (nameText != null) nameText.text = LocalizationManager.Get($"upgrade_{_type.ToString().ToLower()}_name");
@@ -205,7 +219,9 @@ public class UpgradeCardUI : MonoBehaviour
 
     void OnBuyClicked()
     {
+        bool success = UpgradeManager.Instance != null && UpgradeManager.Instance.CanBuy(_type);
         UpgradeManager.Instance?.Buy(_type);
+        if (success) AudioManager.Instance?.PlaySfx(sfxPurchase);
         Refresh();
     }
 }

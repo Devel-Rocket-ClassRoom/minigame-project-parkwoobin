@@ -1,50 +1,78 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Image 컴포넌트에 스프라이트 배열을 순서대로 재생해 GIF처럼 보이게 함.
-/// Animator / AnimationClip 없이 동작.
+/// UI Image 컴포넌트의 스프라이트를 프레임 단위로 바꿔 GIF처럼 재생.
+/// Time.timeScale=0 중에도 동작하도록 unscaledDeltaTime 사용.
 /// </summary>
 [RequireComponent(typeof(Image))]
 public class SpriteAnimator : MonoBehaviour
 {
-    [SerializeField] Sprite[] frames;
+    [Tooltip("초당 프레임 수")]
     [SerializeField] float fps = 12f;
-    [SerializeField] bool loop = true;
+
+    [SerializeField] Sprite[] frames;
 
     Image _image;
+    int _frameIndex;
     float _timer;
-    int _index;
 
     void Awake()
     {
         _image = GetComponent<Image>();
+
+        if (frames == null || frames.Length == 0)
+            frames = LoadSpritesFromTexture();
+
+        if (frames == null || frames.Length == 0)
+            frames = _image.sprite != null ? new[] { _image.sprite } : null;
     }
 
     void OnEnable()
     {
-        _index = 0;
+        Restart();
+    }
+
+    public void Restart()
+    {
+        _frameIndex = 0;
         _timer = 0f;
-        if (frames != null && frames.Length > 0)
+        if (_image != null && frames != null && frames.Length > 0)
             _image.sprite = frames[0];
     }
 
     void Update()
     {
-        if (frames == null || frames.Length == 0) return;
+        if (frames == null || frames.Length <= 1) return;
 
-        _timer += Time.unscaledDeltaTime; // 게임 정지(timeScale=0)에도 재생
-        if (_timer < 1f / fps) return;
+        _timer += Time.unscaledDeltaTime;
+        float interval = fps > 0f ? 1f / fps : 0.125f;
 
-        _timer -= 1f / fps;
-        _index++;
-
-        if (_index >= frames.Length)
+        while (_timer >= interval)
         {
-            if (!loop) { _index = frames.Length - 1; return; }
-            _index = 0;
+            _timer -= interval;
+            _frameIndex = (_frameIndex + 1) % frames.Length;
+            _image.sprite = frames[_frameIndex];
         }
+    }
 
-        _image.sprite = frames[_index];
+    Sprite[] LoadSpritesFromTexture()
+    {
+#if UNITY_EDITOR
+        if (_image == null || _image.sprite == null) return null;
+
+        string path = UnityEditor.AssetDatabase.GetAssetPath(_image.sprite.texture);
+        if (string.IsNullOrEmpty(path)) return null;
+
+        var all = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(path)
+            .OfType<Sprite>()
+            .OrderBy(s => s.name)
+            .ToArray();
+
+        return all.Length > 0 ? all : null;
+#else
+        return null;
+#endif
     }
 }

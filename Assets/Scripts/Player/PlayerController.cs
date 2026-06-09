@@ -25,6 +25,7 @@ public partial class PlayerController : MonoBehaviour
     private float minJumpHeight = 0.4f;
     private float minJumpApexTime = 0.2f;
     private float fallMultiplier = 3.0f;
+    [SerializeField] float maxFallSpeed = 20f;  // 최대 낙하 속도 제한 (터널링 방지)
     private float preLandDistance = 0.8f;
 
     [Header("Wall / Ladder Detection")]
@@ -95,7 +96,6 @@ public partial class PlayerController : MonoBehaviour
     float _wallGripTimer;      // 반대방향키 입력 시 벽 점프 대기 창
     float _savedWallNormalX;   // 대기 창 중 벽 방향 기억
     bool _wallGripUsed;       // 대기 창을 한 번 소모했으면 true → 벽 방향키로 초기화
-    bool _dashWallStick;     // 공중 대시 종료 후 벽에 닿아 있을 때 고정
     bool _dashJustEnded;     // 대시 타이머 만료 직후 한 프레임만 true
 
     // ── 스폰 연출 차단 ──────────────────────────────────────────────────────
@@ -237,25 +237,12 @@ public partial class PlayerController : MonoBehaviour
 
 
 
-        // ── 대시 벽 고정: 대시 종료 시점에 벽에 닿아 있으면 고정 ──────────────
+        // ── 공중 대시 종료: 즉시 낙하 시작 ────────────────────────────────────
         if (_dashJustEnded)
         {
             _dashJustEnded = false;
-            if (_isOnWall && !_isGrounded)
-                _dashWallStick = true;
-            else if (!_isGrounded)        // 공중 대시 종료 → 아래로 낙하 시작
+            if (!_isGrounded)
                 _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, -2f);
-        }
-        if (_dashWallStick)
-        {
-            if (_isGrounded || !_isOnWall)
-                _dashWallStick = false;
-            else
-            {
-                _rb.gravityScale = 0f;
-                _rb.linearVelocity = Vector2.zero;
-                return;
-            }
         }
 
         if (_isHurt) return;
@@ -289,6 +276,10 @@ public partial class PlayerController : MonoBehaviour
             _rb.gravityScale = _defaultGravityScale;
         else if (!_isGrounded && _rb.linearVelocity.y < 0f)
             _rb.gravityScale = _defaultGravityScale * fallMultiplier;
+
+        // 최대 낙하 속도 제한 — 너무 빠르면 바닥 터널링 발생
+        if (_rb.linearVelocity.y < -maxFallSpeed)
+            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, -maxFallSpeed);
 
         // ── 5) 벽 고정 ────────────────────────────────────────────────────
         if (_isOnWall && !_isGrounded)
@@ -366,22 +357,20 @@ public partial class PlayerController : MonoBehaviour
                 }
             }
         }
-        // ── 계단 1타일 제외: 지면 기준 1타일 위에 벽이 없으면 계단 → 벽 판정 해제 ─
+        // ── 계단 1타일 제외: 발 위치 기준 1타일 위에 벽이 없으면 계단 → 벽 판정 해제 ─
         if (_isOnWall)
         {
-            var groundDown = Physics2D.Raycast(
-                new Vector2(transform.position.x, transform.position.y), Vector2.down, 10f, _groundMask);
-            if (groundDown.collider != null)
+            float feetY   = _col != null ? _col.bounds.min.y : transform.position.y - 0.5f;
+            float startX  = _wallNormalX > 0f
+                ? (_col != null ? _col.bounds.min.x : transform.position.x)
+                : (_col != null ? _col.bounds.max.x : transform.position.x);
+            var wDir = new Vector2(-_wallNormalX, 0f);
+            bool wallAboveStair = Physics2D.Raycast(
+                new Vector2(startX, feetY + 1.1f), wDir, 0.6f, _groundMask).collider != null;
+            if (!wallAboveStair)
             {
-                float groundY = groundDown.point.y;
-                var wDir = new Vector2(-_wallNormalX, 0f);
-                bool wallAboveStair = Physics2D.Raycast(
-                    new Vector2(transform.position.x, groundY + 1.1f), wDir, 0.5f, _groundMask).collider != null;
-                if (!wallAboveStair)
-                {
-                    _isOnWall = false;
-                    _wallNormalX = 0f;
-                }
+                _isOnWall = false;
+                _wallNormalX = 0f;
             }
         }
 

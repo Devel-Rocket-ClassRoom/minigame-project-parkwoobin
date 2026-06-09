@@ -26,17 +26,21 @@ public class MapCutsceneManager : MonoBehaviour
     [Header("인트로 컷씬 (맵 시작)")]
     [SerializeField] Page[] introPages;
     [SerializeField] GameObject introRoot;
+    [Tooltip("인트로 중 재생할 BGM. 비워두면 BGM 없음")]
+    [SerializeField] AudioClip introBgm;
 
     [Header("아웃트로 컷씬 (맵 종료)")]
     [SerializeField] Page[] outroPages;
     [SerializeField] GameObject outroRoot;
+    [Tooltip("아웃트로 중 재생할 BGM. 비워두면 BGM 없음")]
+    [SerializeField] AudioClip outroBgm;
 
     [Header("공통 UI")]
     [SerializeField] Button clickArea;
     [SerializeField] Button skipButton;
     [SerializeField] TMP_Text skipButtonText;
-    [Tooltip("컷씬 종료 시 숨길 뮤트 버튼 (introRoot/outroRoot 밖에 있는 경우)")]
-    [SerializeField] GameObject bgmMuteButton;
+    [Tooltip("BGM 뮤트 토글 (컷씬 중 표시, 인트로/아웃트로 BGM 켜기/끄기)")]
+    [SerializeField] Toggle bgmMuteToggle;
 
     [Header("자막")]
     [SerializeField] TMP_Text subtitleText;
@@ -77,6 +81,12 @@ public class MapCutsceneManager : MonoBehaviour
         RefreshSkipButtonText();
         DisableSubtitleRaycasts();
         ClearSubtitle();
+        if (bgmMuteToggle != null)
+        {
+            bgmMuteToggle.gameObject.SetActive(false);
+            bgmMuteToggle.isOn = true;  // 기본: BGM 켜짐
+            bgmMuteToggle.onValueChanged.AddListener(OnBgmMuteToggleChanged);
+        }
     }
 
     void OnEnable() => LanguageManager.OnLanguageChanged += OnLanguageChanged;
@@ -100,6 +110,8 @@ public class MapCutsceneManager : MonoBehaviour
         {
             Time.timeScale = 0f;
             Debug.Log("[MapCutscene] 인트로 시작, timeScale=0");
+            // 인트로 BGM 재생 (SceneBgm보다 먼저 덮어씀)
+            if (introBgm != null) AudioManager.Instance?.PlayBgm(introBgm);
             RunCutscene(introPages, introRoot, OnIntroDone);
         }
     }
@@ -188,7 +200,7 @@ public class MapCutsceneManager : MonoBehaviour
 
     void HideCutsceneUI()
     {
-        if (bgmMuteButton != null) bgmMuteButton.SetActive(false);
+        if (bgmMuteToggle != null) bgmMuteToggle.gameObject.SetActive(false);
         ClearSubtitle();
     }
 
@@ -197,9 +209,12 @@ public class MapCutsceneManager : MonoBehaviour
     void OnIntroDone()
     {
         if (introRoot != null) introRoot.SetActive(false);
-        HideCutsceneUI();
         Time.timeScale = 1f;
         SetHudVisible(true);
+        HideCutsceneUI();  // SetHudVisible 이후에 숨겨야 부모가 활성화돼도 Toggle이 다시 꺼짐
+        // 인트로 종료 → SceneBgm의 맵 BGM으로 전환
+        var sceneBgm = FindFirstObjectByType<SceneBgm>();
+        sceneBgm?.PlayMapBgm();
         IntroComplete = true;
         OnIntroComplete?.Invoke();
     }
@@ -216,6 +231,9 @@ public class MapCutsceneManager : MonoBehaviour
 
         _outroActive = true;
         Time.timeScale = 0f;
+        // 맵 BGM 정지 → 아웃트로 BGM 재생
+        AudioManager.Instance?.StopBgm();
+        if (outroBgm != null) AudioManager.Instance?.PlayBgm(outroBgm);
 
         RunCutscene(outroPages, outroRoot, () =>
         {
@@ -252,6 +270,7 @@ public class MapCutsceneManager : MonoBehaviour
         if (skipButton != null) skipButton.gameObject.SetActive(true);
         RefreshSkipButtonText();
         if (clickArea != null) clickArea.gameObject.SetActive(true);
+        if (bgmMuteToggle != null) bgmMuteToggle.gameObject.SetActive(true);
 
         StartPage(0);
         StartCoroutine(ShowFirstCutThenAuto());
@@ -394,14 +413,19 @@ public class MapCutsceneManager : MonoBehaviour
         StopAllCoroutines();
         if (clickArea != null) clickArea.gameObject.SetActive(false);
         if (skipButton != null) skipButton.gameObject.SetActive(false);
-        HideCutsceneUI();
         // 인트로 스킵 시에만 HUD 복원 + timeScale 복원 (아웃트로는 씬 전환으로 사라지므로 불필요)
         if (!_outroActive)
         {
             Time.timeScale = 1f;
             SetHudVisible(true);
         }
+        HideCutsceneUI();  // SetHudVisible 이후에 호출해야 Toggle이 부모 활성화에 덮어씌워지지 않음
         _onDone?.Invoke();
+    }
+
+    void OnBgmMuteToggleChanged(bool isOn)
+    {
+        AudioManager.Instance?.SetBgm(isOn ? 1f : 0f);
     }
 
     void OnDestroy()

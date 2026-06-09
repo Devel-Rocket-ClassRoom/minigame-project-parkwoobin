@@ -86,7 +86,7 @@ public class ShopPanel : MonoBehaviour
 
     void RefreshCoin(int coins)
     {
-        if (coinText != null) coinText.text = $"${coins}";
+        if (coinText != null) coinText.text = $"{coins}";
     }
 
     void OnLanguageChanged(LanguageManager.Language _)
