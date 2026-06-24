@@ -36,7 +36,7 @@
   "FireBase_ProfileServiceError":       { "ko": "프로필 서비스에 연결할 수 없습니다.",    "en": "Cannot connect to profile service."             },
   "FireBase_AuthServiceError":       { "ko": "인증 서비스에 연결할 수 없습니다.",    "en": "Cannot connect to authentication service."             },
 
-
+ 
   "menu_new_game":       { "ko": "새 게임",       "en": "New Game"    },
   "menu_load_game":      { "ko": "게임 불러오기", "en": "Load Game"   },
   "menu_quit":           { "ko": "게임 종료",     "en": "Quit"        },
