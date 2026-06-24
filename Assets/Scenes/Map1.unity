@@ -28393,7 +28393,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2391463271407946789, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: targetScene
-      value: Map5
+      value: Map2
       objectReference: {fileID: 0}
     - target: {fileID: 2391463271407946789, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: triggerOutro
@@ -28405,7 +28405,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: 2954e5e817f427f489fbf7883b8c3e83, type: 3}
     - target: {fileID: 2391463271407946789, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: targetEntryID
-      value: Map5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6169012161396734694, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: m_Name
