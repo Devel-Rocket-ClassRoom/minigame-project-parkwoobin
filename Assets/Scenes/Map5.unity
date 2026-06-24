@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -463,8 +463,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -11734,7 +11734,6 @@ GameObject:
   - component: {fileID: 170974030}
   - component: {fileID: 170974033}
   - component: {fileID: 170974032}
-  - component: {fileID: 170974031}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -11885,7 +11884,6 @@ GameObject:
   - component: {fileID: 186160251}
   - component: {fileID: 186160254}
   - component: {fileID: 186160253}
-  - component: {fileID: 186160252}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -11961,7 +11959,6 @@ GameObject:
   - component: {fileID: 193729463}
   - component: {fileID: 193729466}
   - component: {fileID: 193729465}
-  - component: {fileID: 193729464}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -12090,7 +12087,6 @@ GameObject:
   - component: {fileID: 242326669}
   - component: {fileID: 242326672}
   - component: {fileID: 242326671}
-  - component: {fileID: 242326670}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -12628,7 +12624,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 270218573}
   m_HandleRect: {fileID: 0}
@@ -13815,7 +13811,6 @@ GameObject:
   - component: {fileID: 445793700}
   - component: {fileID: 445793703}
   - component: {fileID: 445793702}
-  - component: {fileID: 445793701}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -16622,7 +16617,6 @@ GameObject:
   - component: {fileID: 905490909}
   - component: {fileID: 905490912}
   - component: {fileID: 905490911}
-  - component: {fileID: 905490910}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -16956,7 +16950,6 @@ GameObject:
   - component: {fileID: 966226583}
   - component: {fileID: 966226586}
   - component: {fileID: 966226585}
-  - component: {fileID: 966226584}
   m_Layer: 0
   m_Name: Gif
   m_TagString: Untagged
@@ -28210,7 +28203,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 1130165499}
   m_HandleRect: {fileID: 0}

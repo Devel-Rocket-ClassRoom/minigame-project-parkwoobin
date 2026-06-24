@@ -33,6 +33,18 @@ GeneratedAssets/
 **/[Aa]ssets/[Ss]treamingAssets/aa.meta
 **/[Aa]ssets/[Ss]treamingAssets/aa/*
 
+# Firebase 설정 파일 (민감 정보 포함)
+**/google-services-desktop.json
+**/google-services-desktop.json.meta
+**/google-services.json
+**/google-services.json.meta
+
+# NuGet / 패키지 설정 (자동 생성)
+**/packages.config
+**/packages.config.meta
+**/NuGet.config
+**/NuGet.config.meta
+
 # 크래시 리포트
 sysinfo.txt
 

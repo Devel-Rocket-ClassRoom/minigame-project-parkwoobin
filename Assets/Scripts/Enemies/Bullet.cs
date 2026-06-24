@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.Pool;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
@@ -6,20 +8,23 @@ public class Bullet : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] float speed = 12f;
-    [SerializeField] int   damage = 1;
+    [SerializeField] int damage = 1;
     [SerializeField] float lifetime = 3f;
 
     Rigidbody2D _rb;
-    Collider2D  _col;
-    GameObject  _shooter;
-    int         _groundMask;
+    Collider2D _col;
+    GameObject _shooter;
+    int _groundMask;
 
-    static Sprite   _runtimeSprite;     // 모든 Bullet 인스턴스가 공유 (1회만 생성)
+    public IObjectPool<Bullet> _pool;
+    bool _released;
+
+    static Sprite _runtimeSprite;     // 모든 Bullet 인스턴스가 공유 (1회만 생성)
     static Material _runtimeMaterial;   // URP/2D 매젠타 fallback 방지용 기본 머티리얼
 
     void Awake()
     {
-        _rb  = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
         _col = GetComponent<Collider2D>();
         _rb.gravityScale = 0f;
         _rb.bodyType = RigidbodyType2D.Kinematic; // 직선 등속
@@ -28,6 +33,33 @@ public class Bullet : MonoBehaviour
         _groundMask = LayerMask.GetMask("Ground");
 
         EnsureVisual();
+    }
+
+    void OnEnable()
+    {
+        _released = false;
+        if (_col != null) _col.enabled = true;
+        StartCoroutine(LifetimeRoutine());
+    }
+
+    IEnumerator LifetimeRoutine()
+    {
+        yield return new WaitForSeconds(lifetime);
+        ReturnToPool();
+    }
+
+    void ReturnToPool()
+    {
+        if (_released) return;
+        _released = true;
+        _pool?.Release(this);
+    }
+
+    void OnDisable()
+    {
+        StopAllCoroutines(); // lifetime 코루틴 정리
+        if (_col != null) _col.enabled = false;  // null 가드 추가
+        _rb.linearVelocity = Vector2.zero;
     }
 
     /// <summary>SpriteRenderer가 비어있으면 코드로 머티리얼·스프라이트를 자동 생성 (URP 2D 매젠타 방지)</summary>
@@ -82,8 +114,6 @@ public class Bullet : MonoBehaviour
         // 진행 방향으로 회전 (스프라이트가 옆을 향한다고 가정)
         float angle = Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
-
-        Destroy(gameObject, lifetime);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -102,12 +132,12 @@ public class Bullet : MonoBehaviour
         if (player != null)
         {
             if (player.TakeDamage(damage, transform.position.x))
-                Destroy(gameObject);
+                ReturnToPool();
             return;
         }
 
         // 지면/벽에 닿으면 소멸
         if (_groundMask != 0 && ((1 << other.gameObject.layer) & _groundMask) != 0)
-            Destroy(gameObject);
+            ReturnToPool();
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,8 @@ public class EndingSceneController : MonoBehaviour
     [Header("UI 연결")]
     [SerializeField] TMP_Text titleText;
     [SerializeField] TMP_Text saveStatusText;
-    [SerializeField] Button   mainButton;
+    [SerializeField] TMP_Text ClearTimeText;
+    [SerializeField] Button mainButton;
     [SerializeField] TMP_Text mainButtonText;
 
     [Header("씬")]
@@ -25,9 +27,25 @@ public class EndingSceneController : MonoBehaviour
         mainButton?.onClick.AddListener(OnMainClick);
         RefreshTexts();
         StartCoroutine(SaveThenShow());
+        RecordClearTimeAsync().Forget();
     }
 
-    void OnEnable()  => LanguageManager.OnLanguageChanged += OnLanguageChanged;
+    private async UniTaskVoid RecordClearTimeAsync()
+    {
+        if (ScoreManager.Instance == null)
+        {
+            Debug.LogWarning("[Ending] ScoreManager 없음 - 시간 표시 불가");
+            return;
+        }
+
+        float clearTime = await ScoreManager.Instance.FinishGameAsync();
+        Debug.Log($"[Ending] 클리어 타임: {clearTime}s / ClearTimeText: {(ClearTimeText != null ? "연결됨" : "null")}");
+
+        if (ClearTimeText != null)
+            ClearTimeText.text = LocalizationManager.Get("FireBase_ClearTime").Replace("{0}", TimeUtil.FormatClearTime(clearTime));
+    }
+
+    void OnEnable() => LanguageManager.OnLanguageChanged += OnLanguageChanged;
     void OnDisable() => LanguageManager.OnLanguageChanged -= OnLanguageChanged;
 
     void OnLanguageChanged(LanguageManager.Language _) => RefreshTexts();
