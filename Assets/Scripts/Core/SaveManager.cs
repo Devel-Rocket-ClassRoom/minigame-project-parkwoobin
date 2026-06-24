@@ -59,23 +59,23 @@ public class SaveManager : MonoBehaviour
 
         var data = new SaveData
         {
-            sceneName   = SceneManager.GetActiveScene().name,
-            posX        = savePos.x,
-            posY        = savePos.y,
-            stage       = gs != null ? gs.savedStage : 1,
-            coins       = coinKey != null ? coinKey.Coins : 0,
-            hp          = player != null ? player.Hp : 0,
-            maxHp       = player != null ? player.MaxHp : 0,
-            key         = coinKey != null ? coinKey.Keys : 0,
-            hunger      = hunger != null ? hunger.Hunger : 0f,
-            attack      = player != null ? player.AttackPower : 1,
-            skillAttack     = skill != null && skill.attack,
-            skillJump       = skill != null && skill.jump,
-            skillDash       = skill != null && skill.dash,
-            skillTurn       = skill != null && skill.turn,
+            sceneName = SceneManager.GetActiveScene().name,
+            posX = savePos.x,
+            posY = savePos.y,
+            stage = gs != null ? gs.savedStage : 1,
+            coins = coinKey != null ? coinKey.Coins : 0,
+            hp = player != null ? player.Hp : 0,
+            maxHp = player != null ? player.MaxHp : 0,
+            key = coinKey != null ? coinKey.Keys : 0,
+            hunger = hunger != null ? hunger.Hunger : 0f,
+            attack = player != null ? player.AttackPower : 1,
+            skillAttack = skill != null && skill.attack,
+            skillJump = skill != null && skill.jump,
+            skillDash = skill != null && skill.dash,
+            skillTurn = skill != null && skill.turn,
             skillDoubleJump = skill != null && skill.doubleJump,
-            skillWallJump   = skill != null && skill.wallJump,
-            upgradeLevels   = UpgradeManager.Instance?.GetLevels(),
+            skillWallJump = skill != null && skill.wallJump,
+            upgradeLevels = UpgradeManager.Instance?.GetLevels(),
         };
 
         SaveGame(ActiveSlot, data);
@@ -101,24 +101,24 @@ public class SaveManager : MonoBehaviour
 
         // GameState에 스탯 + 위치 복원 정보 세팅
         var gs = GameState.Instance;
-        gs.savedHP         = Mathf.RoundToInt(data.hp);
-        gs.savedMaxHP      = data.maxHp > 0 ? data.maxHp : Mathf.RoundToInt(data.hp);
-        gs.savedHunger     = data.hunger;
-        gs.savedMaxHunger  = 100f;
-        gs.savedCoins      = data.coins;
-        gs.savedKeys       = data.key;
-        gs.savedAttack     = data.attack;
-        gs.savedStage      = data.stage;
-        gs.savedPositionX  = data.posX;
-        gs.savedPositionY  = data.posY;
+        gs.savedHP = Mathf.RoundToInt(data.hp);
+        gs.savedMaxHP = data.maxHp > 0 ? data.maxHp : Mathf.RoundToInt(data.hp);
+        gs.savedHunger = data.hunger;
+        gs.savedMaxHunger = 100f;
+        gs.savedCoins = data.coins;
+        gs.savedKeys = data.key;
+        gs.savedAttack = data.attack;
+        gs.savedStage = data.stage;
+        gs.savedPositionX = data.posX;
+        gs.savedPositionY = data.posY;
         gs.hasSavedPosition = true;
 
-        gs.savedSkillAttack     = data.skillAttack;
-        gs.savedSkillJump       = data.skillJump;
-        gs.savedSkillDash       = data.skillDash;
-        gs.savedSkillTurn       = data.skillTurn;
+        gs.savedSkillAttack = data.skillAttack;
+        gs.savedSkillJump = data.skillJump;
+        gs.savedSkillDash = data.skillDash;
+        gs.savedSkillTurn = data.skillTurn;
         gs.savedSkillDoubleJump = data.skillDoubleJump;
-        gs.savedSkillWallJump   = data.skillWallJump;
+        gs.savedSkillWallJump = data.skillWallJump;
 
         UpgradeManager.Instance?.SetLevels(data.upgradeLevels);
 
@@ -150,25 +150,25 @@ public class SaveManager : MonoBehaviour
 
         var data = new SaveData
         {
-            sceneName       = "Prologue",
-            spawnAtDefault  = true,
-            gameClear       = true,
-            posX            = 0f,
-            posY            = 0f,
-            stage           = gs != null ? gs.savedStage : 1,
-            coins           = coinKey != null ? coinKey.Coins : (gs != null ? gs.savedCoins : 0),
-            hp              = gs != null ? gs.savedHP : 0,
-            maxHp           = gs != null ? gs.savedMaxHP : 0,
-            key             = coinKey != null ? coinKey.Keys : (gs != null ? gs.savedKeys : 0),
-            hunger          = gs != null ? gs.savedMaxHunger : 100f,
-            attack          = gs != null ? gs.savedAttack : 1,
-            skillAttack     = skill != null && skill.attack,
-            skillJump       = skill != null && skill.jump,
-            skillDash       = skill != null && skill.dash,
-            skillTurn       = skill != null && skill.turn,
+            sceneName = "Prologue",
+            spawnAtDefault = true,
+            gameClear = true,
+            posX = 0f,
+            posY = 0f,
+            stage = gs != null ? gs.savedStage : 1,
+            coins = coinKey != null ? coinKey.Coins : (gs != null ? gs.savedCoins : 0),
+            hp = gs != null ? gs.savedHP : 0,
+            maxHp = gs != null ? gs.savedMaxHP : 0,
+            key = coinKey != null ? coinKey.Keys : (gs != null ? gs.savedKeys : 0),
+            hunger = gs != null ? gs.savedMaxHunger : 100f,
+            attack = gs != null ? gs.savedAttack : 1,
+            skillAttack = skill != null && skill.attack,
+            skillJump = skill != null && skill.jump,
+            skillDash = skill != null && skill.dash,
+            skillTurn = skill != null && skill.turn,
             skillDoubleJump = skill != null && skill.doubleJump,
-            skillWallJump   = skill != null && skill.wallJump,
-            upgradeLevels   = UpgradeManager.Instance?.GetLevels(),
+            skillWallJump = skill != null && skill.wallJump,
+            upgradeLevels = UpgradeManager.Instance?.GetLevels(),
         };
 
         SaveGame(ActiveSlot, data);
@@ -176,22 +176,26 @@ public class SaveManager : MonoBehaviour
 
     // ── 내부 유틸 ─────────────────────────────────────────────────────────────
 
-    static string Key(int slot) => SAVE_KEY_PREFIX + slot;
+    static string Key(int slot)
+    {
+        string userId = AuthManager.Instance?.UserId ?? "guest";
+        return SAVE_KEY_PREFIX + userId + "_" + slot;
+    }
 }
 
 [System.Serializable]
 public class SaveData
 {
     public string sceneName;
-    public float  posX;
-    public float  posY;
-    public int    stage;
-    public int    coins;
-    public float  hp;
-    public int    maxHp;
-    public int    key;
-    public float  hunger;
-    public int    attack;
+    public float posX;
+    public float posY;
+    public int stage;
+    public int coins;
+    public float hp;
+    public int maxHp;
+    public int key;
+    public float hunger;
+    public int attack;
     public string savedAt;
     public bool spawnAtDefault;
     public bool gameClear;

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdae0845c0263b344816c6758dafd36b, type: 3}
+  m_Name: FirebaseConfig
+  m_EditorClassIdentifier: Assembly-CSharp::FirebaseConfig
+  apiKey: AIzaSyDUMzp7pTEtD8wIgAVUIkukXuuNJI2EfQc
+  appId: 1:930133907914:android:fd0ea6d7920bc4792fd733
+  projectId: minigame-16c3c
+  databaseUrl: https://minigame-16c3c-default-rtdb.asia-southeast1.firebasedatabase.app
+  storageBucket: minigame-16c3c.firebasestorage.app

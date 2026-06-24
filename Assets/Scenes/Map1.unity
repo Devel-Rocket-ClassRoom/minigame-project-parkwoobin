@@ -684,8 +684,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -27992,7 +27992,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 270218573}
   m_HandleRect: {fileID: 0}
@@ -28393,7 +28393,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2391463271407946789, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: targetScene
-      value: Map2
+      value: Map5
       objectReference: {fileID: 0}
     - target: {fileID: 2391463271407946789, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: triggerOutro
@@ -28405,7 +28405,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: 2954e5e817f427f489fbf7883b8c3e83, type: 3}
     - target: {fileID: 2391463271407946789, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: targetEntryID
-      value: Map2
+      value: Map5
       objectReference: {fileID: 0}
     - target: {fileID: 6169012161396734694, guid: 1ce6655611521fa4080eab3bae750429, type: 3}
       propertyPath: m_Name
@@ -44546,7 +44546,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 1130165499}
   m_HandleRect: {fileID: 0}

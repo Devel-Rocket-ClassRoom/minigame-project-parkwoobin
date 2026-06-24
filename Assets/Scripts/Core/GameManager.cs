@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 
     public GameState CurrentState { get; private set; }
 
-    public static UnityAction<GameState> OnStateChanged;    // 다른 스크립트에서 게임 상태 변경 이벤트를 구독해서 상태 변화를 알 수 있음
+    public static UnityAction<GameState> OnStateChanged;
 
     void Awake()
     {

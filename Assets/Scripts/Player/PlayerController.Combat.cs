@@ -189,8 +189,10 @@ public partial class PlayerController
     {
         if (_isDead) return false;
         if (!_isGrounded && !IsAscending) return false;
+
         _anim?.TriggerTurn();
         _invincibleTimer = Mathf.Max(_invincibleTimer, turnDuration);
+        _isTurning = true;
         PlaySfxTurn();
         ConsumeHunger(HungerAction.Skill);
         if (_turnCoroutine != null) StopCoroutine(_turnCoroutine);
@@ -209,6 +211,7 @@ public partial class PlayerController
 
         if (enemyLayer >= 0)
             Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
+        _isTurning = false;
         _turnCoroutine = null;
     }
 }

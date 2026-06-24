@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class HumanEnemy : EnemyBase
 {
@@ -41,6 +42,10 @@ public class HumanEnemy : EnemyBase
 
     [Header("Bullet")]
     [SerializeField] Bullet bulletPrefab;
+    [SerializeField] int _poolDefaultCapacity = 5;
+    [SerializeField] int _poolMaxSize = 20;
+
+    ObjectPool<Bullet> _bulletPool;
     [SerializeField] float bulletSpawnXOffset = 0.7f;
     [SerializeField] float bulletSpawnYOffset = 0.1f;
 
@@ -129,6 +134,18 @@ public class HumanEnemy : EnemyBase
         {
             _player = p.transform;
             _playerCtrl = p.GetComponent<PlayerController>();
+        }
+
+        if (bulletPrefab != null)
+        {
+            _bulletPool = new ObjectPool<Bullet>(
+                createFunc: () => Instantiate(bulletPrefab),
+                actionOnGet: b => { b._pool = _bulletPool; b.gameObject.SetActive(true); },
+                actionOnRelease: b => b.gameObject.SetActive(false),
+                actionOnDestroy: b => { if (b != null) Destroy(b.gameObject); },
+                defaultCapacity: _poolDefaultCapacity,
+                maxSize: _poolMaxSize
+            );
         }
     }
 
@@ -438,7 +455,8 @@ public class HumanEnemy : EnemyBase
         if (bulletPrefab != null && _player != null)
         {
             Vector3 origin = BulletOrigin();
-            var b = Instantiate(bulletPrefab, origin, Quaternion.identity);
+            var b = _bulletPool.Get();
+            b.transform.SetPositionAndRotation(origin, Quaternion.identity);
             Vector2 dir = ((Vector2)(_aimTargetPos - origin));
             if (dir.sqrMagnitude < 0.0001f) dir = _facingRight ? Vector2.right : Vector2.left;
             b.Launch(dir.normalized, gameObject, attackPower);
@@ -503,5 +521,10 @@ public class HumanEnemy : EnemyBase
         CancelAim();
         _humanAnim?.PlayDead();
         base.Die();
+    }
+
+    void OnDestroy()
+    {
+        _bulletPool?.Dispose();
     }
 }

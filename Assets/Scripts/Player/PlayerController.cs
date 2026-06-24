@@ -97,6 +97,7 @@ public partial class PlayerController : MonoBehaviour
     float _savedWallNormalX;   // 대기 창 중 벽 방향 기억
     bool _wallGripUsed;       // 대기 창을 한 번 소모했으면 true → 벽 방향키로 초기화
     bool _dashJustEnded;     // 대시 타이머 만료 직후 한 프레임만 true
+    bool _isTurning;         // 턴 모션 중 수평 이동 차단
 
     // ── 스폰 연출 차단 ──────────────────────────────────────────────────────
     bool _isSpawning;
@@ -304,6 +305,21 @@ public partial class PlayerController : MonoBehaviour
         }
 
         // ── 6) 수평 이동 적용 ────────────────────────────────────────────
+        // 턴 중 벽 방향 이동 차단 (뚫림 방지) — 애니메이션·무적은 유지
+        if (_isTurning)
+        {
+            float checkDist = (_col != null ? _col.bounds.extents.x : 0.3f) + 0.1f;
+            float moveDir = _rb.linearVelocity.x;
+            if (moveDir != 0f)
+            {
+                var wallHit = Physics2D.Raycast(
+                    transform.position,
+                    new Vector2(Mathf.Sign(moveDir), 0f),
+                    checkDist, _groundMask);
+                if (wallHit.collider != null)
+                    _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+            }
+        }
         // 벽 점프 중 착지 감지: 상승이 끝나고 지면에 닿을 때만 해제
         if (_isWallJumping && _isGrounded && _rb.linearVelocity.y <= 0f)
             _isWallJumping = false;

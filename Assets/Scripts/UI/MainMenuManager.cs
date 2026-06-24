@@ -24,13 +24,11 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] SaveSlotPanel saveSlotPanel;
     [SerializeField] NewGamePanel newGamePanel;
 
-
-
     void Start()
     {
-        if (newGameButton != null)      newGameButton.onClick.AddListener(OnNewGameClick);
-        if (loadGameButton != null)     loadGameButton.onClick.AddListener(OnLoadGameClick);
-        if (quitButton != null)         quitButton.onClick.AddListener(OnQuitClick);
+        if (newGameButton != null) newGameButton.onClick.AddListener(OnNewGameClick);
+        if (loadGameButton != null) loadGameButton.onClick.AddListener(OnLoadGameClick);
+        if (quitButton != null) quitButton.onClick.AddListener(OnQuitClick);
         if (confirmPopupButton != null) confirmPopupButton.onClick.AddListener(OnConfirmPopupClick);
         helpButton?.onClick.AddListener(() => tipsPanel?.Show());
 
@@ -65,12 +63,12 @@ public class MainMenuManager : MonoBehaviour
     void ShowNoSaveDataPopup()
     {
         if (noSaveDataPopup != null) noSaveDataPopup.SetActive(true);
-        if (DimOverlay != null)      DimOverlay.SetActive(true);
+        if (DimOverlay != null) DimOverlay.SetActive(true);
     }
 
     void OnConfirmPopupClick()
     {
         if (noSaveDataPopup != null) noSaveDataPopup.SetActive(false);
-        if (DimOverlay != null)      DimOverlay.SetActive(false);
+        if (DimOverlay != null) DimOverlay.SetActive(false);
     }
 }
